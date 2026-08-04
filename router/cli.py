@@ -6,6 +6,7 @@ it's down or rate-limited), and log what that kept off Claude's plate.
     python3 -m router.cli route "..." --dry-run
     python3 -m router.cli route "..."
     python3 -m router.cli stats
+    python3 -m router.cli claude-usage --by-day
     python3 -m router.cli models
 
 Or, if installed (`pip install -e .` from the repo root): `waterfall ...`.
@@ -154,6 +155,39 @@ def cmd_stats(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_claude_usage(args: argparse.Namespace) -> int:
+    import claude_usage as cu
+
+    since = None
+    if args.since_days:
+        since = datetime.now(timezone.utc) - timedelta(days=args.since_days)
+
+    turns = cu.load_usage_turns(project=args.project, since=since)
+    if not turns:
+        print("No Claude Code transcript data found for that filter.")
+        return 0
+
+    if args.by_day:
+        for day, s in cu.group_by_day(turns).items():
+            print(f"{day}  turns={s.turn_count:<5} sessions={s.session_count:<3} "
+                  f"input(fresh+cached)={s.input_tokens + s.cache_creation_tokens:>9,}  "
+                  f"reused={s.cache_read_tokens:>12,}  output={s.output_tokens:>8,}  "
+                  f"reused%={s.reused_input_pct:.1%}  est.cost=${s.estimated_cost_usd}")
+        return 0
+
+    s = cu.summarize(turns)
+    print(f"assistant turns:        {s.turn_count:,}")
+    print(f"sessions:                {s.session_count}")
+    print(f"fresh input tokens:      {s.input_tokens:,}")
+    print(f"cache-write tokens:      {s.cache_creation_tokens:,}  (new context, cached for reuse)")
+    print(f"cache-read tokens:       {s.cache_read_tokens:,}  (reused from a prior turn -- the compounding cost)")
+    print(f"output tokens:           {s.output_tokens:,}")
+    print(f"total input processed:   {s.total_input_seen:,}")
+    print(f"reused-input share:      {s.reused_input_pct:.1%}")
+    print(f"est. cost (this filter): ${s.estimated_cost_usd}")
+    return 0
+
+
 def cmd_models(args: argparse.Namespace) -> int:
     if not API_ROUTER_AVAILABLE:
         print("OpenRouter API client unavailable -- set OPENROUTER_API_KEY.", file=sys.stderr)
@@ -191,6 +225,12 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("stats", help="show the savings ledger summary")
     sp.add_argument("--since-days", type=int, default=None, help="only include the last N days")
     sp.set_defaults(func=cmd_stats)
+
+    sp = sub.add_parser("claude-usage", help="real Claude Code token usage from local session transcripts")
+    sp.add_argument("--project", help="filter to project dirs whose name contains this substring")
+    sp.add_argument("--since-days", type=int, default=None, help="only include the last N days")
+    sp.add_argument("--by-day", action="store_true", help="show a day-by-day trend instead of one summary")
+    sp.set_defaults(func=cmd_claude_usage)
 
     sp = sub.add_parser("models", help="list the current cheapest capable OpenRouter models")
     sp.add_argument("--limit", type=int, default=5)
