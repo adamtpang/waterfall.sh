@@ -17,12 +17,22 @@ project once the naming/branding direction was clear.
 
 ## Current state (as of this handoff)
 
-- **Domain**: not purchased yet. Working name is `waterfall.sh` (~$22/yr on
-  Vercel domains, confirmed available). Shipping first to a `*.vercel.app`
-  URL; buy the real domain when ready and point it at the same project.
+- **Domain**: not purchased yet, Adam explicitly declined on 2026-08-04
+  ($22/yr quoted, confirmed available, he said not yet). Live now at
+  https://waterfallsh.vercel.app instead -- project `waterfall.sh` under
+  team `adamtpangs-projects`, linked to the
+  github.com/adamtpang/waterfall.sh repo (auto-deploys on push to `main`).
+  Buy the domain and attach it to this same project whenever Adam says go
+  (`get_purchase_quote` -> confirm with him -> `buy_domain`; already
+  quoted once, quote expires in 5 min so re-quote when it's time).
 - **Landing page**: `index.html` + `vercel.json` + `robots.txt` +
-  `sitemap.xml` — plain static HTML, zero build step, deploys to Vercel
-  with no config. Visual style is intentionally reused from vercel.school
+  `sitemap.xml` — plain static HTML, zero build step. **Needs
+  `.vercelignore` excluding `router/` and `pyproject.toml`, and
+  `"framework": null` in `vercel.json`** -- without both, Vercel
+  auto-detects the sibling Python CLI (`pyproject.toml` at repo root) and
+  tries to build this as a Python serverless app instead of a static site,
+  which fails with "No python entrypoint found." Hit and fixed 2026-08-04;
+  don't remove either fix. Visual style is intentionally reused from vercel.school
   (same dark chalkboard-style theme, mono/hand font pairing) for
   consistency across Adam's project portfolio — swap the accent color /
   copy freely, the structure is just a starting point.
