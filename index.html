@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>waterfall.sh — cascade to the best model. automatically.</title>
+<meta name="description" content="Classifies every prompt, routes the routine parts to the cheapest capable model on OpenRouter's live Arena-ranked catalog, and only surfaces the hard part for Claude. Stop burning quota on easy work.">
+<meta property="og:title" content="waterfall.sh — cascade to the best model. automatically.">
+<meta property="og:description" content="Auto-cascade routing across OpenRouter's Arena-ranked models. Easy work falls to cheap models. Hard work rises to Claude.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://waterfall.sh/">
+<link rel="canonical" href="https://waterfall.sh/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%A7%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --board:#0b1220;       /* deep water */
+    --board2:#0f1830;
+    --chalk:#e9edf2;
+    --dust:#9aa6b2;
+    --faint:#5c6873;
+    --line:#1c2740;
+    --accent:#5ec6ff;      /* waterfall blue */
+    --accent-dim:#173447;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Roboto,Helvetica,sans-serif;
+    --hand:'Caveat',cursive;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--board);color:var(--chalk);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(1000px 520px at 85% -5%, #12203d 0%, transparent 60%);}
+  .wrap{max-width:880px;margin:0 auto;padding:72px 24px 80px}
+  a{color:inherit}
+  .mono{font-family:var(--mono)}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"▽";font-size:12px}
+  h1{font-size:clamp(40px,8vw,76px);line-height:1.0;letter-spacing:-.03em;font-weight:700;margin:22px 0 0;text-wrap:balance}
+  h1 .under{position:relative;white-space:nowrap}
+  h1 .under svg{position:absolute;left:0;right:0;bottom:-10px;width:100%;height:14px}
+  .lede{margin-top:26px;font-size:clamp(16px,2.3vw,19px);color:var(--dust);max-width:58ch;text-wrap:pretty}
+  .lede b{color:var(--chalk);font-weight:600}
+  .hand{font-family:var(--hand);color:var(--accent);font-size:1.35em;letter-spacing:.01em}
+
+  .proof{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px}
+  .stat{border:1px solid var(--line);border-radius:10px;padding:10px 16px;background:var(--board2)}
+  .stat b{font-family:var(--mono);font-size:16px;color:var(--chalk)}
+  .stat span{display:block;font-size:11.5px;color:var(--faint);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+
+  h2.sec{margin:72px 0 8px;font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+  .secnote{font-family:var(--hand);color:var(--accent);font-size:22px;margin-bottom:22px}
+
+  .lesson{display:grid;grid-template-columns:64px 1fr;gap:18px;padding:26px 0;border-top:1px solid var(--line)}
+  .lesson:last-of-type{border-bottom:1px solid var(--line)}
+  .num{font-family:var(--mono);font-size:13px;color:var(--accent);padding-top:4px}
+  .lesson h3{font-size:20px;font-weight:650;letter-spacing:-.01em;text-wrap:balance}
+  .lesson p{color:var(--dust);font-size:15px;margin-top:6px;max-width:58ch}
+  .lesson .proof-link{display:inline-block;margin-top:10px;font-family:var(--mono);font-size:12.5px;color:var(--accent);text-decoration:none;border-bottom:1px dashed var(--accent)}
+  .lesson .proof-link:hover{border-bottom-style:solid}
+
+  .cta{margin-top:72px;border:1px solid var(--line);border-radius:14px;padding:30px;background:var(--board2)}
+  .cta h2{font-size:clamp(22px,3.5vw,28px);letter-spacing:-.02em;text-wrap:balance}
+  .cta p{color:var(--dust);margin-top:10px;max-width:56ch}
+  .cta .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+  .btn{display:inline-block;padding:12px 22px;border-radius:9px;font-size:14.5px;font-weight:600;text-decoration:none}
+  .btn.primary{background:var(--chalk);color:var(--board)}
+  .btn.primary:hover{background:#fff}
+  .btn.ghost{border:1px solid var(--line);color:var(--chalk)}
+  .btn.ghost:hover{border-color:var(--dust)}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:var(--faint);font-size:12.5px;font-family:var(--mono)}
+  footer a{color:var(--dust);text-decoration:none}
+  footer a:hover{color:var(--accent)}
+  @media(max-width:560px){.lesson{grid-template-columns:1fr}.num{padding-top:0}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="eyebrow">smart routing for claude code</div>
+  <h1>Cascade to the<br><span class="under">best model.<svg viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true"><path d="M4 9 C60 3, 150 12, 296 6" fill="none" stroke="#5ec6ff" stroke-width="3" stroke-linecap="round" opacity=".85"/></svg></span> Automatically.</h1>
+  <p class="lede">waterfall.sh classifies every prompt, sends the routine part down through the cheapest capable model on OpenRouter's live Arena-ranked catalog, and only sends the genuinely hard part up to Claude. <span class="hand">Stop burning quota on easy work.</span></p>
+
+  <div class="proof">
+    <div class="stat"><b>early build</b><span>status</span></div>
+    <div class="stat"><b>openrouter</b><span>model catalog</span></div>
+    <div class="stat"><b>claude code</b><span>built for</span></div>
+    <div class="stat"><b>▽ 100%</b><span>your own key, your own cost</span></div>
+  </div>
+
+  <h2 class="sec">How it falls</h2>
+  <div class="secnote">every rung is a real HTTP call, not a browser tab →</div>
+
+  <div class="lesson">
+    <div class="num">Rung 01</div>
+    <div>
+      <h3>Classify</h3>
+      <p>A local, zero-API classifier scores each prompt for complexity and decides: free, split, or straight to Claude. No round trip needed just to decide.</p>
+    </div>
+  </div>
+  <div class="lesson">
+    <div class="num">Rung 02</div>
+    <div>
+      <h3>Cascade</h3>
+      <p>The routine part is auto-routed to the cheapest capable model on OpenRouter's live-priced catalog — selected fresh each time, not hardcoded to a model that got expensive or deprecated.</p>
+    </div>
+  </div>
+  <div class="lesson">
+    <div class="num">Rung 03</div>
+    <div>
+      <h3>Fall back</h3>
+      <p>If a call fails or the response is thin, it falls to the next rung. A waterfall, not a single point of failure.</p>
+    </div>
+  </div>
+  <div class="lesson">
+    <div class="num">Rung 04</div>
+    <div>
+      <h3>Surface</h3>
+      <p>Only the hard remainder reaches Claude — with the free model's output already stitched in, ready to paste. Your 20x plan lasts the whole day instead of the first hour.</p>
+    </div>
+  </div>
+
+  <div class="cta">
+    <h2>Bring your own OpenRouter key</h2>
+    <p>waterfall.sh is early — the router core is built and tested, the CLI and dashboard are next. Following along, or want in on testing?</p>
+    <div class="row">
+      <a class="btn primary" href="mailto:adamtpang@gmail.com?subject=waterfall.sh">Email me</a>
+      <a class="btn ghost" href="https://x.com/adamtpang" target="_blank" rel="noopener">Follow along on X</a>
+    </div>
+  </div>
+
+  <footer>
+    <span>Domain: waterfall.sh (not yet purchased — this is the vercel.app preview)</span>
+    <span>built with <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a></span>
+  </footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,19 @@
+[project]
+name = "waterfall-router"
+version = "0.1.0"
+description = "Cascade to the best model, automatically -- classify a prompt, route the routine part to the cheapest capable OpenRouter model, keep a ledger of what it saved."
+requires-python = ">=3.9"
+dependencies = ["requests>=2.31.0"]
+
+[project.scripts]
+waterfall = "router.cli:main"
+
+[tool.setuptools]
+packages = ["router", "router.classifier"]
+
+[tool.setuptools.package-data]
+"router.classifier" = ["data/*.json"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

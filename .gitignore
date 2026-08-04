@@ -1,0 +1,8 @@
+.vercel
+.env
+__pycache__/
+*.pyc
+.DS_Store
+node_modules/
+*.egg-info/
+.claude/settings.local.json
