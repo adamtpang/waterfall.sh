@@ -91,7 +91,11 @@ project once the naming/branding direction was clear.
     `WATERFALL_RINGER_CAP_TOKENS` (default 8,000 est. tokens). Narrowed
     reads (offset/limit given) and piped/redirected shell commands are
     never capped. Fails open on any error/missing file/unparseable
-    command. Same reload-config caveat as the other hook.
+    command. Verified live 2026-08-05 in a running session with no
+    `/hooks` reload or restart needed -- `.claude/settings.json` picked
+    up the new `PreToolUse` entry automatically; denied a blind Read of
+    a 57KB scratch file with the exact reason text, then let the same
+    Read through once `limit` was added.
   - `router/tests/` — 63 passing unit tests (client, cascade fallback,
     tiering, sentinel-price regression, tracker, claude-usage, the
     Ringer hook), no network calls required.
