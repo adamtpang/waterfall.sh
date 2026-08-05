@@ -11,33 +11,50 @@ from landing in the first place.
 Scope, deliberately narrow to avoid false positives:
   - Read with no offset/limit (a "read the whole thing" call) against a
     file over the cap.
-  - A bare `cat <file>` (Bash) or `Get-Content`/`type <file>` (PowerShell)
-    with no pipe/redirect -- i.e. dumping a whole file straight to stdout.
+  - A single output-heavy command (see _BASH_DUMP_COMMANDS /
+    _PWSH_DUMP_COMMANDS below -- cat/less/more/xxd/hexdump/od/base64 on
+    Bash, Get-Content/type/Format-Hex on PowerShell) invoked with exactly
+    one non-flag file argument and no pipe/redirect/chaining -- i.e.
+    dumping a whole file straight to stdout, however it's spelled.
 Reads that already specify offset/limit are trusted and never capped --
-the caller has already narrowed the request. Piped or redirected shell
-commands are never capped -- only a bare whole-file dump to stdout matches.
+the caller has already narrowed the request. Any pipe, redirect, `;`, or
+`&&` drops a shell command out of scope entirely -- only a bare
+whole-file-to-stdout dump matches, by design.
+
+Known gap, not covered: commands whose output size isn't tied to a
+single file's on-disk size and so can't be sized without running them
+first -- `find`, `git log`, `grep`/`rg` without a match cap, `curl`,
+recursive directory listings. A pre-execution hard cap is not possible
+for those without executing them; that's a real limitation, not an
+oversight, and the honest boundary of what a PreToolUse hook can enforce
+before the command runs.
 
 Contract: must NEVER raise, and must fail OPEN (allow) whenever the size
 can't be determined -- missing file, unreadable path, unparseable
-command. A bug here must never be able to brick every tool call in a
-session; the worst acceptable failure mode is "the cap doesn't fire".
+command, ambiguous multi-file invocation. A bug here must never be able
+to brick every tool call in a session; the worst acceptable failure mode
+is "the cap doesn't fire".
 """
 
 from __future__ import annotations
 
 import json
 import os
-import re
+import shlex
 import sys
 from pathlib import Path
 
 CAP_TOKENS = int(os.environ.get("WATERFALL_RINGER_CAP_TOKENS", "8000"))
 
-# Anchored to "the whole command is just a dump of one file to stdout" --
-# a pipe, redirect, extra flag, or second command drops out of the match,
-# which is intentional: those aren't the blind-dump footgun this targets.
-_BASH_CAT_RE = re.compile(r'^cat\s+"?([^"|>\s][^|>]*?)"?\s*$')
-_PWSH_CAT_RE = re.compile(r'^(?:Get-Content|type)\s+"?([^"|>\s][^|>]*?)"?\s*$', re.IGNORECASE)
+# Command names that, invoked bare against one file, dump that file's
+# entire contents to stdout. Matched case-insensitively on the last path
+# component of argv[0] (so "/usr/bin/cat" and "cat" are the same check).
+_BASH_DUMP_COMMANDS = {"cat", "less", "more", "xxd", "hexdump", "od", "base64"}
+_PWSH_DUMP_COMMANDS = {"get-content", "type", "format-hex"}
+
+# Any of these in the raw command string takes it out of scope entirely --
+# a pipe, redirect, or chained command means this isn't a blind dump.
+_SHELL_OPERATORS = ("|", ">", "<", ";", "&&", "||", "\n")
 
 
 def estimate_tokens(num_bytes: int) -> int:
@@ -61,6 +78,13 @@ def _size_tokens(path_str: str, cwd: str) -> tuple[int, int] | None:
     return size, estimate_tokens(size)
 
 
+def _deny_reason(file_path: str, size: int, tokens: int, cap_tokens: int, suggestion: str) -> str:
+    return (
+        f"waterfall Ringer: {file_path} is ~{tokens:,} tokens ({size:,} bytes), "
+        f"over the {cap_tokens:,}-token per-call cap. {suggestion}"
+    )
+
+
 def check_read(tool_input: dict, cwd: str, cap_tokens: int = CAP_TOKENS) -> str | None:
     """Return a deny reason if a whole-file Read would blow the cap, else None."""
     if tool_input.get("offset") or tool_input.get("limit"):
@@ -77,20 +101,54 @@ def check_read(tool_input: dict, cwd: str, cap_tokens: int = CAP_TOKENS) -> str 
     if tokens <= cap_tokens:
         return None
 
-    return (
-        f"waterfall Ringer: {file_path} is ~{tokens:,} tokens ({size:,} bytes), "
-        f"over the {cap_tokens:,}-token per-call cap. Read a narrower slice with "
-        f"offset/limit, or use Grep to search it instead of reading it whole."
+    return _deny_reason(
+        file_path, size, tokens, cap_tokens,
+        "Read a narrower slice with offset/limit, or use Grep to search it instead of reading it whole.",
     )
 
 
-def _check_whole_file_dump(
-    command: str, pattern: re.Pattern, cwd: str, cap_tokens: int
-) -> str | None:
-    match = pattern.match(command.strip())
-    if not match:
+def _strip_quotes(token: str) -> str:
+    if len(token) >= 2 and token[0] == token[-1] and token[0] in ('"', "'"):
+        return token[1:-1]
+    return token
+
+
+def _extract_whole_file_target(command: str, dump_commands: set[str]) -> str | None:
+    """If `command` is exactly one dump command with exactly one file
+    argument and nothing else (no pipe/redirect/chain), return that file
+    argument. Otherwise None -- fail open on anything ambiguous."""
+    stripped = command.strip()
+    if not stripped or any(op in stripped for op in _SHELL_OPERATORS):
         return None
-    file_path = match.group(1).strip()
+
+    try:
+        # posix=False: posix mode treats backslash as an escape character,
+        # which silently mangles Windows-style paths (C:\Users\... loses
+        # its backslashes). False preserves them; quotes are stripped
+        # manually below instead.
+        tokens = shlex.split(stripped, posix=False)
+    except ValueError:
+        return None  # unbalanced quotes etc -- don't guess
+    if not tokens:
+        return None
+
+    cmd_name = _strip_quotes(tokens[0]).lower().replace("\\", "/").rsplit("/", 1)[-1]
+    if cmd_name not in dump_commands:
+        return None
+
+    positional = [_strip_quotes(t) for t in tokens[1:] if not t.startswith("-")]
+    if len(positional) != 1:
+        return None  # zero or multiple file args -- ambiguous, don't guess
+
+    return positional[0]
+
+
+def _check_whole_file_dump(
+    command: str, dump_commands: set[str], cwd: str, cap_tokens: int
+) -> str | None:
+    file_path = _extract_whole_file_target(command, dump_commands)
+    if file_path is None:
+        return None
 
     sized = _size_tokens(file_path, cwd)
     if sized is None:
@@ -99,19 +157,18 @@ def _check_whole_file_dump(
     if tokens <= cap_tokens:
         return None
 
-    return (
-        f"waterfall Ringer: {file_path} is ~{tokens:,} tokens ({size:,} bytes), "
-        f"over the {cap_tokens:,}-token per-call cap. Use Read with offset/limit, "
-        f"or Grep, instead of dumping the whole file to stdout."
+    return _deny_reason(
+        file_path, size, tokens, cap_tokens,
+        "Use Read with offset/limit, or Grep, instead of dumping the whole file to stdout.",
     )
 
 
 def check_bash(tool_input: dict, cwd: str, cap_tokens: int = CAP_TOKENS) -> str | None:
-    return _check_whole_file_dump(tool_input.get("command", ""), _BASH_CAT_RE, cwd, cap_tokens)
+    return _check_whole_file_dump(tool_input.get("command", ""), _BASH_DUMP_COMMANDS, cwd, cap_tokens)
 
 
 def check_powershell(tool_input: dict, cwd: str, cap_tokens: int = CAP_TOKENS) -> str | None:
-    return _check_whole_file_dump(tool_input.get("command", ""), _PWSH_CAT_RE, cwd, cap_tokens)
+    return _check_whole_file_dump(tool_input.get("command", ""), _PWSH_DUMP_COMMANDS, cwd, cap_tokens)
 
 
 def evaluate(tool_name: str, tool_input: dict, cwd: str, cap_tokens: int = CAP_TOKENS) -> str | None:

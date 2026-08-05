@@ -86,17 +86,29 @@ project once the naming/branding direction was clear.
   - `router/hooks/pre_tool_use.py` — a `PreToolUse` command hook
     (project-scoped, wired in `.claude/settings.json`, matcher
     `Read|Bash|PowerShell`). The "Ringer" from `TOKEN_COMPOUNDING.md`:
-    hard-blocks (not nudges) a `Read` with no offset/limit, or a bare
-    `cat`/`Get-Content`/`type`, against a file over
+    hard-blocks (not nudges) a `Read` with no offset/limit, or a single
+    output-heavy shell command (Bash `cat`/`less`/`more`/`xxd`/`hexdump`/
+    `od`/`base64`; PowerShell `Get-Content`/`type`/`Format-Hex`) invoked
+    against exactly one file with no pipe/redirect/`;`/`&&`, over
     `WATERFALL_RINGER_CAP_TOKENS` (default 8,000 est. tokens). Narrowed
-    reads (offset/limit given) and piped/redirected shell commands are
-    never capped. Fails open on any error/missing file/unparseable
-    command. Verified live 2026-08-05 in a running session with no
-    `/hooks` reload or restart needed -- `.claude/settings.json` picked
-    up the new `PreToolUse` entry automatically; denied a blind Read of
-    a 57KB scratch file with the exact reason text, then let the same
-    Read through once `limit` was added.
-  - `router/tests/` — 63 passing unit tests (client, cascade fallback,
+    reads and piped/redirected/chained/multi-file shell commands are
+    never capped -- deliberately, to keep false positives at zero.
+    Known, documented gap: commands whose output size isn't tied to one
+    file's on-disk size (`find`, `git log`, unbounded `grep`/`rg`,
+    `curl`) can't be pre-sized without running them, so aren't covered.
+    Fails open on any error/missing file/unparseable command. **Real bug
+    caught in its own build** (2026-08-05): the command parser first
+    used `shlex.split(cmd, posix=True)`, which treats backslash as an
+    escape character -- on this all-Windows-paths machine that silently
+    mangled every path (`C:\Users\...` lost its backslashes), corrupting
+    the stat lookup and making the cap fail open on every single call,
+    completely undetected until the test suite ran red. Fixed with
+    `posix=False` plus manual quote-stripping; regression-tested. Live
+    end-to-end (57KB scratch file, real `Bash` tool `cat`, real `Read`)
+    on 2026-08-05 with no `/hooks` reload or restart needed --
+    `.claude/settings.json` picked up the change automatically both
+    times.
+  - `router/tests/` — 78 passing unit tests (client, cascade fallback,
     tiering, sentinel-price regression, tracker, claude-usage, the
     Ringer hook), no network calls required.
   - Verified end-to-end for real, twice: once with an invalid test key

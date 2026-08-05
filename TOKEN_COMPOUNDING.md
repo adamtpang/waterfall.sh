@@ -46,15 +46,36 @@ within one.
 (not nudges) a tool call that would dump an entire large file into
 context in one shot: a `Read` with no `offset`/`limit` against a file
 over the cap (default 8,000 estimated tokens, `WATERFALL_RINGER_CAP_TOKENS`
-to override), or a bare `cat`/`Get-Content`/`type` of a whole file with
-no pipe or redirect. Reads that already specify `offset`/`limit` are
-trusted and never capped. Piped or redirected shell commands are never
-capped either — only a blind whole-file-to-stdout dump matches, by
-design, to keep false positives near zero. Denial reasons are shown back
-to Claude so it can retry narrower (offset/limit, or Grep) instead of
-just failing. Fails open (allows) on any error, missing file, or
-unparseable command — a bug here must never be able to brick every tool
-call in a session.
+to override), or a single output-heavy shell command invoked against
+exactly one file with nothing else on the line -- Bash
+`cat`/`less`/`more`/`xxd`/`hexdump`/`od`/`base64`, PowerShell
+`Get-Content`/`type`/`Format-Hex`. Reads that already specify
+`offset`/`limit` are trusted and never capped. Any pipe, redirect, `;`,
+`&&`, or a second file argument takes a shell command out of scope
+entirely -- only a bare whole-file-to-stdout dump matches, by design, to
+keep false positives near zero. Denial reasons are shown back to Claude
+so it can retry narrower (offset/limit, or Grep) instead of just
+failing. Fails open (allows) on any error, missing file, or unparseable
+command — a bug here must never be able to brick every tool call in a
+session.
+
+**Explicitly out of scope, not silently dropped**: commands whose
+output size isn't tied to a single file's on-disk size -- `find`,
+`git log`, unbounded `grep`/`rg`, `curl`. A pre-execution hard cap on
+those isn't possible without running them first; that's a real
+boundary of what a PreToolUse hook can enforce, not an oversight.
+
+**Real bug this caught in its own build**: the first version parsed
+shell commands with `shlex.split(cmd, posix=True)`. POSIX mode treats
+backslash as an escape character, so on this Windows machine it silently
+stripped the backslashes out of every path (`C:\Users\...` →
+`C:UsersAppData...`), which broke the file-size lookup and made the cap
+fail open on *every single call*, cat included -- undetected until the
+test suite (which does construct real Windows paths) turned red across
+14 tests. Fixed with `posix=False` plus manual quote-stripping. A
+reminder that "fail open on error" as a safety default can mask a bug
+that defeats the feature entirely if nothing is actually exercising the
+success path with realistic inputs.
 
 This is the one mechanism from the list above that actually shrinks
 reused-input on an *already-running* thread, rather than just diverting

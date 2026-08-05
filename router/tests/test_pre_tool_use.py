@@ -116,6 +116,79 @@ class CheckBashTests(RingerTestCase):
         )
         self.assertIsNotNone(reason)
 
+    def test_flag_before_path_still_matched(self) -> None:
+        path = self._write("big.txt", 1000)
+        reason = ringer.check_bash({"command": f"cat -n {path}"}, self.cwd, cap_tokens=CAP)
+        self.assertIsNotNone(reason)
+
+    def test_less_of_large_file_denied(self) -> None:
+        path = self._write("big.txt", 1000)
+        reason = ringer.check_bash({"command": f"less {path}"}, self.cwd, cap_tokens=CAP)
+        self.assertIsNotNone(reason)
+
+    def test_more_of_large_file_denied(self) -> None:
+        path = self._write("big.txt", 1000)
+        reason = ringer.check_bash({"command": f"more {path}"}, self.cwd, cap_tokens=CAP)
+        self.assertIsNotNone(reason)
+
+    def test_xxd_of_large_file_denied(self) -> None:
+        path = self._write("big.bin", 1000)
+        reason = ringer.check_bash({"command": f"xxd {path}"}, self.cwd, cap_tokens=CAP)
+        self.assertIsNotNone(reason)
+
+    def test_hexdump_of_large_file_denied(self) -> None:
+        path = self._write("big.bin", 1000)
+        reason = ringer.check_bash({"command": f"hexdump {path}"}, self.cwd, cap_tokens=CAP)
+        self.assertIsNotNone(reason)
+
+    def test_od_of_large_file_denied(self) -> None:
+        path = self._write("big.bin", 1000)
+        reason = ringer.check_bash({"command": f"od -c {path}"}, self.cwd, cap_tokens=CAP)
+        self.assertIsNotNone(reason)
+
+    def test_base64_of_large_file_denied(self) -> None:
+        path = self._write("big.bin", 1000)
+        reason = ringer.check_bash({"command": f"base64 {path}"}, self.cwd, cap_tokens=CAP)
+        self.assertIsNotNone(reason)
+
+    def test_absolute_binary_path_matched(self) -> None:
+        path = self._write("big.txt", 1000)
+        reason = ringer.check_bash(
+            {"command": f"/bin/cat {path}"}, self.cwd, cap_tokens=CAP
+        )
+        self.assertIsNotNone(reason)
+
+    def test_multiple_file_args_allowed(self) -> None:
+        path1 = self._write("a.txt", 1000)
+        path2 = self._write("b.txt", 1000)
+        reason = ringer.check_bash(
+            {"command": f"cat {path1} {path2}"}, self.cwd, cap_tokens=CAP
+        )
+        self.assertIsNone(reason)
+
+    def test_chained_command_allowed(self) -> None:
+        path = self._write("big.txt", 1000)
+        reason = ringer.check_bash(
+            {"command": f"cat {path} && echo done"}, self.cwd, cap_tokens=CAP
+        )
+        self.assertIsNone(reason)
+
+    def test_semicolon_chained_command_allowed(self) -> None:
+        path = self._write("big.txt", 1000)
+        reason = ringer.check_bash(
+            {"command": f"cat {path}; echo done"}, self.cwd, cap_tokens=CAP
+        )
+        self.assertIsNone(reason)
+
+    def test_unbalanced_quotes_fails_open(self) -> None:
+        reason = ringer.check_bash({"command": 'cat "unterminated'}, self.cwd, cap_tokens=CAP)
+        self.assertIsNone(reason)
+
+    def test_unbounded_find_not_covered(self) -> None:
+        # Known gap: output size isn't tied to one file's on-disk size.
+        reason = ringer.check_bash({"command": "find . -type f"}, self.cwd, cap_tokens=CAP)
+        self.assertIsNone(reason)
+
 
 class CheckPowershellTests(RingerTestCase):
     def test_get_content_of_large_file_denied(self) -> None:
@@ -140,6 +213,20 @@ class CheckPowershellTests(RingerTestCase):
             cap_tokens=CAP,
         )
         self.assertIsNone(reason)
+
+    def test_get_content_raw_flag_still_matched(self) -> None:
+        path = self._write("big.txt", 1000)
+        reason = ringer.check_powershell(
+            {"command": f"Get-Content -Raw {path}"}, self.cwd, cap_tokens=CAP
+        )
+        self.assertIsNotNone(reason)
+
+    def test_format_hex_of_large_file_denied(self) -> None:
+        path = self._write("big.bin", 1000)
+        reason = ringer.check_powershell(
+            {"command": f"Format-Hex {path}"}, self.cwd, cap_tokens=CAP
+        )
+        self.assertIsNotNone(reason)
 
 
 class EvaluateDispatchTests(RingerTestCase):
