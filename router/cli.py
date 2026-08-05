@@ -94,6 +94,8 @@ def cmd_route(args: argparse.Namespace) -> int:
 
     result = router.route_with_api(prompt, system=args.system, model=args.model, tier=args.tier)
 
+    if result.cache_hit:
+        print("\nserved from cache -- identical routed text answered before, no new API call")
     print(f"\nmodel used:   {result.model_used or '(none -- routed fully to Claude)'}")
     print(f"model tier:   {result.model_tier or '(n/a)'}")
     print(f"cost (USD):   {result.cost_usd}")
@@ -117,7 +119,7 @@ def cmd_route(args: argparse.Namespace) -> int:
             claude_tokens_needed=split.claude_token_estimate,
             tokens_saved=tokens_saved,
             cost_saved_usd=estimate_cost_saved(tokens_saved, result.cost_usd),
-            backend_used="openrouter",
+            backend_used="cache" if result.cache_hit else "openrouter",
             model_used=result.model_used,
             routing_decision=cls.routing,
             task_types=cls.task_types,

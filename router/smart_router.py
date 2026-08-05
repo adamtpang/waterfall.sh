@@ -47,6 +47,12 @@ except ImportError as e:
     _api_import_error = str(e)
     logger.warning("OpenRouter API router unavailable: %s", e)
 
+try:
+    from cache import ResponseCache
+    CACHE_AVAILABLE = True
+except ImportError:
+    CACHE_AVAILABLE = False
+
 # AI profiles considered "free" (no API cost / browser-based free tier)
 FREE_PROFILES = {"Gemini", "OpenRouter", "ChatGPT", "Copilot",
                  "Ollama Web UI", "Ollama (Terminal)", "LM Studio"}
@@ -71,16 +77,23 @@ class ApiRoutingResult:
     output_tokens: int
     elapsed_sec: float
     final_claude_prompt: str
+    cache_hit: bool = False
 
 
 class SmartRouter:
     """Classify prompts and route between free + Claude sessions."""
 
-    def __init__(self) -> None:
+    def __init__(self, cache: Optional["ResponseCache"] = None) -> None:
         if not SMART_ROUTER_AVAILABLE:
             raise RuntimeError(f"classifier not importable: {_import_error}")
         self._classifier = PromptClassifier()
         self._splitter = TaskSplitter(self._classifier)
+        if cache is not None:
+            self._cache = cache
+        elif CACHE_AVAILABLE:
+            self._cache = ResponseCache()
+        else:
+            self._cache = None
 
     def classify(self, prompt: str) -> "TaskClassification":
         """Score the prompt and decide routing."""
@@ -158,18 +171,30 @@ class SmartRouter:
 
         free_response = ""
         gen = None
+        cache_hit = False
         if split.free_prompt:
-            gen = client.generate_with_usage(
-                split.free_prompt,
-                model=model,
-                tier=None if model else resolved_tier,
-                system=system or (
-                    "You are handling the routine/easy part of a coding task. "
-                    "Be direct and concise -- your output will be handed to "
-                    "another model to finish the harder remaining work."
-                ),
-            )
-            free_response = gen.text
+            cached = self._cache.get(split.free_prompt) if self._cache else None
+            if cached is not None:
+                free_response = cached.response
+                cache_hit = True
+                gen = _openrouter_api_client.GenerateResult(
+                    text=cached.response, model=cached.model_used,
+                    input_tokens=0, output_tokens=0, cost_usd=0.0, elapsed_sec=0.0,
+                )
+            else:
+                gen = client.generate_with_usage(
+                    split.free_prompt,
+                    model=model,
+                    tier=None if model else resolved_tier,
+                    system=system or (
+                        "You are handling the routine/easy part of a coding task. "
+                        "Be direct and concise -- your output will be handed to "
+                        "another model to finish the harder remaining work."
+                    ),
+                )
+                free_response = gen.text
+                if self._cache:
+                    self._cache.put(split.free_prompt, gen.text, gen.model, "openrouter")
 
         if split.claude_prompt:
             final_claude_prompt = (
@@ -191,4 +216,5 @@ class SmartRouter:
             output_tokens=gen.output_tokens if gen else 0,
             elapsed_sec=gen.elapsed_sec if gen else 0.0,
             final_claude_prompt=final_claude_prompt,
+            cache_hit=cache_hit,
         )

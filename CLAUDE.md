@@ -108,9 +108,24 @@ project once the naming/branding direction was clear.
     on 2026-08-05 with no `/hooks` reload or restart needed --
     `.claude/settings.json` picked up the change automatically both
     times.
-  - `router/tests/` — 78 passing unit tests (client, cascade fallback,
+  - `router/cache.py` — the last open item from `TOKEN_COMPOUNDING.md`
+    (#9, cross-session dedup), shipped 2026-08-05. Disk-backed exact-match
+    cache (`~/.claude/waterfall_response_cache.json`) keyed by a
+    normalized hash of the *routed* text; wired into
+    `SmartRouter.route_with_api()` so an identical routed sub-task within
+    7 days (`ttl_seconds`) is served from cache instead of a second real
+    OpenRouter call -- `waterfall route` reports `served from cache`,
+    cost/tokens/elapsed all `0`. Not semantic -- only byte-identical
+    (post-normalization) repeats hit. Verified live against the real API
+    with a real key: first call cost $9.2e-07 and took 1.15s; the
+    identical call right after was instant, `$0.0`, `0 in / 0 out`, same
+    output. All 9 countermeasures from `TOKEN_COMPOUNDING.md` are now
+    shipped -- see that file's "The gap" section for what still isn't
+    solved (the general reused-input compounding problem, as opposed to
+    these specific footguns).
+  - `router/tests/` — 96 passing unit tests (client, cascade fallback,
     tiering, sentinel-price regression, tracker, claude-usage, the
-    Ringer hook), no network calls required.
+    Ringer hook, the response cache), no network calls required.
   - Verified end-to-end for real, twice: once with an invalid test key
     (correctly surfaced a 401), and again on 2026-08-04 with Adam's real
     `OPENROUTER_API_KEY` -- `route "Write a one-line docstring..."` actually
@@ -133,12 +148,14 @@ Distilled from a Nate B. Jones transcript on why LLM token usage compounds
 (every turn resends the whole conversation) and the countermeasures. These
 now shape both how this tool is used and what it should still grow into.
 **See `TOKEN_COMPOUNDING.md`** for the standalone version of this
-distillation plus a status table of which countermeasures are actually
-shipped vs. still just a habit (8 of 9 shipped as of 2026-08-05, now
-including the hard per-call cap — the "Ringer",
-`router/hooks/pre_tool_use.py` — added 2026-08-05. The one still-open
-item, cross-session dedup, is the most invasive: it needs persistent
-memory across sessions, not just routing/enforcement within one).
+distillation plus a status table of countermeasures — **9 of 9 shipped
+as of 2026-08-05** (the hard per-call cap, `router/hooks/pre_tool_use.py`,
+and the cross-session response cache, `router/cache.py`, both landed
+that day). That file's "The gap" section is the important honest part:
+shipping all 9 doesn't mean reused-input compounding is solved — every
+mechanism here attacks a specific, narrow footgun (one huge file, one
+repeated ask), not a long thread's accumulated, non-repeating history,
+which is what actually drives the 65–96% reused-input share.
 
 - **Classify/split before you send** (`classify`, `route --dry-run`) — free,
   no network, the equivalent of "edit your mistake instead of retrying" and

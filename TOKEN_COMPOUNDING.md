@@ -33,12 +33,9 @@ raw daily volume grew from ~15–30M reused tokens/day in April to
 | 6 | Level 2 — skill self-triggers on routine sub-tasks | **Shipped** | `~/.claude/skills/waterfall/SKILL.md` |
 | 7 | Level 2 — automatic nudge hook, no judgment call needed | **Shipped** | `router/hooks/user_prompt_submit.py` |
 | 8 | Level 3 — hard per-call token/size limits ("the Ringer") | **Shipped** (2026-08-05) | `router/hooks/pre_tool_use.py` |
-| 9 | Cross-session "have I already answered this" cache | **Not built** | — |
+| 9 | Cross-session "have I already answered this" cache | **Shipped** (2026-08-05) | `router/cache.py` |
 
-**8 of 9 concrete proposals are shipped as code.** The one still open —
-cross-session dedup — is the most invasive: it needs some form of
-persistent memory across sessions, not just routing or enforcement
-within one.
+**9 of 9 proposals are now shipped as code.**
 
 ### The Ringer (#8), specifically
 
@@ -85,6 +82,31 @@ address the general reused-input compounding problem (a long thread's
 accumulated history still gets resent every turn); that's still a
 session-hygiene problem, not a per-call one.
 
+### Cross-session cache (#9), specifically
+
+`router/cache.py` is a disk-backed, exact-match cache
+(`~/.claude/waterfall_response_cache.json`) keyed by a normalized
+(whitespace/case-collapsed) hash of the *routed* text — the sub-task
+text `SmartRouter.route_with_api()` sends to the free model, not the raw
+human prompt. Wired into `route_with_api()`: on an identical routed ask
+within 7 days (`ttl_seconds`, configurable), the cached response is
+served instead of a second real OpenRouter call — `waterfall route`
+prints `served from cache`, cost/tokens/elapsed all report `0`. A miss
+calls the model as before and writes the result to cache. Entries past
+the TTL are treated as a miss, not silently served stale.
+
+Deliberately **not** a semantic cache — two differently-worded asks for
+the same thing are two different keys and both cost a real call. It only
+catches byte-identical (post-normalization) repeats, which is a narrow
+but real case: the same mechanical sub-task asked again, maybe in a
+different session days later.
+
+Verified live 2026-08-05 against the real OpenRouter API and a real key:
+`waterfall route "write a one-line docstring for a function that adds
+two numbers"` cost $9.2e-07 and took 1.15s the first time; the identical
+call immediately after printed `served from cache`, cost `$0.0`, `0 in /
+0 out` tokens, and returned the exact same text, instantly.
+
 Alongside those, the transcript's other recommendations were always
 behavioral, not mechanical, and stay that way: edit-not-retry, batch
 related asks, start a clean thread when the job changes, ask for only
@@ -106,6 +128,16 @@ The single biggest lever against reused-input specifically is session
 hygiene — starting a fresh thread when the topic changes, `/compact`ing
 instead of letting a thread run forever, not re-reading/re-pasting large
 files repeatedly. That's still mostly an unenforced habit: the Ringer
-(#8) now forces the "don't dump one huge file whole" case specifically,
-but a long thread built up from many small, individually-under-cap turns
-is still unaddressed — no per-session or cross-session cap exists yet.
+(#8) forces the "don't dump one huge file whole" case specifically, and
+the cache (#9) forces the "don't redo an identical routed sub-task"
+case specifically — but a long thread built up from many small,
+individually-under-cap, non-repeating turns is still unaddressed.
+**All 9 proposed countermeasures are now shipped, and the core
+reused-input compounding problem still isn't solved** — every mechanism
+above attacks a specific, narrow footgun (one huge file, one repeated
+ask); none of them cap or shrink a long thread's *accumulated*, varied
+history, which is what `waterfall claude-usage --by-day` actually shows
+driving the 65–96% reused-input share. That would need something that
+doesn't exist yet in any proposed form here: a real cap on session/
+thread length itself, or automatic compaction, enforced rather than
+habitual.
