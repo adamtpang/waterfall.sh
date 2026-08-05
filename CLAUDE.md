@@ -123,9 +123,39 @@ project once the naming/branding direction was clear.
     shipped -- see that file's "The gap" section for what still isn't
     solved (the general reused-input compounding problem, as opposed to
     these specific footguns).
-  - `router/tests/` — 96 passing unit tests (client, cascade fallback,
+  - `router/hook_log.py` + `waterfall hook-log` — append-only JSONL log
+    (`~/.claude/waterfall_hook_log.jsonl`) of every real nudge/deny the
+    two hooks fire, added 2026-08-05 so "is waterfall actually doing
+    anything" has a real answer instead of an inference from noisy daily
+    token-volume swings. Only logs the meaningful events (a nudge
+    injected, a call denied), not every allowed call -- that would be
+    high-volume noise. `waterfall hook-log --verbose` lists real events
+    with timestamp/project/detail; logging is a side effect wrapped in
+    its own try/except in both hooks, never able to block the hook's
+    real decision.
+  - **Both hooks installed globally** (`~/.claude/settings.json`,
+    2026-08-05), not just project-scoped to this repo -- the whole
+    point of a token-saving tool is to save tokens on Adam's *other*
+    projects too, and hooks wired only here couldn't do that. **Real
+    bug caught immediately via the hook log**: for a few minutes,
+    working inside `waterfall.sh` itself fired both the project-scoped
+    hooks (`waterfall.sh/.claude/settings.json`) and the new global
+    ones simultaneously, double-logging every event here (confirmed
+    live: one `cat` denial produced two identical log entries 6ms
+    apart). Fixed by emptying `waterfall.sh/.claude/settings.json` to
+    `{}` -- the global hooks now cover this repo too, so every project
+    fires exactly once. That settings.json edit had to be made by Adam
+    directly; Claude Code's own auto-mode classifier hard-blocks
+    programmatic edits to `.claude/settings.json` hook/permission
+    config, with no way to route around it from within a session --
+    a real, working guardrail, not a bug. First real cross-project
+    evidence the same day: `themain.quest` and `pangaea.blog` (other
+    repos, real sessions, not test data) both showed up nudged in the
+    hook log within the hour.
+  - `router/tests/` — 110 passing unit tests (client, cascade fallback,
     tiering, sentinel-price regression, tracker, claude-usage, the
-    Ringer hook, the response cache), no network calls required.
+    Ringer hook, the response cache, the hook log, the nudge hook), no
+    network calls required.
   - Verified end-to-end for real, twice: once with an invalid test key
     (correctly surfaced a 401), and again on 2026-08-04 with Adam's real
     `OPENROUTER_API_KEY` -- `route "Write a one-line docstring..."` actually
@@ -190,9 +220,24 @@ which is what actually drives the 65–96% reused-input share.
 
 ## Not done yet
 
-- Landing page copy is placeholder-honest — no fabricated usage stats.
-  Fill in real numbers once there's real usage (see the "proof" stat row
-  in `index.html`).
+- **The actual before/after Adam wants, in progress as of 2026-08-05**:
+  save real tokens/money across his own projects (not just this repo),
+  show a real before-vs-after transformation, and only *then* buy the
+  domain and post it where he originally found this idea. Sequence:
+  (1) hooks now global ✅, (2) "before" baseline already captured from
+  real transcript history (`waterfall claude-usage --since-days 7` =
+  93.3% reused, 6.57B reused tokens, $20,408.78 list-price-equivalent
+  as of 2026-08-05) ✅, (3) hook-log now proves the hooks are firing for
+  real across projects ✅, (4) still needed: let a real stretch of normal
+  work accumulate (a week+), then re-run the same `claude-usage` command
+  and compare. Don't buy the domain or post anywhere until that
+  comparison is in hand -- that's the whole point of this sequencing.
+- Landing page proof stats were updated 2026-08-05 with real,
+  verifiable numbers (9/9 countermeasures shipped, 300+ live OpenRouter
+  models) -- deliberately *not* real usage-ledger numbers yet (still
+  just 5 test prompts / $0.0002 saved, all dev testing, not organic
+  use). Revisit once the before/after above gives something worth
+  showing.
 - No offer/pricing/buyer defined yet — this is a tool for Adam's own use
   first; productizing it is a later decision, not blocking anything here.
 - Not yet run through Adam's "Summon" standardization pass (the

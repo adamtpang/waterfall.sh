@@ -7,6 +7,7 @@ it's down or rate-limited), and log what that kept off Claude's plate.
     python3 -m router.cli route "..."
     python3 -m router.cli stats
     python3 -m router.cli claude-usage --by-day
+    python3 -m router.cli hook-log --verbose
     python3 -m router.cli models
 
 Or, if installed (`pip install -e .` from the repo root): `waterfall ...`.
@@ -190,6 +191,43 @@ def cmd_claude_usage(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_hook_log(args: argparse.Namespace) -> int:
+    import hook_log as hl
+
+    since = None
+    if args.since_days:
+        since = datetime.now(timezone.utc) - timedelta(days=args.since_days)
+
+    entries = hl.load_entries(since=since)
+    if args.project:
+        entries = [e for e in entries if args.project.lower() in e.project.lower()]
+
+    if not entries:
+        print(
+            "No hook activity logged for that filter -- either nothing fired, "
+            "or the hooks aren't installed/reloaded in the relevant session yet."
+        )
+        return 0
+
+    nudges = [e for e in entries if e.hook == "nudge"]
+    denies = [e for e in entries if e.hook == "ringer"]
+    print(f"nudges (UserPromptSubmit):  {len(nudges)}")
+    print(f"denials (Ringer/PreToolUse): {len(denies)}")
+
+    by_project: dict[str, int] = {}
+    for e in entries:
+        by_project[e.project] = by_project.get(e.project, 0) + 1
+    print("by project: " + ", ".join(
+        f"{p}={c}" for p, c in sorted(by_project.items(), key=lambda x: -x[1])
+    ))
+
+    if args.verbose:
+        print()
+        for e in entries[-args.limit:]:
+            print(f"{e.timestamp}  [{e.hook:6}] {e.project:<24} {e.detail}")
+    return 0
+
+
 def cmd_models(args: argparse.Namespace) -> int:
     if not API_ROUTER_AVAILABLE:
         print("OpenRouter API client unavailable -- set OPENROUTER_API_KEY.", file=sys.stderr)
@@ -233,6 +271,13 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--since-days", type=int, default=None, help="only include the last N days")
     sp.add_argument("--by-day", action="store_true", help="show a day-by-day trend instead of one summary")
     sp.set_defaults(func=cmd_claude_usage)
+
+    sp = sub.add_parser("hook-log", help="show real nudge/deny events fired by the waterfall hooks")
+    sp.add_argument("--project", help="filter to projects whose name contains this substring")
+    sp.add_argument("--since-days", type=int, default=None, help="only include the last N days")
+    sp.add_argument("--verbose", action="store_true", help="also list the individual events")
+    sp.add_argument("--limit", type=int, default=20, help="how many recent events to show with --verbose")
+    sp.set_defaults(func=cmd_hook_log)
 
     sp = sub.add_parser("models", help="list the current cheapest capable OpenRouter models")
     sp.add_argument("--limit", type=int, default=5)

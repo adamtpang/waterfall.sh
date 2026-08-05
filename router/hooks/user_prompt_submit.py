@@ -59,6 +59,15 @@ def main() -> int:
         f"inline."
     )
 
+    try:
+        from hook_log import log_nudge
+        log_nudge(
+            payload.get("cwd", ""),
+            f"routing={cls.routing} tier={tier} complexity={cls.complexity_score}",
+        )
+    except Exception:
+        pass  # logging is a side effect -- never let it block the nudge itself
+
     print(json.dumps({
         "hookSpecificOutput": {
             "hookEventName": "UserPromptSubmit",

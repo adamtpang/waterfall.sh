@@ -44,6 +44,8 @@ import shlex
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 CAP_TOKENS = int(os.environ.get("WATERFALL_RINGER_CAP_TOKENS", "8000"))
 
 # Command names that, invoked bare against one file, dump that file's
@@ -197,6 +199,12 @@ def main() -> int:
 
     if reason is None:
         return 0
+
+    try:
+        from hook_log import log_deny
+        log_deny(cwd, f"{tool_name}: {reason}")
+    except Exception:
+        pass  # logging is a side effect -- never let it block the deny itself
 
     print(json.dumps({
         "hookSpecificOutput": {

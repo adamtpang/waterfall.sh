@@ -8,11 +8,13 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "hooks"))
 
 import pre_tool_use as ringer  # noqa: E402
+import hook_log  # noqa: E402
 
 CAP = 100  # tiny cap for tests: 100 tokens == 400 bytes
 
@@ -290,6 +292,48 @@ class MainStdinTests(RingerTestCase):
         finally:
             sys.stdin = old_stdin
         self.assertEqual(code, 0)
+
+
+class MainHookLoggingTests(RingerTestCase):
+    """A deny should leave a real, checkable entry in the hook log --
+    the whole point of hook_log.py. Redirects hook_log.DEFAULT_LOG_PATH
+    to a temp file so this never touches the real ~/.claude log."""
+
+    def _run_main_with_log(self, payload: dict, log_path: Path) -> None:
+        stdin = io.StringIO(json.dumps(payload))
+        old_stdin, old_stdout = sys.stdin, sys.stdout
+        sys.stdin, sys.stdout = stdin, io.StringIO()
+        try:
+            with mock.patch.object(hook_log, "DEFAULT_LOG_PATH", log_path):
+                ringer.main()
+        finally:
+            sys.stdin, sys.stdout = old_stdin, old_stdout
+
+    def test_deny_writes_a_real_ringer_log_entry(self) -> None:
+        log_path = Path(self.cwd) / "hook_log.jsonl"
+        path = self._write("big.txt", 100_000)
+
+        self._run_main_with_log(
+            {"tool_name": "Read", "tool_input": {"file_path": path}, "cwd": self.cwd},
+            log_path,
+        )
+
+        entries = hook_log.load_entries(log_path=log_path)
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].hook, "ringer")
+        self.assertEqual(entries[0].action, "denied")
+        self.assertIn("Read", entries[0].detail)
+
+    def test_allow_writes_nothing(self) -> None:
+        log_path = Path(self.cwd) / "hook_log.jsonl"
+        path = self._write("small.txt", 100)
+
+        self._run_main_with_log(
+            {"tool_name": "Read", "tool_input": {"file_path": path}, "cwd": self.cwd},
+            log_path,
+        )
+
+        self.assertEqual(hook_log.load_entries(log_path=log_path), [])
 
 
 if __name__ == "__main__":
