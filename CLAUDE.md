@@ -105,7 +105,13 @@ project once the naming/branding direction was clear.
 
 Distilled from a Nate B. Jones transcript on why LLM token usage compounds
 (every turn resends the whole conversation) and the countermeasures. These
-now shape both how this tool is used and what it should still grow into:
+now shape both how this tool is used and what it should still grow into.
+**See `TOKEN_COMPOUNDING.md`** for the standalone version of this
+distillation plus a status table of which countermeasures are actually
+shipped vs. still just a habit (7 of 9 shipped as of 2026-08-05; the two
+open ones — hard per-call caps and cross-session dedup — are enforcement,
+not routing, and neither one shrinks reused-input on an already-long
+thread the way starting a fresh session does).
 
 - **Classify/split before you send** (`classify`, `route --dry-run`) — free,
   no network, the equivalent of "edit your mistake instead of retrying" and
