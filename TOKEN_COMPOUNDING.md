@@ -32,11 +32,37 @@ raw daily volume grew from ~15–30M reused tokens/day in April to
 | 5 | Right model for the job, not just cheapest | **Shipped** | model tiering in `openrouter_api_client.py` |
 | 6 | Level 2 — skill self-triggers on routine sub-tasks | **Shipped** | `~/.claude/skills/waterfall/SKILL.md` |
 | 7 | Level 2 — automatic nudge hook, no judgment call needed | **Shipped** | `router/hooks/user_prompt_submit.py` |
-| 8 | Level 3 — hard per-call token/size limits ("the Ringer") | **Not built** | — |
+| 8 | Level 3 — hard per-call token/size limits ("the Ringer") | **Shipped** (2026-08-05) | `router/hooks/pre_tool_use.py` |
 | 9 | Cross-session "have I already answered this" cache | **Not built** | — |
 
-**7 of 9 concrete proposals are shipped as code.** The other two are the
-harder, more invasive ones — enforcement rather than routing.
+**8 of 9 concrete proposals are shipped as code.** The one still open —
+cross-session dedup — is the most invasive: it needs some form of
+persistent memory across sessions, not just routing or enforcement
+within one.
+
+### The Ringer (#8), specifically
+
+`router/hooks/pre_tool_use.py` is a `PreToolUse` hook that hard-blocks
+(not nudges) a tool call that would dump an entire large file into
+context in one shot: a `Read` with no `offset`/`limit` against a file
+over the cap (default 8,000 estimated tokens, `WATERFALL_RINGER_CAP_TOKENS`
+to override), or a bare `cat`/`Get-Content`/`type` of a whole file with
+no pipe or redirect. Reads that already specify `offset`/`limit` are
+trusted and never capped. Piped or redirected shell commands are never
+capped either — only a blind whole-file-to-stdout dump matches, by
+design, to keep false positives near zero. Denial reasons are shown back
+to Claude so it can retry narrower (offset/limit, or Grep) instead of
+just failing. Fails open (allows) on any error, missing file, or
+unparseable command — a bug here must never be able to brick every tool
+call in a session.
+
+This is the one mechanism from the list above that actually shrinks
+reused-input on an *already-running* thread, rather than just diverting
+new work before it's generated — see "The gap" below, which this now
+partly closes for the single-large-file case specifically. It does not
+address the general reused-input compounding problem (a long thread's
+accumulated history still gets resent every turn); that's still a
+session-hygiene problem, not a per-call one.
 
 Alongside those, the transcript's other recommendations were always
 behavioral, not mechanical, and stay that way: edit-not-retry, batch
@@ -58,6 +84,7 @@ regardless of who originally produced it.
 The single biggest lever against reused-input specifically is session
 hygiene — starting a fresh thread when the topic changes, `/compact`ing
 instead of letting a thread run forever, not re-reading/re-pasting large
-files repeatedly. That's habit #9 above in list form, unenforced by any
-of the shipped code. The unbuilt hard-cap idea (#8) is the only proposed
-mechanism that would actually force this rather than rely on discipline.
+files repeatedly. That's still mostly an unenforced habit: the Ringer
+(#8) now forces the "don't dump one huge file whole" case specifically,
+but a long thread built up from many small, individually-under-cap turns
+is still unaddressed — no per-session or cross-session cap exists yet.

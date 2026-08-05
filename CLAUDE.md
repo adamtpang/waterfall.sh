@@ -83,8 +83,18 @@ project once the naming/branding direction was clear.
     silent no-op. Needs `/hooks` (reload config) or a session restart to
     start firing, since `.claude/` didn't exist in this project when the
     hook was added.
-  - `router/tests/` — 28 passing unit tests (client, cascade fallback,
-    tiering, sentinel-price regression, tracker), no network calls required.
+  - `router/hooks/pre_tool_use.py` — a `PreToolUse` command hook
+    (project-scoped, wired in `.claude/settings.json`, matcher
+    `Read|Bash|PowerShell`). The "Ringer" from `TOKEN_COMPOUNDING.md`:
+    hard-blocks (not nudges) a `Read` with no offset/limit, or a bare
+    `cat`/`Get-Content`/`type`, against a file over
+    `WATERFALL_RINGER_CAP_TOKENS` (default 8,000 est. tokens). Narrowed
+    reads (offset/limit given) and piped/redirected shell commands are
+    never capped. Fails open on any error/missing file/unparseable
+    command. Same reload-config caveat as the other hook.
+  - `router/tests/` — 63 passing unit tests (client, cascade fallback,
+    tiering, sentinel-price regression, tracker, claude-usage, the
+    Ringer hook), no network calls required.
   - Verified end-to-end for real, twice: once with an invalid test key
     (correctly surfaced a 401), and again on 2026-08-04 with Adam's real
     `OPENROUTER_API_KEY` -- `route "Write a one-line docstring..."` actually
@@ -108,10 +118,11 @@ Distilled from a Nate B. Jones transcript on why LLM token usage compounds
 now shape both how this tool is used and what it should still grow into.
 **See `TOKEN_COMPOUNDING.md`** for the standalone version of this
 distillation plus a status table of which countermeasures are actually
-shipped vs. still just a habit (7 of 9 shipped as of 2026-08-05; the two
-open ones — hard per-call caps and cross-session dedup — are enforcement,
-not routing, and neither one shrinks reused-input on an already-long
-thread the way starting a fresh session does).
+shipped vs. still just a habit (8 of 9 shipped as of 2026-08-05, now
+including the hard per-call cap — the "Ringer",
+`router/hooks/pre_tool_use.py` — added 2026-08-05. The one still-open
+item, cross-session dedup, is the most invasive: it needs persistent
+memory across sessions, not just routing/enforcement within one).
 
 - **Classify/split before you send** (`classify`, `route --dry-run`) — free,
   no network, the equivalent of "edit your mistake instead of retrying" and
