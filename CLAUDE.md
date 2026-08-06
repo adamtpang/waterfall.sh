@@ -166,6 +166,34 @@ project once the naming/branding direction was clear.
   and if routine, run `route` and use the cheap model's actual output
   instead of generating the answer itself. Verified live 2026-08-04 (loaded
   correctly, classified a real sub-task as `free`/`small`).
+- **Self-trigger compliance investigated, 2026-08-05**: after global hook
+  install, the hook log showed 97 real nudges fired across 16 projects in
+  24h but `waterfall stats` still showed only 5 routed prompts, all from
+  this session's own testing -- organic self-triggering essentially never
+  happens. Root-caused, not guessed: (1) the classifier only ever sees the
+  current prompt's raw text -- no conversation history, no file content --
+  so it fires on short conversational follow-ups ("yes, look into why")
+  that can never be safely routed regardless of what Claude does; (2)
+  `SKILL.md`'s own "never route" rules correctly decline most of the
+  remainder (anything needing repo/conversation context beyond the bare
+  prompt string) -- this part is the safety net working as designed, not
+  a bug; (3) even for the genuinely-eligible remainder -- a small
+  mechanical chunk generated *within* Claude's own response -- compliance
+  is separately low because nothing enforces the proactive check: there is
+  no tool call to intercept for "chose to generate inline instead of
+  routing," so no Ringer-style hard gate is possible here. Considered and
+  **rejected** building a `Stop`-hook heuristic to retroactively flag
+  "this response looks mechanical" -- the classifier is built to score
+  *requests*, not completed prose/code, and a fuzzy proxy metric here
+  would repeat the exact mistake already made and reversed with
+  reused-input % (a number that looked like signal but wasn't measuring
+  the real thing). Tried instead: tightened `SKILL.md`'s "When to
+  self-trigger" section from a soft "when it feels worth it" judgment call
+  into an unconditional checklist ("if it matches this list, CLASSIFY
+  before writing a word -- not a vibe") plus a mid-generation recovery
+  clause. Cheap to try, honestly uncertain to work -- self-triggering
+  compliance has a real ceiling that prompting alone may not fully close;
+  not yet re-measured.
 - **CLI on PATH**: installed via `pip install --user -e .`, but the
   `Scripts` dir isn't on this machine's PATH (known issue, see
   `feedback_windows_path_poison` memory) -- always invoke by full path
