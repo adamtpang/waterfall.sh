@@ -8,6 +8,7 @@ it's down or rate-limited), and log what that kept off Claude's plate.
     python3 -m router.cli stats
     python3 -m router.cli claude-usage --by-day
     python3 -m router.cli hook-log --verbose
+    python3 -m router.cli usage-pace --used-pct 22
     python3 -m router.cli models
 
 Or, if installed (`pip install -e .` from the repo root): `waterfall ...`.
@@ -31,6 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from smart_router import SmartRouter, SMART_ROUTER_AVAILABLE, API_ROUTER_AVAILABLE
 from tracker import SavingsTracker, estimate_cost_saved
+import usage_pace
 from classifier.types import SavingsEvent
 
 
@@ -228,6 +230,28 @@ def cmd_hook_log(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_usage_pace(args: argparse.Namespace) -> int:
+    tz = timezone(timedelta(hours=args.utc_offset))
+    now = datetime.now(tz)
+    result = usage_pace.compute_pace(
+        used_pct=args.used_pct,
+        now=now,
+        reset_weekday=usage_pace.WEEKDAYS[args.reset_day.lower()],
+        reset_hour=args.reset_hour,
+    )
+
+    print(f"now:         {now.strftime('%Y-%m-%d %H:%M')} (UTC{args.utc_offset:+g})")
+    print(f"last reset:  {result.last_reset.strftime('%Y-%m-%d %H:%M')} "
+          f"({args.reset_day.title()} {args.reset_hour}:00)")
+    print(f"next reset:  {result.next_reset.strftime('%Y-%m-%d %H:%M')}  "
+          f"({result.hours_remaining:.1f}h remaining)")
+    print(f"elapsed:     {result.hours_elapsed:.1f}h of {usage_pace.HOURS_PER_WEEK}h "
+          f"({result.elapsed_pct:.1f}% of the week gone)")
+    print(f"quota used:  {result.used_pct:.1f}%")
+    print(f"delta:       {result.pace_delta:+.1f} points  -- {result.status}")
+    return 0
+
+
 def cmd_models(args: argparse.Namespace) -> int:
     if not API_ROUTER_AVAILABLE:
         print("OpenRouter API client unavailable -- set OPENROUTER_API_KEY.", file=sys.stderr)
@@ -278,6 +302,17 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--verbose", action="store_true", help="also list the individual events")
     sp.add_argument("--limit", type=int, default=20, help="how many recent events to show with --verbose")
     sp.set_defaults(func=cmd_hook_log)
+
+    sp = sub.add_parser("usage-pace", help="check Claude plan weekly-quota pace against elapsed time")
+    sp.add_argument("--used-pct", type=float, required=True,
+                     help="your self-reported %% of weekly quota used, from Claude Code's own usage display")
+    sp.add_argument("--reset-day", default="tuesday", choices=list(usage_pace.WEEKDAYS.keys()),
+                     help="day of week the quota resets (default tuesday)")
+    sp.add_argument("--reset-hour", type=int, default=17,
+                     help="hour (0-23, local time) the quota resets (default 17 = 5pm)")
+    sp.add_argument("--utc-offset", type=float, default=8.0,
+                     help="your UTC offset in hours (default 8 = SGT)")
+    sp.set_defaults(func=cmd_usage_pace)
 
     sp = sub.add_parser("models", help="list the current cheapest capable OpenRouter models")
     sp.add_argument("--limit", type=int, default=5)

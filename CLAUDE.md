@@ -152,10 +152,21 @@ project once the naming/branding direction was clear.
     evidence the same day: `themain.quest` and `pangaea.blog` (other
     repos, real sessions, not test data) both showed up nudged in the
     hook log within the hour.
-  - `router/tests/` — 110 passing unit tests (client, cascade fallback,
+  - `router/usage_pace.py` + `waterfall usage-pace` — added 2026-08-07.
+    Claude Max/Pro plan quota %-used has to come from Claude Code's own
+    usage display (Anthropic weighs cached/reused tokens far lighter
+    than fresh ones for quota purposes, and neither that formula nor a
+    plan's ceiling is derivable from local transcripts) -- this just
+    takes that self-reported number plus the weekly reset schedule
+    (`--reset-day`/`--reset-hour`/`--utc-offset`, defaults tuesday
+    17:00 UTC+8) and reports whether it's ahead of, on, or behind a
+    flat linear share of the week elapsed. Verified live 2026-08-07:
+    Adam at 22% used, 38.3% of the week elapsed (Fri 09:24, reset
+    Tue 17:00 SGT) -> -16.3 points, "comfortable cushion."
+  - `router/tests/` — 123 passing unit tests (client, cascade fallback,
     tiering, sentinel-price regression, tracker, claude-usage, the
-    Ringer hook, the response cache, the hook log, the nudge hook), no
-    network calls required.
+    Ringer hook, the response cache, the hook log, the nudge hook, the
+    usage-pace calculator), no network calls required.
   - Verified end-to-end for real, twice: once with an invalid test key
     (correctly surfaced a 401), and again on 2026-08-04 with Adam's real
     `OPENROUTER_API_KEY` -- `route "Write a one-line docstring..."` actually
