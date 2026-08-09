@@ -7,6 +7,19 @@ their numbers mean anything. Nothing here works without a real person
 running Claude Code normally for a few days afterward; there's no way to
 simulate that.
 
+## Fast path: one-line install
+
+```bash
+curl -sSL https://raw.githubusercontent.com/adamtpang/waterfall.sh/main/install.py | python3
+```
+
+Requires `git` and `python3` on PATH. This clones into `~/.waterfall`,
+installs the one dependency, and wires the two hooks into your
+`~/.claude/settings.json` automatically — merging into whatever's
+already there, backing it up first. Safe to re-run. If this works,
+skip straight to step 3 below. If you'd rather see exactly what it's
+doing (or it doesn't work for some reason), the manual steps follow.
+
 ## 1. Clone and install
 
 ```bash
@@ -79,14 +92,23 @@ case.
 ## 4. After a few days, report back
 
 ```bash
+python3 router/cli.py dashboard --since-days 5
+```
+
+or the two commands it's built from, if you'd rather send raw numbers:
+
+```bash
 python3 router/cli.py hook-log --since-days 5
 python3 router/cli.py stats
 ```
 
-Send both outputs back. That's the whole ask — no code changes, no
-config beyond step 2, no need to touch OpenRouter/`route` at all unless
-you want to try that separately (needs its own `OPENROUTER_API_KEY`,
-see `README.md`).
+Send the output back (a screenshot of `dashboard` is fine). That's the
+whole ask — no code changes, no config beyond step 2, no need to touch
+OpenRouter/`route` at all unless you want to try that separately (needs
+its own `OPENROUTER_API_KEY`, see `README.md`). Fair warning:
+`dashboard` scans your full local Claude Code transcript history for
+the reused-input trend, which can take a couple of minutes if you have
+a lot of history.
 
 ## Why this matters before claiming any real number publicly
 
