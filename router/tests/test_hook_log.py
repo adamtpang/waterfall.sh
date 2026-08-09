@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from hook_log import HookLogEntry, append_entry, load_entries, log_deny, log_nudge, project_label
+from hook_log import HookLogEntry, append_entry, denial_tokens, group_by_day, load_entries, log_deny, log_nudge, project_label
 
 
 class ProjectLabelTests(unittest.TestCase):
@@ -85,6 +85,44 @@ class HookLogTests(unittest.TestCase):
         entries = load_entries(log_path=self.log_path)
         self.assertEqual(len(entries), 1)
         self.assertEqual(entries[0].detail, "ok")
+
+
+class DenialTokensTests(unittest.TestCase):
+    def test_parses_comma_formatted_token_count(self) -> None:
+        entry = HookLogEntry("t", "ringer", "p", "denied", "waterfall Ringer: x is ~25,000 tokens (100,000 bytes), over the cap.")
+        self.assertEqual(denial_tokens(entry), 25000)
+
+    def test_unparseable_detail_returns_zero(self) -> None:
+        entry = HookLogEntry("t", "nudge", "p", "nudged", "routing=free tier=small complexity=0.3")
+        self.assertEqual(denial_tokens(entry), 0)
+
+
+class GroupByDayTests(unittest.TestCase):
+    def test_buckets_by_day_and_hook_type(self) -> None:
+        entries = [
+            HookLogEntry("2026-08-05T01:00:00+00:00", "nudge", "p", "nudged", "d"),
+            HookLogEntry("2026-08-05T02:00:00+00:00", "ringer", "p", "denied", "d"),
+            HookLogEntry("2026-08-05T03:00:00+00:00", "nudge", "p", "nudged", "d"),
+            HookLogEntry("2026-08-06T01:00:00+00:00", "ringer", "p", "denied", "d"),
+        ]
+        by_day = group_by_day(entries)
+        self.assertEqual(by_day["2026-08-05"], {"nudge": 2, "ringer": 1})
+        self.assertEqual(by_day["2026-08-06"], {"nudge": 0, "ringer": 1})
+
+    def test_sorted_chronologically(self) -> None:
+        entries = [
+            HookLogEntry("2026-08-07T00:00:00+00:00", "nudge", "p", "nudged", "d"),
+            HookLogEntry("2026-08-05T00:00:00+00:00", "nudge", "p", "nudged", "d"),
+        ]
+        by_day = group_by_day(entries)
+        self.assertEqual(list(by_day.keys()), ["2026-08-05", "2026-08-07"])
+
+    def test_empty_input(self) -> None:
+        self.assertEqual(group_by_day([]), {})
+
+    def test_skips_entries_without_timestamp(self) -> None:
+        entries = [HookLogEntry("", "nudge", "p", "nudged", "d")]
+        self.assertEqual(group_by_day(entries), {})
 
 
 if __name__ == "__main__":

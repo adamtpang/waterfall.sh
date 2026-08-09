@@ -9,6 +9,7 @@ it's down or rate-limited), and log what that kept off Claude's plate.
     python3 -m router.cli claude-usage --by-day
     python3 -m router.cli hook-log --verbose
     python3 -m router.cli usage-pace --used-pct 22
+    python3 -m router.cli dashboard
     python3 -m router.cli models
 
 Or, if installed (`pip install -e .` from the repo root): `waterfall ...`.
@@ -33,6 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from smart_router import SmartRouter, SMART_ROUTER_AVAILABLE, API_ROUTER_AVAILABLE
 from tracker import SavingsTracker, estimate_cost_saved
 import usage_pace
+import dashboard
 from classifier.types import SavingsEvent
 
 
@@ -252,6 +254,34 @@ def cmd_usage_pace(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_dashboard(args: argparse.Namespace) -> int:
+    import hook_log as hl
+    import claude_usage as cu
+
+    since = datetime.now(timezone.utc) - timedelta(days=args.since_days) if args.since_days else None
+    hook_entries = hl.load_entries(since=since)
+    denial_tokens_list = [hl.denial_tokens(e) for e in hook_entries if e.hook == "ringer"]
+
+    tracker = SavingsTracker()
+    summary = tracker.summarize(tracker.load_events(since=since))
+
+    usage_since_days = args.since_days or 8
+    turns = cu.load_usage_turns(since=datetime.now(timezone.utc) - timedelta(days=usage_since_days))
+    reuse_by_day = [
+        (day, s.reused_input_pct * 100) for day, s in cu.group_by_day(turns).items()
+    ]
+
+    print(dashboard.render_full_dashboard(
+        hook_by_day=hl.group_by_day(hook_entries),
+        denial_tokens_list=denial_tokens_list,
+        total_prompts=summary.total_prompts,
+        tokens_avoided=summary.tokens_avoided,
+        estimated_cost_saved=summary.estimated_cost_saved,
+        reuse_by_day=reuse_by_day,
+    ))
+    return 0
+
+
 def cmd_models(args: argparse.Namespace) -> int:
     if not API_ROUTER_AVAILABLE:
         print("OpenRouter API client unavailable -- set OPENROUTER_API_KEY.", file=sys.stderr)
@@ -313,6 +343,12 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--utc-offset", type=float, default=8.0,
                      help="your UTC offset in hours (default 8 = SGT)")
     sp.set_defaults(func=cmd_usage_pace)
+
+    sp = sub.add_parser("dashboard", help="terminal ASCII dashboard of real hook/routing/usage data")
+    sp.add_argument("--since-days", type=int, default=None,
+                     help="restrict all sections to the last N days "
+                          "(default: all-time for hooks/routing, last 8 days for the reuse trend)")
+    sp.set_defaults(func=cmd_dashboard)
 
     sp = sub.add_parser("models", help="list the current cheapest capable OpenRouter models")
     sp.add_argument("--limit", type=int, default=5)

@@ -16,12 +16,16 @@ returned. Both hook scripts wrap their log call in a bare try/except.
 from __future__ import annotations
 
 import json
+import re
+from collections import defaultdict
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
 DEFAULT_LOG_PATH = Path.home() / ".claude" / "waterfall_hook_log.jsonl"
+
+_TOKEN_ESTIMATE_RE = re.compile(r"~([\d,]+) tokens")
 
 
 @dataclass
@@ -84,3 +88,24 @@ def load_entries(
                 continue
         entries.append(entry)
     return entries
+
+
+def denial_tokens(entry: HookLogEntry) -> int:
+    """Parse the "~N tokens" estimate a Ringer denial's detail always
+    contains (see pre_tool_use.py's deny-reason text). 0 if unparseable --
+    fail quiet, this is a reporting aid, not load-bearing anywhere."""
+    match = _TOKEN_ESTIMATE_RE.search(entry.detail)
+    return int(match.group(1).replace(",", "")) if match else 0
+
+
+def group_by_day(entries: list[HookLogEntry]) -> dict[str, dict[str, int]]:
+    """Bucket entries by UTC calendar day (YYYY-MM-DD prefix of the
+    timestamp) into {"nudge": count, "ringer": count} per day, sorted
+    chronologically."""
+    by_day: dict[str, dict[str, int]] = defaultdict(lambda: {"nudge": 0, "ringer": 0})
+    for e in entries:
+        if not e.timestamp:
+            continue
+        day = e.timestamp[:10]
+        by_day[day][e.hook] = by_day[day].get(e.hook, 0) + 1
+    return dict(sorted(by_day.items()))
