@@ -49,6 +49,16 @@
   .stat b{font-family:var(--mono);font-size:16px;color:var(--chalk)}
   .stat span{display:block;font-size:11.5px;color:var(--faint);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
 
+  .install{margin-top:22px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#08101f;max-width:640px}
+  .install-bar{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line)}
+  .install-dot{width:9px;height:9px;border-radius:50%;background:var(--line)}
+  .install-label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-left:2px}
+  .install-row{display:flex;align-items:center;gap:12px;padding:14px 16px}
+  .install-cmd{font-family:var(--mono);font-size:13.5px;color:var(--accent);overflow-x:auto;white-space:pre;flex:1}
+  .install-copy{flex-shrink:0;font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--dust);background:transparent;border:1px solid var(--line);border-radius:7px;padding:7px 12px;cursor:pointer}
+  .install-copy:hover{border-color:var(--dust);color:var(--chalk)}
+  .install-copy.copied{border-color:var(--accent);color:var(--accent)}
+
   h2.sec{margin:72px 0 8px;font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
   .secnote{font-family:var(--hand);color:var(--accent);font-size:22px;margin-bottom:22px}
 
@@ -89,6 +99,17 @@
     <div class="stat"><b>▽ 100%</b><span>your own key, your own cost</span></div>
   </div>
 
+  <div class="install">
+    <div class="install-bar">
+      <span class="install-dot"></span><span class="install-dot"></span><span class="install-dot"></span>
+      <span class="install-label">install in one command</span>
+    </div>
+    <div class="install-row">
+      <pre class="install-cmd" id="installCmd">curl -sSL https://raw.githubusercontent.com/adamtpang/waterfall.sh/main/install.py | python3</pre>
+      <button class="install-copy" id="installCopyBtn" type="button">Copy</button>
+    </div>
+  </div>
+
   <h2 class="sec">How it falls</h2>
   <div class="secnote">every rung is a real HTTP call, not a browser tab →</div>
 
@@ -123,7 +144,7 @@
 
   <div class="cta">
     <h2>Bring your own OpenRouter key</h2>
-    <p>waterfall.sh is early — the router core is built and tested, the CLI and dashboard are next. Following along, or want in on testing?</p>
+    <p>waterfall.sh is early — the router, CLI, and dashboard are built and tested; onboarding the first beta testers now. Following along, or want in?</p>
     <div class="row">
       <a class="btn primary" href="mailto:adamtpang@gmail.com?subject=waterfall.sh">Email me</a>
       <a class="btn ghost" href="https://x.com/adamtpang" target="_blank" rel="noopener">Follow along on X</a>
@@ -135,5 +156,19 @@
     <span>built with <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a></span>
   </footer>
 </main>
+<script>
+  const copyBtn = document.getElementById('installCopyBtn');
+  const cmdEl = document.getElementById('installCmd');
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(cmdEl.textContent.trim());
+      copyBtn.textContent = 'Copied';
+      copyBtn.classList.add('copied');
+      setTimeout(() => { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }, 1800);
+    } catch (e) {
+      copyBtn.textContent = 'Select & copy';
+    }
+  });
+</script>
 </body>
 </html>
