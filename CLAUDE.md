@@ -163,14 +163,51 @@ project once the naming/branding direction was clear.
     flat linear share of the week elapsed. Verified live 2026-08-07:
     Adam at 22% used, 38.3% of the week elapsed (Fri 09:24, reset
     Tue 17:00 SGT) -> -16.3 points, "comfortable cushion."
-  - `router/tests/` — 123 passing unit tests (client, cascade fallback,
+  - `router/dashboard.py` + `waterfall dashboard` — added 2026-08-09.
+    Terminal ASCII bar charts (no browser/server) over real hook-log,
+    savings-ledger, and claude-usage data: nudges/denials by day, total
+    Ringer prevention (denials, tokens, $ equivalent -- parsed from the
+    hook log's own denial-reason text via `hook_log.denial_tokens()`),
+    routing savings, and the reused-input % trend. Built so a beta
+    tester can self-report results without needing a browser -- just
+    run it and paste/screenshot the output back. **Known cost**: the
+    reuse-trend section scans the full local transcript history via
+    `claude_usage.load_usage_turns()`, which took over 2 minutes on
+    Adam's own multi-project history during live testing -- not fast,
+    documented rather than silently shipped.
+  - `router/tests/` — 154 passing unit tests (client, cascade fallback,
     tiering, sentinel-price regression, tracker, claude-usage, the
     Ringer hook, the response cache, the hook log, the nudge hook, the
-    usage-pace calculator), no network calls required.
+    usage-pace calculator, the dashboard renderer, the installer's
+    settings-merge logic), no network calls required.
   - Verified end-to-end for real, twice: once with an invalid test key
     (correctly surfaced a 401), and again on 2026-08-04 with Adam's real
     `OPENROUTER_API_KEY` -- `route "Write a one-line docstring..."` actually
     called OpenRouter, got real usage/cost back, and logged a ledger entry.
+- **`install.py`** — one-line installer (`curl -sSL .../install.py |
+  python3`) for a beta tester's machine: clones/updates into
+  `~/.waterfall`, installs the one dependency, and merges (never
+  overwrites) the two hook entries into the tester's own
+  `~/.claude/settings.json`, with an automatic backup first. **Real
+  incident, 2026-08-09**: the first live smoke test used
+  `HOME=/tmp/... python3 install.py` to sandbox it, assuming that would
+  redirect `Path.home()` the way it does on Linux/Mac. On this Windows
+  machine `Path.home()` resolves via `USERPROFILE`, which `HOME` doesn't
+  override -- the "isolated" test silently ran for real, cloning a
+  second copy of the repo to `C:\Users\adamp\.waterfall` and adding a
+  *third*, duplicate set of hook entries to Adam's real global
+  `settings.json` (re-triggering the exact double-firing bug fixed
+  earlier that same day). The duplicate hook entries were removed via
+  Edit (that specific edit went through the auto-mode classifier this
+  time, unlike earlier attempts -- inconsistent, not something to rely
+  on); the stray `.waterfall` clone directory is still there, since
+  directory deletion is blocked by the same permission rules
+  (`rm -rf`/`Remove-Item -Recurse` are deny-listed) and routing around
+  that block (e.g. via `shutil.rmtree` in a script) was explicitly
+  avoided as against the intent of the guardrail -- Adam needs to
+  delete `C:\Users\adamp\.waterfall` by hand. Lesson: verify a sandbox
+  actually took effect before running anything that writes to a
+  developer's real global config, especially cross-platform.
 - **Level 2 skill**: `~/.claude/skills/waterfall/SKILL.md` (user-scoped, not
   project-scoped -- available in every Claude Code session, not just this
   repo). Claude self-triggers it on small/mechanical sub-tasks: classify,
