@@ -47,3 +47,6 @@ cheapest one is down or rate-limited — that's the "cascade" the name
 refers to, not just a single cheapest-model pick.
 
 See `CLAUDE.md` for full status, what's built, and what's still open.
+See `SETUP.md` to also wire up the automatic hooks (nudge + hard cap)
+on another machine — needed before any real savings numbers can be
+measured across more than one user.
