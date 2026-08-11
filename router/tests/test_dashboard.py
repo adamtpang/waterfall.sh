@@ -8,7 +8,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from dashboard import bar_chart, render_full_dashboard, render_hook_activity, render_reuse_trend, render_ringer_summary, render_routing_summary
+from dashboard import (
+    bar_chart, render_full_dashboard, render_hook_activity, render_reuse_trend,
+    render_ringer_summary, render_routing_summary,
+    render_model_usage_by_day, render_top_model_projects,
+)
 
 
 class BarChartTests(unittest.TestCase):
@@ -86,6 +90,45 @@ class RenderReuseTrendTests(unittest.TestCase):
         self.assertIn("95.4%", out)
 
 
+class RenderModelUsageByDayTests(unittest.TestCase):
+    def test_empty(self) -> None:
+        out = render_model_usage_by_day({})
+        self.assertIn("no claude-usage data", out)
+
+    def test_renders_breakdown_per_day(self) -> None:
+        out = render_model_usage_by_day({
+            "2026-08-09": {"sonnet": 5891, "opus": 12, "haiku": 3},
+            "2026-08-10": {"sonnet": 6203, "opus": 41},
+        })
+        self.assertIn("sonnet=5891", out)
+        self.assertIn("opus=12", out)
+        self.assertIn("haiku=3", out)
+        self.assertIn("sonnet=6203", out)
+
+    def test_zero_count_tiers_omitted(self) -> None:
+        out = render_model_usage_by_day({"2026-08-09": {"sonnet": 10, "opus": 0}})
+        self.assertNotIn("opus=0", out)
+
+    def test_tier_order_is_opus_sonnet_haiku_fable_other(self) -> None:
+        out = render_model_usage_by_day({"2026-08-09": {"haiku": 1, "opus": 1, "sonnet": 1}})
+        line = out.splitlines()[-1]
+        self.assertLess(line.index("opus"), line.index("sonnet"))
+        self.assertLess(line.index("sonnet"), line.index("haiku"))
+
+
+class RenderTopModelProjectsTests(unittest.TestCase):
+    def test_empty(self) -> None:
+        out = render_top_model_projects("opus", [])
+        self.assertIn("top projects by opus usage", out)
+        self.assertIn("none this range", out)
+
+    def test_renders_ranked_projects(self) -> None:
+        out = render_top_model_projects("opus", [("themain.quest", 191), ("summon.guide", 2)])
+        self.assertIn("themain.quest", out)
+        self.assertIn("191 opus turns", out)
+        self.assertIn("summon.guide", out)
+
+
 class RenderFullDashboardTests(unittest.TestCase):
     def test_combines_all_sections(self) -> None:
         out = render_full_dashboard(
@@ -100,6 +143,25 @@ class RenderFullDashboardTests(unittest.TestCase):
         self.assertIn("Ringer prevention", out)
         self.assertIn("Routing savings", out)
         self.assertIn("reused-input", out)
+
+    def test_model_sections_omitted_when_not_provided(self) -> None:
+        out = render_full_dashboard(
+            hook_by_day={}, denial_tokens_list=[], total_prompts=0,
+            tokens_avoided=0, estimated_cost_saved=0.0, reuse_by_day=[],
+        )
+        self.assertNotIn("model usage by day", out)
+        self.assertNotIn("top projects by", out)
+
+    def test_model_sections_included_when_provided(self) -> None:
+        out = render_full_dashboard(
+            hook_by_day={}, denial_tokens_list=[], total_prompts=0,
+            tokens_avoided=0, estimated_cost_saved=0.0, reuse_by_day=[],
+            model_by_day={"2026-08-09": {"sonnet": 10}},
+            top_opus_projects=[("themain.quest", 191)],
+        )
+        self.assertIn("model usage by day", out)
+        self.assertIn("top projects by opus usage", out)
+        self.assertIn("themain.quest", out)
 
 
 if __name__ == "__main__":

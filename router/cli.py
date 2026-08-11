@@ -278,6 +278,8 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
         tokens_avoided=summary.tokens_avoided,
         estimated_cost_saved=summary.estimated_cost_saved,
         reuse_by_day=reuse_by_day,
+        model_by_day=cu.group_by_day_and_model(turns),
+        top_opus_projects=cu.top_projects_by_model(turns, "opus"),
     ))
     return 0
 

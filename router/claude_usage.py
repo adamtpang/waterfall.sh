@@ -47,6 +47,22 @@ def _pricing_for(model: str) -> tuple[float, float]:
     return DEFAULT_PRICING
 
 
+# Known tiers, checked in this order so "other" only catches genuinely
+# unrecognized strings like "<synthetic>" (internal turns, not a real model).
+MODEL_TIERS = ["opus", "sonnet", "haiku", "fable"]
+
+
+def simplify_model(model: str) -> str:
+    """Collapse a raw model string (e.g. "claude-sonnet-5",
+    "claude-haiku-4-5-20251001", "claude-opus-4-8") down to its tier name,
+    for grouping real usage by model family rather than exact version."""
+    model_lower = model.lower()
+    for tier in MODEL_TIERS:
+        if tier in model_lower:
+            return tier
+    return "other"
+
+
 @dataclass
 class UsageTurn:
     """One assistant turn's real, API-reported token usage."""
@@ -196,3 +212,33 @@ def group_by_day(turns: list[UsageTurn]) -> dict[str, UsageSummary]:
         day = t.timestamp[:10]
         by_day.setdefault(day, []).append(t)
     return {day: summarize(day_turns) for day, day_turns in sorted(by_day.items())}
+
+
+def group_by_day_and_model(turns: list[UsageTurn]) -> dict[str, dict[str, int]]:
+    """Bucket turn counts by day, then by simplified model tier -- e.g.
+    {"2026-08-10": {"sonnet": 6203, "opus": 41, "haiku": 8}}. Reveals model
+    differentiation (or the lack of it) day by day, which raw volume alone
+    doesn't show -- 6,000 Sonnet turns and 6,000 turns split across tiers
+    look identical in every other metric here."""
+    by_day: dict[str, dict[str, int]] = {}
+    for t in turns:
+        if not t.timestamp:
+            continue
+        day = t.timestamp[:10]
+        tier = simplify_model(t.model)
+        by_day.setdefault(day, {})
+        by_day[day][tier] = by_day[day].get(tier, 0) + 1
+    return dict(sorted(by_day.items()))
+
+
+def top_projects_by_model(
+    turns: list[UsageTurn], tier: str, limit: int = 5
+) -> list[tuple[str, int]]:
+    """Projects with the most turns on a given model tier, descending --
+    e.g. tier="opus" surfaces which projects actually reach for heavier
+    reasoning, as an organic signal rather than a guess."""
+    counts: dict[str, int] = {}
+    for t in turns:
+        if simplify_model(t.model) == tier:
+            counts[t.project] = counts.get(t.project, 0) + 1
+    return sorted(counts.items(), key=lambda kv: -kv[1])[:limit]

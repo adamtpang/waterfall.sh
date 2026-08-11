@@ -71,6 +71,37 @@ def render_routing_summary(
     )
 
 
+MODEL_TIER_ORDER = ["opus", "sonnet", "haiku", "fable", "other"]
+
+
+def render_model_usage_by_day(by_day_model: dict[str, dict[str, int]]) -> str:
+    """by_day_model: claude_usage.group_by_day_and_model()'s output --
+    {day: {"sonnet": n, "opus": n, ...}}. The bar reflects total turn volume
+    that day; the trailing counts show whether that volume is actually
+    split across model tiers or all landing on one, which raw volume alone
+    can't reveal. Zero-count tiers are omitted per day to stay readable."""
+    if not by_day_model:
+        return "model usage by day\n(no claude-usage data for this range)"
+
+    rows = []
+    for day, counts in by_day_model.items():
+        total = sum(counts.values())
+        breakdown = " ".join(
+            f"{tier}={counts[tier]}" for tier in MODEL_TIER_ORDER if counts.get(tier)
+        )
+        rows.append((day, float(total), breakdown))
+    return "model usage by day\n" + bar_chart(rows)
+
+
+def render_top_model_projects(tier: str, rows: list[tuple[str, int]]) -> str:
+    """rows: claude_usage.top_projects_by_model()'s output for one tier."""
+    header = f"top projects by {tier} usage"
+    if not rows:
+        return f"{header}\n(none this range)"
+    lines = [f"{project:<20} {count:,} {tier} turns" for project, count in rows]
+    return header + "\n" + "\n".join(lines)
+
+
 def render_reuse_trend(by_day_pct: list[tuple[str, float]]) -> str:
     """by_day_pct: [(day, reused_input_pct_0_to_100), ...] chronological."""
     if not by_day_pct:
@@ -86,6 +117,8 @@ def render_full_dashboard(
     tokens_avoided: int,
     estimated_cost_saved: float,
     reuse_by_day: list[tuple[str, float]],
+    model_by_day: dict[str, dict[str, int]] | None = None,
+    top_opus_projects: list[tuple[str, int]] | None = None,
 ) -> str:
     sections = [
         render_hook_activity(hook_by_day),
@@ -93,4 +126,8 @@ def render_full_dashboard(
         render_routing_summary(total_prompts, tokens_avoided, estimated_cost_saved),
         render_reuse_trend(reuse_by_day),
     ]
+    if model_by_day is not None:
+        sections.append(render_model_usage_by_day(model_by_day))
+    if top_opus_projects is not None:
+        sections.append(render_top_model_projects("opus", top_opus_projects))
     return "\n\n".join(sections)

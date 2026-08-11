@@ -11,7 +11,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from claude_usage import load_usage_turns, summarize, group_by_day, _pricing_for
+from claude_usage import (
+    load_usage_turns, summarize, group_by_day, _pricing_for,
+    simplify_model, group_by_day_and_model, top_projects_by_model,
+)
 
 
 def _assistant_line(session_id, timestamp, model, input_tokens=0,
@@ -153,6 +156,96 @@ class ClaudeUsageTests(unittest.TestCase):
         ])
         turns = load_usage_turns(transcript_files=[p1, p2])
         self.assertEqual({t.project for t in turns}, {"proj-a", "proj-b"})
+
+
+class SimplifyModelTests(unittest.TestCase):
+    def test_recognizes_each_tier(self) -> None:
+        self.assertEqual(simplify_model("claude-sonnet-5"), "sonnet")
+        self.assertEqual(simplify_model("claude-opus-5"), "opus")
+        self.assertEqual(simplify_model("claude-opus-4-8"), "opus")
+        self.assertEqual(simplify_model("claude-haiku-4-5-20251001"), "haiku")
+        self.assertEqual(simplify_model("claude-fable-5"), "fable")
+
+    def test_unrecognized_model_is_other(self) -> None:
+        self.assertEqual(simplify_model("<synthetic>"), "other")
+        self.assertEqual(simplify_model(""), "other")
+
+
+class _TranscriptFixtureMixin:
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def _write_transcript(self, project_dir: str, filename: str, lines: list[str]) -> Path:
+        d = self.root / project_dir
+        d.mkdir(parents=True, exist_ok=True)
+        path = d / filename
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return path
+
+
+class GroupByDayAndModelTests(_TranscriptFixtureMixin, unittest.TestCase):
+    def test_buckets_by_day_and_tier(self) -> None:
+        path = self._write_transcript("proj-a", "s1.jsonl", [
+            _assistant_line("s1", "2026-08-09T10:00:00+00:00", "claude-sonnet-5"),
+            _assistant_line("s1", "2026-08-09T11:00:00+00:00", "claude-sonnet-5"),
+            _assistant_line("s1", "2026-08-09T12:00:00+00:00", "claude-opus-5"),
+            _assistant_line("s1", "2026-08-10T10:00:00+00:00", "claude-haiku-4-5-20251001"),
+        ])
+        turns = load_usage_turns(transcript_files=[path])
+        by_day = group_by_day_and_model(turns)
+        self.assertEqual(by_day["2026-08-09"], {"sonnet": 2, "opus": 1})
+        self.assertEqual(by_day["2026-08-10"], {"haiku": 1})
+
+    def test_sorted_chronologically(self) -> None:
+        path = self._write_transcript("proj-a", "s1.jsonl", [
+            _assistant_line("s1", "2026-08-10T10:00:00+00:00", "claude-sonnet-5"),
+            _assistant_line("s1", "2026-08-05T10:00:00+00:00", "claude-sonnet-5"),
+        ])
+        turns = load_usage_turns(transcript_files=[path])
+        by_day = group_by_day_and_model(turns)
+        self.assertEqual(list(by_day.keys()), ["2026-08-05", "2026-08-10"])
+
+    def test_empty_input(self) -> None:
+        self.assertEqual(group_by_day_and_model([]), {})
+
+
+class TopProjectsByModelTests(_TranscriptFixtureMixin, unittest.TestCase):
+    def test_ranks_projects_by_tier_descending(self) -> None:
+        p1 = self._write_transcript("proj-a", "s1.jsonl", [
+            _assistant_line("s1", "2026-08-09T10:00:00+00:00", "claude-opus-5"),
+            _assistant_line("s1", "2026-08-09T11:00:00+00:00", "claude-opus-5"),
+        ])
+        p2 = self._write_transcript("proj-b", "s2.jsonl", [
+            _assistant_line("s2", "2026-08-09T10:00:00+00:00", "claude-opus-5"),
+        ])
+        p3 = self._write_transcript("proj-c", "s3.jsonl", [
+            _assistant_line("s3", "2026-08-09T10:00:00+00:00", "claude-sonnet-5"),
+        ])
+        turns = load_usage_turns(transcript_files=[p1, p2, p3])
+        top = top_projects_by_model(turns, "opus")
+        self.assertEqual(top, [("proj-a", 2), ("proj-b", 1)])
+
+    def test_respects_limit(self) -> None:
+        paths = [
+            self._write_transcript(f"proj-{i}", f"s{i}.jsonl", [
+                _assistant_line(f"s{i}", "2026-08-09T10:00:00+00:00", "claude-opus-5"),
+            ])
+            for i in range(5)
+        ]
+        turns = load_usage_turns(transcript_files=paths)
+        top = top_projects_by_model(turns, "opus", limit=2)
+        self.assertEqual(len(top), 2)
+
+    def test_empty_when_tier_never_used(self) -> None:
+        path = self._write_transcript("proj-a", "s1.jsonl", [
+            _assistant_line("s1", "2026-08-09T10:00:00+00:00", "claude-sonnet-5"),
+        ])
+        turns = load_usage_turns(transcript_files=[path])
+        self.assertEqual(top_projects_by_model(turns, "opus"), [])
 
 
 if __name__ == "__main__":

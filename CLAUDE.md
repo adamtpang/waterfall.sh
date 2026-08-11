@@ -175,11 +175,31 @@ project once the naming/branding direction was clear.
     `claude_usage.load_usage_turns()`, which took over 2 minutes on
     Adam's own multi-project history during live testing -- not fast,
     documented rather than silently shipped.
-  - `router/tests/` — 154 passing unit tests (client, cascade fallback,
+  - **Model-tier breakdown added to the dashboard, 2026-08-11**, via
+    `/next`: a "model usage by day" section and a "top projects by opus
+    usage" section, both from two new `claude_usage.py` helpers
+    (`simplify_model()` collapses raw model strings like
+    `claude-haiku-4-5-20251001` down to a tier name; `group_by_day_and_
+    model()` and `top_projects_by_model()` do the aggregation). Real
+    finding this surfaced immediately: **98.9% of every turn across
+    every project, last 7 days, is Sonnet** -- 220 Opus turns (nearly
+    all in themain.quest), 104 Haiku, 10 Fable, out of ~39,000 total.
+    Zero differentiation happening in practice. Separately confirmed
+    (via a fresh claude-code-guide check) that Claude Code hooks cannot
+    force a model switch -- no `model`/`modelOverride` field exists in
+    any hook's output, and there's no per-prompt auto-routing mechanism
+    at all, only the manual `/model` command or a static session
+    default -- so a full "auto-route to the optimal Claude model"
+    feature isn't buildable today. The dashboard section ships as a
+    reporting tool only; if a suggestion nudge gets built on top of
+    this later, expect the same low real-world conversion the routing
+    nudge already showed (97 nudges fired, 5 real routes followed).
+  - `router/tests/` — 170 passing unit tests (client, cascade fallback,
     tiering, sentinel-price regression, tracker, claude-usage, the
     Ringer hook, the response cache, the hook log, the nudge hook, the
     usage-pace calculator, the dashboard renderer, the installer's
-    settings-merge logic), no network calls required.
+    settings-merge logic, the model-tier breakdown), no network calls
+    required.
   - Verified end-to-end for real, twice: once with an invalid test key
     (correctly surfaced a 401), and again on 2026-08-04 with Adam's real
     `OPENROUTER_API_KEY` -- `route "Write a one-line docstring..."` actually
