@@ -306,8 +306,11 @@ def cmd_models(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="waterfall", description="Cascade to the best model. Automatically.")
-    sub = p.add_subparsers(dest="command", required=True)
+    p = argparse.ArgumentParser(
+        prog="waterfall",
+        description="Cascade to the best model. Automatically. Bare `waterfall` shows the dashboard.",
+    )
+    sub = p.add_subparsers(dest="command", required=False)
 
     sp = sub.add_parser("classify", help="classify a prompt -- no network calls")
     _add_prompt_args(sp)
@@ -371,6 +374,9 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.command is None:
+        # bare `waterfall`, no subcommand -- show the dashboard
+        args = parser.parse_args(["dashboard"])
     return args.func(args)
 
 

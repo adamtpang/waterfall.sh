@@ -46,9 +46,32 @@ def clone_or_update() -> Path:
     return INSTALL_DIR
 
 
-def install_dependencies(repo_dir: Path) -> None:
-    print("Installing dependencies ...")
-    _run([sys.executable, "-m", "pip", "install", "-q", "-r", str(repo_dir / "router" / "requirements.txt")])
+def install_package(repo_dir: Path) -> None:
+    """Installs waterfall as an editable package, not just its one
+    dependency -- this is what actually registers the `waterfall` console
+    command (pyproject.toml's [project.scripts] entry), so `waterfall` on
+    its own works after this instead of only `python3 router/cli.py ...`."""
+    print("Installing waterfall ...")
+    _run([sys.executable, "-m", "pip", "install", "-q", "-e", str(repo_dir)])
+
+
+def check_waterfall_on_path() -> None:
+    """pip installs the console script into Python's user-scripts
+    directory, which isn't always on PATH (a known issue on Windows in
+    particular). Report the truth instead of silently leaving `waterfall`
+    broken with no explanation."""
+    if shutil.which("waterfall") is not None:
+        print("`waterfall` is on PATH and ready to use.")
+        return
+    print(
+        "\nNOTE: `waterfall` installed but isn't on PATH yet, so the bare "
+        "command won't resolve in a new terminal.\n"
+        "This is a real, known issue, not a bug in this installer -- pip "
+        "puts console scripts in a user-scripts directory that many "
+        "systems don't add to PATH automatically.\n"
+        "Until that's fixed, invoke it by full path instead:\n"
+        f'  python3 "{(INSTALL_DIR / "router" / "cli.py").as_posix()}" ...'
+    )
 
 
 def _hook_entry(script_path: Path, matcher: str | None = None) -> dict:
@@ -115,13 +138,13 @@ def wire_hooks(repo_dir: Path) -> None:
 def main() -> int:
     print("waterfall.sh installer\n")
     repo_dir = clone_or_update()
-    install_dependencies(repo_dir)
+    install_package(repo_dir)
     wire_hooks(repo_dir)
+    check_waterfall_on_path()
     print(
         "\nDone. Start a new Claude Code session for the hooks to take effect.\n"
-        "\nAfter a few days of normal use, report back with:\n"
-        f'  python3 "{(repo_dir / "router" / "cli.py").as_posix()}" hook-log --since-days 5\n'
-        f'  python3 "{(repo_dir / "router" / "cli.py").as_posix()}" stats'
+        "\nAfter a few days of normal use, run `waterfall` on its own to see "
+        "the dashboard (or the full path shown above if it's not on PATH yet)."
     )
     return 0
 

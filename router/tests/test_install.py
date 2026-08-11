@@ -1,6 +1,6 @@
 """Tests for install.py's hook-merging logic -- no git/pip/network calls.
 
-clone_or_update() and install_dependencies() are real system operations
+clone_or_update() and install_package() are real system operations
 (git, pip) and aren't unit-tested here; this covers the part that's
 actually risky to get wrong -- merging into a stranger's existing
 ~/.claude/settings.json without clobbering it.
