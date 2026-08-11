@@ -110,6 +110,55 @@ def render_reuse_trend(by_day_pct: list[tuple[str, float]]) -> str:
     return "reused-input % by day (Claude Code, all projects)\n" + bar_chart(rows)
 
 
+COUNTERMEASURES = [
+    (1, "classify before sending", None,
+     "decision step, no number of its own, feeds #3"),
+    (2, "auto-fallback across models", None,
+     "reliability only, keeps #3 working when the cheap model is down"),
+    (3, "routing ledger (real openrouter calls)", "routing_tokens",
+     "tokens avoided via real routed calls"),
+    (4, "claude usage ledger", None,
+     "measurement only, this is the baseline everything else is checked against, 0 tokens saved by itself"),
+    (5, "model tiering", None,
+     "no number of its own, affects cost efficiency inside #3's calls"),
+    (6, "skill self-triggers", None,
+     "delivery mechanism for #3, no number of its own"),
+    (7, "automatic nudge hook", None,
+     "delivery mechanism for #3, no number of its own"),
+    (8, "the ringer (hard per-call cap)", "ringer_tokens",
+     "tokens prevented from ever entering context"),
+    (9, "cross-session response cache", "cache_tokens",
+     "tokens avoided via cache hits, counted separately from #3"),
+]
+
+
+def render_countermeasures_breakdown(
+    ringer_tokens: int, routing_tokens: int, cache_tokens: int,
+) -> str:
+    """Honest per-countermeasure breakdown. Only 3 of the 9 have a real,
+    distinct token number: the rest are decision, delivery, or reliability
+    mechanisms that feed those 3, not separate savings sources. Assigning
+    a fabricated number to all 9 would look tidier but would be lying,
+    since most of them have no measurable output of their own."""
+    values = {
+        "ringer_tokens": ringer_tokens,
+        "routing_tokens": routing_tokens,
+        "cache_tokens": cache_tokens,
+    }
+    lines = ["the 9 countermeasures, what each actually saves"]
+    real_count = 0
+    for num, name, value_key, note in COUNTERMEASURES:
+        if value_key:
+            real_count += 1
+            amount = values[value_key]
+            lines.append(f"{num}. {name:<42} {amount:,} tokens. {note}")
+        else:
+            lines.append(f"{num}. {name:<42} no standalone number. {note}")
+    lines.append("")
+    lines.append(f"{real_count} of 9 have their own measurable number. the other {9 - real_count} support those {real_count}, they don't save tokens on their own.")
+    return "\n".join(lines)
+
+
 def render_full_dashboard(
     hook_by_day: dict[str, dict[str, int]],
     denial_tokens_list: list[int],
@@ -119,6 +168,8 @@ def render_full_dashboard(
     reuse_by_day: list[tuple[str, float]],
     model_by_day: dict[str, dict[str, int]] | None = None,
     top_opus_projects: list[tuple[str, int]] | None = None,
+    openrouter_tokens_avoided: int | None = None,
+    cache_tokens_avoided: int | None = None,
 ) -> str:
     sections = [
         render_hook_activity(hook_by_day),
@@ -130,4 +181,10 @@ def render_full_dashboard(
         sections.append(render_model_usage_by_day(model_by_day))
     if top_opus_projects is not None:
         sections.append(render_top_model_projects("opus", top_opus_projects))
+    if openrouter_tokens_avoided is not None and cache_tokens_avoided is not None:
+        sections.append(render_countermeasures_breakdown(
+            ringer_tokens=sum(denial_tokens_list),
+            routing_tokens=openrouter_tokens_avoided,
+            cache_tokens=cache_tokens_avoided,
+        ))
     return "\n\n".join(sections)

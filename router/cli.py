@@ -263,7 +263,10 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
     denial_tokens_list = [hl.denial_tokens(e) for e in hook_entries if e.hook == "ringer"]
 
     tracker = SavingsTracker()
-    summary = tracker.summarize(tracker.load_events(since=since))
+    events = tracker.load_events(since=since)
+    summary = tracker.summarize(events)
+    openrouter_tokens = sum(e.tokens_saved for e in events if e.backend_used == "openrouter")
+    cache_tokens = sum(e.tokens_saved for e in events if e.backend_used == "cache")
 
     usage_since_days = args.since_days or 8
     turns = cu.load_usage_turns(since=datetime.now(timezone.utc) - timedelta(days=usage_since_days))
@@ -280,6 +283,8 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
         reuse_by_day=reuse_by_day,
         model_by_day=cu.group_by_day_and_model(turns),
         top_opus_projects=cu.top_projects_by_model(turns, "opus"),
+        openrouter_tokens_avoided=openrouter_tokens,
+        cache_tokens_avoided=cache_tokens,
     ))
     return 0
 

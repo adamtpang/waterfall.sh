@@ -12,6 +12,7 @@ from dashboard import (
     bar_chart, render_full_dashboard, render_hook_activity, render_reuse_trend,
     render_ringer_summary, render_routing_summary,
     render_model_usage_by_day, render_top_model_projects,
+    render_countermeasures_breakdown,
 )
 
 
@@ -162,6 +163,50 @@ class RenderFullDashboardTests(unittest.TestCase):
         self.assertIn("model usage by day", out)
         self.assertIn("top projects by opus usage", out)
         self.assertIn("themain.quest", out)
+
+    def test_countermeasures_section_omitted_without_both_token_args(self) -> None:
+        out = render_full_dashboard(
+            hook_by_day={}, denial_tokens_list=[], total_prompts=0,
+            tokens_avoided=0, estimated_cost_saved=0.0, reuse_by_day=[],
+            openrouter_tokens_avoided=100,
+        )
+        self.assertNotIn("the 9 countermeasures", out)
+
+    def test_countermeasures_section_included_when_both_provided(self) -> None:
+        out = render_full_dashboard(
+            hook_by_day={}, denial_tokens_list=[500], total_prompts=0,
+            tokens_avoided=0, estimated_cost_saved=0.0, reuse_by_day=[],
+            openrouter_tokens_avoided=100, cache_tokens_avoided=50,
+        )
+        self.assertIn("the 9 countermeasures", out)
+        self.assertIn("500 tokens", out)
+        self.assertIn("100 tokens", out)
+        self.assertIn("50 tokens", out)
+
+
+class RenderCountermeasuresBreakdownTests(unittest.TestCase):
+    def test_lists_all_nine(self) -> None:
+        out = render_countermeasures_breakdown(ringer_tokens=100, routing_tokens=50, cache_tokens=25)
+        for n in range(1, 10):
+            self.assertIn(f"{n}.", out)
+
+    def test_real_numbers_appear_for_the_three_measurable_items(self) -> None:
+        out = render_countermeasures_breakdown(ringer_tokens=4188156, routing_tokens=75, cache_tokens=10)
+        self.assertIn("4,188,156 tokens", out)
+        self.assertIn("75 tokens", out)
+        self.assertIn("10 tokens", out)
+
+    def test_unmeasurable_items_say_no_standalone_number(self) -> None:
+        out = render_countermeasures_breakdown(ringer_tokens=1, routing_tokens=1, cache_tokens=1)
+        self.assertIn("no standalone number", out)
+
+    def test_summary_line_reports_three_of_nine(self) -> None:
+        out = render_countermeasures_breakdown(ringer_tokens=1, routing_tokens=1, cache_tokens=1)
+        self.assertIn("3 of 9", out)
+
+    def test_zero_values_still_render(self) -> None:
+        out = render_countermeasures_breakdown(ringer_tokens=0, routing_tokens=0, cache_tokens=0)
+        self.assertIn("0 tokens", out)
 
 
 if __name__ == "__main__":

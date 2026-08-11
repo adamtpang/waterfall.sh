@@ -194,12 +194,27 @@ project once the naming/branding direction was clear.
     reporting tool only; if a suggestion nudge gets built on top of
     this later, expect the same low real-world conversion the routing
     nudge already showed (97 nudges fired, 5 real routes followed).
-  - `router/tests/` — 170 passing unit tests (client, cascade fallback,
+  - **Per-countermeasure breakdown added 2026-08-11**, for Adam's
+    pitch to Claude power users hitting usage limits even on Max
+    plans: `waterfall dashboard` now has a "the 9 countermeasures,
+    what each actually saves" section, `dashboard.
+    render_countermeasures_breakdown()`. Deliberately honest rather
+    than tidy: only 3 of the 9 (#3 routing ledger, #8 the Ringer, #9
+    cross-session cache) have their own real, distinct token number.
+    The other 6 (classify, auto-fallback, the usage ledger itself,
+    model tiering, the skill, the nudge hook) are decision, delivery,
+    reliability, or measurement mechanisms that feed those 3 -- they
+    don't save tokens on their own, and the breakdown says so plainly
+    instead of inventing a number for each to make all 9 look equally
+    impressive. #3 and #9 are computed as separate, non-overlapping
+    sums from the tracker ledger (split by `backend_used`) so cache
+    hits aren't double-counted inside the routing total.
+  - `router/tests/` — 177 passing unit tests (client, cascade fallback,
     tiering, sentinel-price regression, tracker, claude-usage, the
     Ringer hook, the response cache, the hook log, the nudge hook, the
     usage-pace calculator, the dashboard renderer, the installer's
-    settings-merge logic, the model-tier breakdown), no network calls
-    required.
+    settings-merge logic, the model-tier breakdown, the countermeasures
+    breakdown), no network calls required.
   - Verified end-to-end for real, twice: once with an invalid test key
     (correctly surfaced a 401), and again on 2026-08-04 with Adam's real
     `OPENROUTER_API_KEY` -- `route "Write a one-line docstring..."` actually
