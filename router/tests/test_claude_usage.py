@@ -94,6 +94,50 @@ class ClaudeUsageTests(unittest.TestCase):
         self.assertEqual(len(turns), 1)
         self.assertEqual(turns[0].input_tokens, 2)
 
+    def test_since_skips_files_whose_mtime_predates_it(self) -> None:
+        import os
+        from datetime import datetime, timezone
+        # Content timestamp is AFTER `since`, but the file's real mtime is
+        # forced BEFORE it -- if the mtime-skip optimization used the
+        # content instead of the file's own mtime, this would wrongly
+        # include the turn. It must not, since the mtime says the file
+        # predates the window regardless of what a line inside claims.
+        path = self._write_transcript("proj-a", "s1.jsonl", [
+            _assistant_line("s1", "2026-08-05T10:00:00+00:00", "claude-sonnet-5", input_tokens=99),
+        ])
+        old_time = datetime(2026, 8, 1, tzinfo=timezone.utc).timestamp()
+        os.utime(path, (old_time, old_time))
+
+        since = datetime(2026, 8, 3, tzinfo=timezone.utc)
+        turns = load_usage_turns(transcript_files=[path], since=since)
+        self.assertEqual(turns, [])
+
+    def test_since_still_reads_files_with_recent_mtime(self) -> None:
+        import os
+        from datetime import datetime, timezone
+        path = self._write_transcript("proj-a", "s1.jsonl", [
+            _assistant_line("s1", "2026-08-05T10:00:00+00:00", "claude-sonnet-5", input_tokens=42),
+        ])
+        recent_time = datetime(2026, 8, 6, tzinfo=timezone.utc).timestamp()
+        os.utime(path, (recent_time, recent_time))
+
+        since = datetime(2026, 8, 3, tzinfo=timezone.utc)
+        turns = load_usage_turns(transcript_files=[path], since=since)
+        self.assertEqual(len(turns), 1)
+        self.assertEqual(turns[0].input_tokens, 42)
+
+    def test_no_since_reads_everything_regardless_of_mtime(self) -> None:
+        import os
+        from datetime import datetime, timezone
+        path = self._write_transcript("proj-a", "s1.jsonl", [
+            _assistant_line("s1", "2026-08-01T10:00:00+00:00", "claude-sonnet-5", input_tokens=7),
+        ])
+        old_time = datetime(2020, 1, 1, tzinfo=timezone.utc).timestamp()
+        os.utime(path, (old_time, old_time))
+
+        turns = load_usage_turns(transcript_files=[path])
+        self.assertEqual(len(turns), 1)
+
     def test_summarize_aggregates_and_computes_reused_pct(self) -> None:
         path = self._write_transcript("proj-a", "s1.jsonl", [
             _assistant_line("s1", "2026-08-04T10:00:00+00:00", "claude-sonnet-5",

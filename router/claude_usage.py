@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -126,6 +126,22 @@ def load_usage_turns(
     files = transcript_files if transcript_files is not None else _iter_transcript_files(project)
     for path in files:
         project_name = path.parent.name
+        if since is not None:
+            # Transcripts are append-only -- a file's mtime is its last
+            # write, so if that predates `since`, every line in it does
+            # too. Skipping the read entirely (rather than reading and
+            # filtering line by line) is what actually makes --since-days
+            # fast: most of an active user's transcript directory is old,
+            # inactive project files this avoids opening at all. Compared
+            # in UTC regardless of `since`'s own tzinfo, since a file
+            # mtime is an absolute point in time either way.
+            try:
+                mtime = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+            except OSError:
+                mtime = None
+            since_utc = since if since.tzinfo else since.replace(tzinfo=timezone.utc)
+            if mtime is not None and mtime < since_utc:
+                continue
         try:
             lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()
         except OSError:
