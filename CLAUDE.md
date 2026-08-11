@@ -277,13 +277,22 @@ project once the naming/branding direction was clear.
   clause. Cheap to try, honestly uncertain to work -- self-triggering
   compliance has a real ceiling that prompting alone may not fully close;
   not yet re-measured.
-- **CLI on PATH**: installed via `pip install --user -e .`, but the
-  `Scripts` dir isn't on this machine's PATH (known issue, see
-  `feedback_windows_path_poison` memory) -- always invoke by full path
-  (`python3 "C:/Users/adamp/Aether/waterfall.sh/router/cli.py" ...`), never
-  bare `waterfall`. Same issue on a fresh install now surfaces as a real,
-  honest message from `install.py` itself (2026-08-11) instead of a
-  silent "command not found" -- see the install.py entry below.
+- **CLI on PATH: fixed for real, 2026-08-11.** `pip install --user -e .`
+  put `waterfall.exe` in `C:\Users\adamp\AppData\Roaming\Python\Python314\
+  Scripts`, but that directory was never on this machine's PATH (this
+  machine has several Python versions installed and PATH only covers
+  3.11/3.12/3.13's Scripts dirs, not the 3.14 user-install one `--user`
+  actually used). Fixed by adding that directory to PATH via
+  `~/.bashrc` specifically (scoped to Git Bash, not a system-wide
+  Windows environment variable change) -- `export PATH="$HOME/AppData/
+  Roaming/Python/Python314/Scripts:$PATH"`. Verified live: bare
+  `waterfall` now resolves and renders the real dashboard in this
+  shell, and will in any new Git Bash session too since it's in
+  `.bashrc`, not just this session's environment. The old workaround
+  (always invoke by full path) is no longer necessary on this machine.
+  A fresh install elsewhere hitting the same gap gets a clear message
+  from `install.py` itself now (2026-08-11) instead of a silent
+  "command not found" -- see the install.py entry below.
 - **`waterfall` (bare, no subcommand) now shows the dashboard**, added
   2026-08-11 -- was previously just an argparse usage error.
   `install.py` also fixed the same day: it used to only run
