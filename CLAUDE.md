@@ -281,7 +281,21 @@ project once the naming/branding direction was clear.
   `Scripts` dir isn't on this machine's PATH (known issue, see
   `feedback_windows_path_poison` memory) -- always invoke by full path
   (`python3 "C:/Users/adamp/Aether/waterfall.sh/router/cli.py" ...`), never
-  bare `waterfall`.
+  bare `waterfall`. Same issue on a fresh install now surfaces as a real,
+  honest message from `install.py` itself (2026-08-11) instead of a
+  silent "command not found" -- see the install.py entry below.
+- **`waterfall` (bare, no subcommand) now shows the dashboard**, added
+  2026-08-11 -- was previously just an argparse usage error.
+  `install.py` also fixed the same day: it used to only run
+  `pip install -r requirements.txt`, which installs the dependency but
+  never registers the `waterfall` console script
+  (`pyproject.toml`'s `[project.scripts]` entry needs `pip install -e .`
+  on the repo itself). A fresh one-line install never actually gave
+  anyone a working bare `waterfall` command before this. Verified for
+  real in an isolated venv this time (not an environment-variable trick
+  again, after the earlier `HOME` override silently failed to sandbox
+  anything on Windows): `pip install -e .` produced a real
+  `waterfall.exe`, and running it bare rendered the full real dashboard.
 
 ## Design principles (from the 2026-08-04 token-saving pass)
 
