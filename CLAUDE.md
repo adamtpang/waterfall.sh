@@ -163,6 +163,30 @@ project once the naming/branding direction was clear.
     flat linear share of the week elapsed. Verified live 2026-08-07:
     Adam at 22% used, 38.3% of the week elapsed (Fri 09:24, reset
     Tue 17:00 SGT) -> -16.3 points, "comfortable cushion."
+  - **`usage-pace` extended to multiple quota buckets, 2026-08-13**,
+    prompted by a real screenshot of Claude Code's own usage panel
+    showing three separate clocks at once (5-hour session limit, weekly
+    all-models, weekly per-model e.g. Fable), each with its own reset.
+    The original `compute_pace()` only ever handled the single weekly
+    bucket. Added `BucketResult` + `compute_bucket_pace()` -- same pace
+    math, generalized to any window length, driven by an
+    hours-remaining countdown (what the panel actually shows, "resets
+    in 3h 27m") instead of a weekday+hour schedule -- and `guidance()`,
+    which names the tightest bucket (relative to its own elapsed time,
+    not raw %-used) as the binding constraint to ease off, and the
+    roomiest as safe to lean on harder. Wired into the CLI via
+    `--session-pct`/`--session-hours-remaining`/`--session-window-hours`
+    and repeatable `--model-pct MODEL=PCT`. Verified live against
+    Adam's real numbers (13% used/3.45h remaining on a 5h session, 24%
+    weekly all-models, 3% weekly Fable, both weekly resetting Tue
+    ~4pm): weekly all-models -1.7 points ("tracking evenly"), session
+    -18.0 ("comfortable cushion"), Fable -22.7 ("comfortable cushion"),
+    guidance correctly named weekly all-models as the binding
+    constraint (least-negative, still comfortable) and weekly Fable as
+    having the most headroom. 20 new tests
+    (`ComputeBucketPaceTests`, `GuidanceTests`), full suite still green
+    at 200 tests. Not yet surfaced inside `dashboard` itself -- still a
+    separate `usage-pace` CLI path.
   - `router/dashboard.py` + `waterfall dashboard` — added 2026-08-09.
     Terminal ASCII bar charts (no browser/server) over real hook-log,
     savings-ledger, and claude-usage data: nudges/denials by day, total
@@ -209,12 +233,61 @@ project once the naming/branding direction was clear.
     impressive. #3 and #9 are computed as separate, non-overlapping
     sums from the tracker ledger (split by `backend_used`) so cache
     hits aren't double-counted inside the routing total.
-  - `router/tests/` — 177 passing unit tests (client, cascade fallback,
+  - **Desktop GUI shipped 2026-08-11** (`desktop/`, `waterfall desktop`):
+    local command center on `127.0.0.1:8765` with three tabs —
+    Dashboard (ledger + hooks), Cascade (classify / dry-run / live
+    route), Agents (detect + launch Claude Code, Codex, Grok Build,
+    OpenCode, Gemini, Cursor Agent). Stdlib HTTP + HTML only; optional
+    `pywebview` via `waterfall desktop --native` or
+    `pip install -e ".[desktop]"`. Patterns learned from OSS landscape
+    (AionUi multi-agent glass, opcode usage chrome, Palot GUI-over-CLI,
+    OpenCode multi-surface) without forking — research recorded in
+    `DESKTOP_GUI_LANDSCAPE.md`. Template rule satisfied by reusing this
+    repo's own `index.html` visual system rather than scaffolding a new
+    Electron app from empty.
+  - **`watertop` one-word launcher (2026-08-11)**: console script
+    `watertop = desktop.watertop:main` in pyproject.toml. Defaults to
+    native window when pywebview is present, else browser. Same as
+    `waterfall desktop` with less typing. Install path still
+    `pip install -e .` (or `install.py`); installer now checks both
+    `waterfall` and `watertop` on PATH.
+  - **Peer desktops installed 2026-08-11** (Path "install peers"):
+    CC Switch 3.19.2, AionUi 2.1.47, OpenCode Desktop 1.18.16 via
+    winget; OpenChamber 1.18.2 via GitHub win-x64 installer. Documented
+    in `PEERS_INSTALLED.md`. Product split: peers = Claude/Codex-class
+    agent UI; watertop = cascade/quota only.
+  - **Native `waterfall.exe` (2026-08-11)**: Tauri 2 app in
+    `desktop-app/`, scaffolded from official
+    `create-tauri-app --template vanilla`, customized with CC Switch
+    (Tauri shell), AionUi (peer launch), OpenChamber (sidebar) patterns
+    + existing cascade Python API. Built release binary:
+    `dist/waterfall.exe`, also
+    `desktop-app/src-tauri/target/release/waterfall.exe`, NSIS setup
+    `waterfall_0.1.0_x64-setup.exe`, MSI
+    `waterfall_0.1.0_x64_en-US.msi`. Run `waterfall-app` (bash) or
+    double-click `dist/waterfall.exe`. Not a full fork of AionUi monorepo
+    (would be wrong product); pattern-merge into waterfall-branded shell.
+  - **Parity pass vs Claude Code (2026-08-11)**: gap doc
+    `GAP_VS_CLAUDE_CODE.md`. PowerShell process was Claude Desktop
+    parent, not waterfall. P1 shipped: CREATE_NO_WINDOW backend,
+    Claude session browser (`~/.claude/projects`), launch Claude/Codex/
+    Grok CLI into project cwd. Still not full agent tool-loop (by design;
+    peers own that).
+  - **Design system + logo (2026-08-11)**: tokens in `DESIGN.md`. Brand mark
+    is a **blue W** on deep water (`brand/logo.svg` / `logo.png`). Desktop
+    icons via `npx tauri icon brand/logo.png`. Favicon `brand/favicon.svg`.
+  - **Desktop UX overhaul (2026-08-11)**: maximized window on open; Home
+    token-savings hero; Projects (agent-modular, not Claude-default);
+    Savings tab; Settings with theme/accent/density + local OAuth scaffold
+    (`~/.waterfall/profile.json`). UX refs Linear/Figma/VS Code/Raycast.
+    No em dashes in product UI. Full agent tool-loop still via peer CLIs
+    (honest gap in `GAP_VS_CLAUDE_CODE.md`).
+  - `router/tests/` — unit tests (client, cascade fallback,
     tiering, sentinel-price regression, tracker, claude-usage, the
     Ringer hook, the response cache, the hook log, the nudge hook, the
     usage-pace calculator, the dashboard renderer, the installer's
     settings-merge logic, the model-tier breakdown, the countermeasures
-    breakdown), no network calls required.
+    breakdown, desktop API/server), no network calls required.
   - Verified end-to-end for real, twice: once with an invalid test key
     (correctly surfaced a 401), and again on 2026-08-04 with Adam's real
     `OPENROUTER_API_KEY` -- `route "Write a one-line docstring..."` actually
