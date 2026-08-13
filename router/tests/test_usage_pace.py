@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from usage_pace import WEEKDAYS, compute_pace, _last_reset
+from usage_pace import WEEKDAYS, compute_pace, compute_bucket_pace, guidance, _last_reset, BucketResult
 
 SGT = timezone(timedelta(hours=8))
 TUESDAY = WEEKDAYS["tuesday"]
@@ -93,6 +93,66 @@ class ComputePaceTests(unittest.TestCase):
         )
         # Last Sunday before Wed 2026-08-05 is 2026-08-02
         self.assertEqual(result.last_reset, datetime(2026, 8, 2, 9, 0, tzinfo=SGT))
+
+
+class ComputeBucketPaceTests(unittest.TestCase):
+    def test_matches_manual_calc_for_five_hour_session(self) -> None:
+        # 13% used, 5h window, 3h27m (3.45h) remaining -> 1.55h elapsed -> 31.0% elapsed
+        b = compute_bucket_pace("session", used_pct=13.0, window_hours=5.0, hours_remaining=3.45)
+        self.assertAlmostEqual(b.elapsed_pct, 31.0, delta=0.1)
+        self.assertLess(b.pace_delta, 0)  # 13% used < 31% elapsed -- comfortable
+
+    def test_zero_remaining_is_fully_elapsed(self) -> None:
+        b = compute_bucket_pace("session", used_pct=50.0, window_hours=5.0, hours_remaining=0.0)
+        self.assertEqual(b.elapsed_pct, 100.0)
+
+    def test_negative_remaining_clamped_to_zero(self) -> None:
+        b = compute_bucket_pace("session", used_pct=50.0, window_hours=5.0, hours_remaining=-1.0)
+        self.assertEqual(b.hours_remaining, 0.0)
+        self.assertEqual(b.elapsed_pct, 100.0)
+
+    def test_status_reflects_window_language(self) -> None:
+        b = compute_bucket_pace("session", used_pct=90.0, window_hours=5.0, hours_remaining=2.5)
+        self.assertIn("burning faster than the window", b.status)
+
+    def test_label_is_preserved(self) -> None:
+        b = compute_bucket_pace("weekly (fable)", used_pct=3.0, window_hours=168.0, hours_remaining=100.0)
+        self.assertEqual(b.label, "weekly (fable)")
+
+
+class GuidanceTests(unittest.TestCase):
+    def test_empty_list(self) -> None:
+        self.assertIn("no usage buckets", guidance([]))
+
+    def test_identifies_tightest_bucket_as_binding_constraint(self) -> None:
+        tight = BucketResult("tight-one", used_pct=90, elapsed_pct=50, pace_delta=40.0,
+                              status="burning faster than the window is passing", window_hours=5, hours_remaining=2.5)
+        loose = BucketResult("loose-one", used_pct=5, elapsed_pct=50, pace_delta=-45.0,
+                              status="comfortable cushion", window_hours=168, hours_remaining=80)
+        out = guidance([tight, loose])
+        self.assertIn("tight-one", out.split("\n")[0])
+
+    def test_recommends_easing_off_the_tightest_when_over_margin(self) -> None:
+        tight = BucketResult("tight-one", used_pct=90, elapsed_pct=50, pace_delta=40.0,
+                              status="burning faster", window_hours=5, hours_remaining=2.5)
+        out = guidance([tight])
+        self.assertIn("ease off tight-one", out)
+
+    def test_names_the_roomiest_bucket_when_comfortable(self) -> None:
+        tight = BucketResult("even-one", used_pct=50, elapsed_pct=50, pace_delta=0.0,
+                              status="tracking evenly", window_hours=5, hours_remaining=2.5)
+        roomy = BucketResult("roomy-one", used_pct=3, elapsed_pct=50, pace_delta=-47.0,
+                              status="comfortable cushion", window_hours=168, hours_remaining=80)
+        out = guidance([tight, roomy])
+        self.assertIn("most headroom: roomy-one", out)
+
+    def test_no_headroom_callout_when_nothing_is_comfortable(self) -> None:
+        b1 = BucketResult("a", used_pct=50, elapsed_pct=50, pace_delta=0.0, status="tracking evenly",
+                           window_hours=5, hours_remaining=2.5)
+        b2 = BucketResult("b", used_pct=52, elapsed_pct=50, pace_delta=2.0, status="tracking evenly",
+                           window_hours=168, hours_remaining=80)
+        out = guidance([b1, b2])
+        self.assertNotIn("most headroom", out)
 
 
 if __name__ == "__main__":

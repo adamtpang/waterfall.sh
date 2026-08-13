@@ -10,6 +10,7 @@ it's down or rate-limited), and log what that kept off Claude's plate.
     python3 -m router.cli hook-log --verbose
     python3 -m router.cli usage-pace --used-pct 22
     python3 -m router.cli dashboard
+    python3 -m router.cli desktop
     python3 -m router.cli models
 
 Or, if installed (`pip install -e .` from the repo root): `waterfall ...`.
@@ -36,6 +37,16 @@ from tracker import SavingsTracker, estimate_cost_saved
 import usage_pace
 import dashboard
 from classifier.types import SavingsEvent
+
+
+def _parse_model_pct(raw: str) -> tuple[str, float]:
+    if "=" not in raw:
+        raise argparse.ArgumentTypeError(f"expected MODEL=PCT, got {raw!r}")
+    model, _, pct = raw.partition("=")
+    try:
+        return model.strip(), float(pct)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"{pct!r} isn't a number in {raw!r}")
 
 
 def _read_prompt(args: argparse.Namespace) -> str:
@@ -251,6 +262,38 @@ def cmd_usage_pace(args: argparse.Namespace) -> int:
           f"({result.elapsed_pct:.1f}% of the week gone)")
     print(f"quota used:  {result.used_pct:.1f}%")
     print(f"delta:       {result.pace_delta:+.1f} points  -- {result.status}")
+
+    buckets = [usage_pace.BucketResult(
+        label="weekly (all models)", used_pct=result.used_pct, elapsed_pct=result.elapsed_pct,
+        pace_delta=result.pace_delta, status=result.status,
+        window_hours=usage_pace.HOURS_PER_WEEK, hours_remaining=result.hours_remaining,
+    )]
+
+    if args.session_pct is not None:
+        if args.session_hours_remaining is None:
+            print("\n--session-pct needs --session-hours-remaining too, skipping the session bucket", file=sys.stderr)
+        else:
+            b = usage_pace.compute_bucket_pace(
+                "5-hour session", args.session_pct, args.session_window_hours, args.session_hours_remaining,
+            )
+            buckets.append(b)
+            print(f"\n{b.label}")
+            print(f"  window:      {args.session_window_hours:g}h, {b.hours_remaining:.2f}h remaining "
+                  f"({b.elapsed_pct:.1f}% of the window gone)")
+            print(f"  used:        {b.used_pct:.1f}%")
+            print(f"  delta:       {b.pace_delta:+.1f} points  -- {b.status}")
+
+    for model, pct in args.model_pct or []:
+        b = usage_pace.compute_bucket_pace(
+            f"weekly ({model})", pct, usage_pace.HOURS_PER_WEEK, result.hours_remaining,
+        )
+        buckets.append(b)
+        print(f"\n{b.label}")
+        print(f"  used:        {b.used_pct:.1f}%")
+        print(f"  delta:       {b.pace_delta:+.1f} points  -- {b.status}")
+
+    if len(buckets) > 1:
+        print(f"\n{usage_pace.guidance(buckets)}")
     return 0
 
 
@@ -305,6 +348,25 @@ def cmd_models(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_desktop(args: argparse.Namespace) -> int:
+    """Open the waterfall desktop command center (local GUI)."""
+    repo_root = Path(__file__).resolve().parent.parent
+    desktop_dir = repo_root / "desktop"
+    if str(repo_root) not in sys.path:
+        sys.path.insert(0, str(repo_root))
+    if not (desktop_dir / "server.py").is_file():
+        print("desktop/server.py missing -- is this a full waterfall checkout?", file=sys.stderr)
+        return 1
+    from desktop.server import main as desktop_main
+
+    argv = ["--host", args.host, "--port", str(args.port)]
+    if args.no_open:
+        argv.append("--no-open")
+    if args.native:
+        argv.append("--native")
+    return desktop_main(argv)
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="waterfall",
@@ -352,6 +414,14 @@ def build_parser() -> argparse.ArgumentParser:
                      help="hour (0-23, local time) the quota resets (default 17 = 5pm)")
     sp.add_argument("--utc-offset", type=float, default=8.0,
                      help="your UTC offset in hours (default 8 = SGT)")
+    sp.add_argument("--session-pct", type=float, default=None,
+                     help="%% used on the 5-hour rolling session limit, if your plan has one")
+    sp.add_argument("--session-hours-remaining", type=float, default=None,
+                     help="hours remaining on that session limit, e.g. 3.45 for \"3h 27m\"")
+    sp.add_argument("--session-window-hours", type=float, default=5.0,
+                     help="length of the session window in hours (default 5)")
+    sp.add_argument("--model-pct", action="append", type=_parse_model_pct, default=[], metavar="MODEL=PCT",
+                     help="a per-model weekly %% used, e.g. --model-pct fable=3 -- repeatable for several models")
     sp.set_defaults(func=cmd_usage_pace)
 
     sp = sub.add_parser("dashboard", help="terminal ASCII dashboard of real hook/routing/usage data")
@@ -364,6 +434,20 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--limit", type=int, default=5)
     sp.add_argument("--tier", choices=["small", "medium", "large"], help="preview a specific tier band instead of the flat cheapest list")
     sp.set_defaults(func=cmd_models)
+
+    sp = sub.add_parser(
+        "desktop",
+        help="open the local desktop GUI (dashboard + cascade + agent launcher)",
+    )
+    sp.add_argument("--host", default="127.0.0.1")
+    sp.add_argument("--port", type=int, default=8765)
+    sp.add_argument("--no-open", action="store_true", help="bind the server only, don't open a browser")
+    sp.add_argument(
+        "--native",
+        action="store_true",
+        help="use a pywebview native window if installed (pip install pywebview)",
+    )
+    sp.set_defaults(func=cmd_desktop)
 
     return p
 
