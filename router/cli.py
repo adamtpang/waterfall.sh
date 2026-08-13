@@ -10,6 +10,7 @@ it's down or rate-limited), and log what that kept off Claude's plate.
     python3 -m router.cli hook-log --verbose
     python3 -m router.cli usage-pace --used-pct 22
     python3 -m router.cli dashboard
+    python3 -m router.cli dashboard --used-pct 24 --session-pct 13 --session-hours-remaining 3.45 --model-pct fable=3
     python3 -m router.cli desktop
     python3 -m router.cli models
 
@@ -243,6 +244,44 @@ def cmd_hook_log(args: argparse.Namespace) -> int:
     return 0
 
 
+def _build_usage_pace_buckets(args: argparse.Namespace) -> list[usage_pace.BucketResult]:
+    """Shared by `usage-pace` and `dashboard` -- same flags build the same
+    bucket list, so the two commands' guidance never disagrees. Returns []
+    if --used-pct wasn't given (dashboard's flags are all optional, unlike
+    usage-pace's required one)."""
+    if args.used_pct is None:
+        return []
+
+    tz = timezone(timedelta(hours=args.utc_offset))
+    now = datetime.now(tz)
+    result = usage_pace.compute_pace(
+        used_pct=args.used_pct,
+        now=now,
+        reset_weekday=usage_pace.WEEKDAYS[args.reset_day.lower()],
+        reset_hour=args.reset_hour,
+    )
+    buckets = [usage_pace.BucketResult(
+        label="weekly (all models)", used_pct=result.used_pct, elapsed_pct=result.elapsed_pct,
+        pace_delta=result.pace_delta, status=result.status,
+        window_hours=usage_pace.HOURS_PER_WEEK, hours_remaining=result.hours_remaining,
+    )]
+
+    if args.session_pct is not None:
+        if args.session_hours_remaining is None:
+            print("--session-pct needs --session-hours-remaining too, skipping the session bucket", file=sys.stderr)
+        else:
+            buckets.append(usage_pace.compute_bucket_pace(
+                "5-hour session", args.session_pct, args.session_window_hours, args.session_hours_remaining,
+            ))
+
+    for model, pct in args.model_pct or []:
+        buckets.append(usage_pace.compute_bucket_pace(
+            f"weekly ({model})", pct, usage_pace.HOURS_PER_WEEK, result.hours_remaining,
+        ))
+
+    return buckets
+
+
 def cmd_usage_pace(args: argparse.Namespace) -> int:
     tz = timezone(timedelta(hours=args.utc_offset))
     now = datetime.now(tz)
@@ -263,32 +302,11 @@ def cmd_usage_pace(args: argparse.Namespace) -> int:
     print(f"quota used:  {result.used_pct:.1f}%")
     print(f"delta:       {result.pace_delta:+.1f} points  -- {result.status}")
 
-    buckets = [usage_pace.BucketResult(
-        label="weekly (all models)", used_pct=result.used_pct, elapsed_pct=result.elapsed_pct,
-        pace_delta=result.pace_delta, status=result.status,
-        window_hours=usage_pace.HOURS_PER_WEEK, hours_remaining=result.hours_remaining,
-    )]
-
-    if args.session_pct is not None:
-        if args.session_hours_remaining is None:
-            print("\n--session-pct needs --session-hours-remaining too, skipping the session bucket", file=sys.stderr)
-        else:
-            b = usage_pace.compute_bucket_pace(
-                "5-hour session", args.session_pct, args.session_window_hours, args.session_hours_remaining,
-            )
-            buckets.append(b)
-            print(f"\n{b.label}")
-            print(f"  window:      {args.session_window_hours:g}h, {b.hours_remaining:.2f}h remaining "
-                  f"({b.elapsed_pct:.1f}% of the window gone)")
-            print(f"  used:        {b.used_pct:.1f}%")
-            print(f"  delta:       {b.pace_delta:+.1f} points  -- {b.status}")
-
-    for model, pct in args.model_pct or []:
-        b = usage_pace.compute_bucket_pace(
-            f"weekly ({model})", pct, usage_pace.HOURS_PER_WEEK, result.hours_remaining,
-        )
-        buckets.append(b)
+    buckets = _build_usage_pace_buckets(args)
+    for b in buckets[1:]:
         print(f"\n{b.label}")
+        print(f"  window:      {b.window_hours:g}h, {b.hours_remaining:.2f}h remaining "
+              f"({b.elapsed_pct:.1f}% of the window gone)")
         print(f"  used:        {b.used_pct:.1f}%")
         print(f"  delta:       {b.pace_delta:+.1f} points  -- {b.status}")
 
@@ -328,6 +346,7 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
         top_opus_projects=cu.top_projects_by_model(turns, "opus"),
         openrouter_tokens_avoided=openrouter_tokens,
         cache_tokens_avoided=cache_tokens,
+        usage_pace_buckets=_build_usage_pace_buckets(args),
     ))
     return 0
 
@@ -428,6 +447,23 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--since-days", type=int, default=None,
                      help="restrict all sections to the last N days "
                           "(default: all-time for hooks/routing, last 8 days for the reuse trend)")
+    sp.add_argument("--used-pct", type=float, default=None,
+                     help="your self-reported %% of weekly quota used, from Claude Code's own usage "
+                          "display -- adds the usage-pace guidance section (omit to skip it)")
+    sp.add_argument("--reset-day", default="tuesday", choices=list(usage_pace.WEEKDAYS.keys()),
+                     help="day of week the quota resets (default tuesday)")
+    sp.add_argument("--reset-hour", type=int, default=17,
+                     help="hour (0-23, local time) the quota resets (default 17 = 5pm)")
+    sp.add_argument("--utc-offset", type=float, default=8.0,
+                     help="your UTC offset in hours (default 8 = SGT)")
+    sp.add_argument("--session-pct", type=float, default=None,
+                     help="%% used on the 5-hour rolling session limit, if your plan has one")
+    sp.add_argument("--session-hours-remaining", type=float, default=None,
+                     help="hours remaining on that session limit, e.g. 3.45 for \"3h 27m\"")
+    sp.add_argument("--session-window-hours", type=float, default=5.0,
+                     help="length of the session window in hours (default 5)")
+    sp.add_argument("--model-pct", action="append", type=_parse_model_pct, default=[], metavar="MODEL=PCT",
+                     help="a per-model weekly %% used, e.g. --model-pct fable=3 -- repeatable for several models")
     sp.set_defaults(func=cmd_dashboard)
 
     sp = sub.add_parser("models", help="list the current cheapest capable OpenRouter models")

@@ -11,6 +11,8 @@ loads to these.
 
 from __future__ import annotations
 
+import usage_pace
+
 BAR_CHAR = "#"
 MAX_BAR_WIDTH = 40
 
@@ -110,6 +112,30 @@ def render_reuse_trend(by_day_pct: list[tuple[str, float]]) -> str:
     return "reused-input % by day (Claude Code, all projects)\n" + bar_chart(rows)
 
 
+def render_usage_pace(buckets: list[usage_pace.BucketResult]) -> str:
+    """buckets: usage_pace.compute_pace()/compute_bucket_pace() results, one
+    per quota clock (weekly all-models, 5-hour session, per-model weekly).
+    Mirrors the standalone `usage-pace` command's guidance so the dashboard
+    answers "push harder or ease off" without a second command."""
+    if not buckets:
+        return (
+            "usage pace\n"
+            "(pass --used-pct, and optionally --session-pct/--session-hours-remaining "
+            "and --model-pct, to see quota pacing here)"
+        )
+
+    lines = ["usage pace (quota clocks)"]
+    for b in buckets:
+        lines.append(
+            f"  {b.label:<20} used {b.used_pct:5.1f}%  elapsed {b.elapsed_pct:5.1f}%  "
+            f"{b.pace_delta:+6.1f} pts  -- {b.status}"
+        )
+    if len(buckets) > 1:
+        lines.append("")
+        lines.append(usage_pace.guidance(buckets))
+    return "\n".join(lines)
+
+
 COUNTERMEASURES = [
     (1, "classify before sending", None,
      "decision step, no number of its own, feeds #3"),
@@ -170,6 +196,7 @@ def render_full_dashboard(
     top_opus_projects: list[tuple[str, int]] | None = None,
     openrouter_tokens_avoided: int | None = None,
     cache_tokens_avoided: int | None = None,
+    usage_pace_buckets: list[usage_pace.BucketResult] | None = None,
 ) -> str:
     sections = [
         render_hook_activity(hook_by_day),
@@ -177,6 +204,8 @@ def render_full_dashboard(
         render_routing_summary(total_prompts, tokens_avoided, estimated_cost_saved),
         render_reuse_trend(reuse_by_day),
     ]
+    if usage_pace_buckets:
+        sections.append(render_usage_pace(usage_pace_buckets))
     if model_by_day is not None:
         sections.append(render_model_usage_by_day(model_by_day))
     if top_opus_projects is not None:

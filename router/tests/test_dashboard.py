@@ -12,8 +12,9 @@ from dashboard import (
     bar_chart, render_full_dashboard, render_hook_activity, render_reuse_trend,
     render_ringer_summary, render_routing_summary,
     render_model_usage_by_day, render_top_model_projects,
-    render_countermeasures_breakdown,
+    render_countermeasures_breakdown, render_usage_pace,
 )
+from usage_pace import BucketResult
 
 
 class BarChartTests(unittest.TestCase):
@@ -130,6 +131,32 @@ class RenderTopModelProjectsTests(unittest.TestCase):
         self.assertIn("summon.guide", out)
 
 
+class RenderUsagePaceTests(unittest.TestCase):
+    def test_empty_list_shows_how_to_enable(self) -> None:
+        out = render_usage_pace([])
+        self.assertIn("--used-pct", out)
+
+    def test_single_bucket_renders_without_guidance(self) -> None:
+        b = BucketResult("weekly (all models)", used_pct=24.0, elapsed_pct=25.7,
+                          pace_delta=-1.7, status="tracking the week evenly",
+                          window_hours=168, hours_remaining=124.9)
+        out = render_usage_pace([b])
+        self.assertIn("weekly (all models)", out)
+        self.assertIn("24.0", out)
+        self.assertNotIn("binding constraint", out)
+
+    def test_multiple_buckets_include_guidance(self) -> None:
+        weekly = BucketResult("weekly (all models)", used_pct=24.0, elapsed_pct=25.7,
+                               pace_delta=-1.7, status="tracking the week evenly",
+                               window_hours=168, hours_remaining=124.9)
+        session = BucketResult("5-hour session", used_pct=13.0, elapsed_pct=31.0,
+                                pace_delta=-18.0, status="comfortable cushion",
+                                window_hours=5, hours_remaining=3.45)
+        out = render_usage_pace([weekly, session])
+        self.assertIn("5-hour session", out)
+        self.assertIn("binding constraint", out)
+
+
 class RenderFullDashboardTests(unittest.TestCase):
     def test_combines_all_sections(self) -> None:
         out = render_full_dashboard(
@@ -182,6 +209,33 @@ class RenderFullDashboardTests(unittest.TestCase):
         self.assertIn("500 tokens", out)
         self.assertIn("100 tokens", out)
         self.assertIn("50 tokens", out)
+
+    def test_usage_pace_section_omitted_when_not_provided(self) -> None:
+        out = render_full_dashboard(
+            hook_by_day={}, denial_tokens_list=[], total_prompts=0,
+            tokens_avoided=0, estimated_cost_saved=0.0, reuse_by_day=[],
+        )
+        self.assertNotIn("usage pace", out)
+
+    def test_usage_pace_section_omitted_for_empty_bucket_list(self) -> None:
+        out = render_full_dashboard(
+            hook_by_day={}, denial_tokens_list=[], total_prompts=0,
+            tokens_avoided=0, estimated_cost_saved=0.0, reuse_by_day=[],
+            usage_pace_buckets=[],
+        )
+        self.assertNotIn("usage pace", out)
+
+    def test_usage_pace_section_included_when_buckets_provided(self) -> None:
+        b = BucketResult("weekly (all models)", used_pct=24.0, elapsed_pct=25.7,
+                          pace_delta=-1.7, status="tracking the week evenly",
+                          window_hours=168, hours_remaining=124.9)
+        out = render_full_dashboard(
+            hook_by_day={}, denial_tokens_list=[], total_prompts=0,
+            tokens_avoided=0, estimated_cost_saved=0.0, reuse_by_day=[],
+            usage_pace_buckets=[b],
+        )
+        self.assertIn("usage pace", out)
+        self.assertIn("weekly (all models)", out)
 
 
 class RenderCountermeasuresBreakdownTests(unittest.TestCase):
