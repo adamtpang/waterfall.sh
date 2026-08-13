@@ -90,8 +90,17 @@ Parity of **agent intelligence** is subscription + local CLIs (Grok Build, Claud
 | 2 | **Persistent chat transcript** per project/session on disk | Survive restart like Claude | **Done** |
 | 3 | **Multi-session**: run/queue more than one agent; switch without kill | Mission control | Next |
 | 4 | **Status filters**: running / idle / error / archived | Claude filter bar | **Done** (running/idle/error) |
-| 5 | **Permission prompts** in UI for non-yolo mode | Trust + control | Next |
+| 5 | **Permission prompts** in UI for non-yolo mode | Trust + control | Next, real reference pattern found |
 | 6 | **Embedded terminal pane** (optional) | Ctrl+` parity | Later |
+
+Reference for #5, not a fork: [OpenMausBot](https://github.com/milind-soni/OpenMausBot)
+(`server/drivers/claude.ts`, evaluated 2026-08-11) solves exactly this. A
+headless Claude Code subprocess has no terminal to show its own permission
+prompts, so it spawns a small local MCP server whose only job is relaying
+each approval request to the app's own chat UI as an Allow/Deny card over
+a local socket, then feeds the answer back to the CLI via
+`--permission-prompt-tool`. Same borrow-the-pattern-not-the-code approach
+as #11's Composio note above.
 
 ### P2 — Workspace parity
 
