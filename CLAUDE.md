@@ -185,8 +185,23 @@ project once the naming/branding direction was clear.
     constraint (least-negative, still comfortable) and weekly Fable as
     having the most headroom. 20 new tests
     (`ComputeBucketPaceTests`, `GuidanceTests`), full suite still green
-    at 200 tests. Not yet surfaced inside `dashboard` itself -- still a
-    separate `usage-pace` CLI path.
+    at 200 tests.
+  - **`usage-pace` guidance surfaced inside `dashboard`, 2026-08-13**:
+    `dashboard.render_usage_pace()` plus the same `--used-pct`/
+    `--session-pct`/`--session-hours-remaining`/`--model-pct` flags added
+    to the `dashboard` subparser (all optional there, unlike
+    `usage-pace`'s required `--used-pct`). A shared
+    `cli._build_usage_pace_buckets(args)` builds the bucket list for both
+    commands so their guidance can never disagree. The section is skipped
+    entirely when no `--used-pct` is given, so the plain `waterfall`
+    dashboard is unchanged. Live-verified with
+    `waterfall dashboard --used-pct 24 --session-pct 13
+    --session-hours-remaining 3.45 --model-pct fable=3`: guidance section
+    rendered in the right place alongside the existing hook/routing/
+    reuse/countermeasures sections, and a flag-less `dashboard` run
+    confirmed the section is cleanly absent otherwise. 6 new tests
+    (`RenderUsagePaceTests` + 3 `RenderFullDashboardTests` cases), full
+    suite green at 206 tests.
   - `router/dashboard.py` + `waterfall dashboard` — added 2026-08-09.
     Terminal ASCII bar charts (no browser/server) over real hook-log,
     savings-ledger, and claude-usage data: nudges/denials by day, total
