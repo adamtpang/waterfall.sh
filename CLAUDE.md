@@ -365,6 +365,22 @@ project once the naming/branding direction was clear.
   clause. Cheap to try, honestly uncertain to work -- self-triggering
   compliance has a real ceiling that prompting alone may not fully close;
   not yet re-measured.
+- **Re-measured, 2026-08-14: the 2026-08-05 checklist tightening did not
+  move the needle.** All-time totals: nudges 97 -> 3,920 (+3,823), routed
+  prompts 5 -> 6 (+1). Nearly 4,000 additional nudges produced one
+  additional real route. This confirms the "honestly uncertain to work"
+  flag from 2026-08-05 -- wording clarity was never the bottleneck; there
+  is still no enforcement point that intercepts "chose to generate inline
+  instead of routing," and a second round of stricter checklist wording
+  can't create one. Adam asked to tighten it again anyway; done, but
+  framed differently this time rather than just re-emphasizing the same
+  checklist: `SKILL.md` now leads with the raw 3,920-vs-6 numbers before
+  any instructions, and explicitly names the actual rationalization
+  ("this one's obviously simple enough that checking is overkill") as the
+  failure mode itself rather than a valid exception. Whether making the
+  failure mode visible in-context changes anything is unverified -- this
+  is a real experiment, not a confirmed fix; re-measure before claiming
+  it worked.
 - **CLI on PATH: fixed for real, 2026-08-11.** `pip install --user -e .`
   put `waterfall.exe` in `C:\Users\adamp\AppData\Roaming\Python\Python314\
   Scripts`, but that directory was never on this machine's PATH (this
