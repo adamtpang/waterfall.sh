@@ -486,6 +486,16 @@ which is what actually drives the 65–96% reused-input share.
 
 ## Not done yet
 
+- **Re-check nudge-vs-routed compliance around 2026-08-17 (~3 days after
+  the 2026-08-14 SKILL.md re-tightening)**: run `waterfall hook-log` and
+  `waterfall stats`, compare nudges-fired and prompts-routed against the
+  2026-08-14 baseline (3,920 nudges, 6 routed), and report the delta
+  plainly. No local cron survives a closed session and no cloud routine
+  can see `~/.claude/waterfall_hook_log.jsonl` or the savings ledger (both
+  local-only), so this can't be scheduled automatically -- whichever
+  session next works in this repo around that date should just run it.
+  Don't overclaim if it's still flat; see the 2026-08-14 entry above for
+  why a third wording pass likely wouldn't help either.
 - **The actual before/after Adam wants, in progress as of 2026-08-05**:
   save real tokens/money across his own projects (not just this repo),
   show a real before-vs-after transformation, and only *then* buy the
