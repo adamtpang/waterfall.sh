@@ -1,7 +1,7 @@
 # CLAUDE.md - waterfall.sh
 
 Context for Claude Code, Codex, and humans working in this folder. This is
-the live handoff — the source of truth for current progress, decisions,
+the live handoff: the source of truth for current progress, decisions,
 and open tasks. Update it as things change so future sessions (and other
 agents) stay in sync.
 
@@ -9,7 +9,7 @@ agents) stay in sync.
 
 waterfall.sh is a dev tool: it classifies a prompt, routes the routine
 part to the cheapest capable model on OpenRouter's live Arena-ranked
-catalog, and only surfaces the genuinely hard part for Claude — so a
+catalog, and only surfaces the genuinely hard part for Claude, so a
 Claude Code / Claude Pro plan's quota goes further. Born out of a Cowork
 session extending the (unrelated, Windows-only) `Claude-Token-Saver` repo
 at github.com/awesomo913/Claude-Token-Saver, then pulled out into its own
@@ -26,7 +26,7 @@ project once the naming/branding direction was clear.
   (`get_purchase_quote` -> confirm with him -> `buy_domain`; already
   quoted once, quote expires in 5 min so re-quote when it's time).
 - **Landing page**: `index.html` + `vercel.json` + `robots.txt` +
-  `sitemap.xml` — plain static HTML, zero build step. **Needs
+  `sitemap.xml`: plain static HTML, zero build step. **Needs
   `.vercelignore` excluding `router/` and `pyproject.toml`, and
   `"framework": null` in `vercel.json`** -- without both, Vercel
   auto-detects the sibling Python CLI (`pyproject.toml` at repo root) and
@@ -34,32 +34,32 @@ project once the naming/branding direction was clear.
   which fails with "No python entrypoint found." Hit and fixed 2026-08-04;
   don't remove either fix. Visual style is intentionally reused from vercel.school
   (same dark chalkboard-style theme, mono/hand font pairing) for
-  consistency across Adam's project portfolio — swap the accent color /
+  consistency across Adam's project portfolio. Swap the accent color /
   copy freely, the structure is just a starting point.
-- **Router core**: `router/` — this is real, tested, working Python, not a
+- **Router core**: `router/`: this is real, tested, working Python, not a
   stub:
-  - `router/openrouter_api_client.py` — direct HTTP client for OpenRouter's
+  - `router/openrouter_api_client.py`: direct HTTP client for OpenRouter's
     API (model catalog fetch+cache, cheapest-capable-model auto-selection,
     chat completions with cost accounting). `generate_with_usage()` now
-    **cascades through the N cheapest capable models** — if the cheapest
+    **cascades through the N cheapest capable models**: if the cheapest
     one is down/rate-limited/errors out after its retries, it automatically
     tries the next-cheapest candidate before giving up (`pick_cheap_models(n)`
     supplies the ranked candidate list). This is the literal "auto falls
-    back to the next best model" behavior the tool is named for — it only
+    back to the next best model" behavior the tool is named for. It only
     covered picking one model before 2026-08-04, no actual fallback chain.
-  - `router/smart_router.py` — `SmartRouter.route_with_api()`: classify →
+  - `router/smart_router.py`: `SmartRouter.route_with_api()`: classify →
     split → send the easy part to OpenRouter → return what's left for
     Claude with the free model's output already stitched in.
-  - `router/classifier/` — local, zero-API prompt classifier (pure
+  - `router/classifier/`: local, zero-API prompt classifier (pure
     stdlib) that decides free/split/claude routing and estimates the
     free/Claude token split.
-  - `router/tracker.py` — `SavingsTracker`: append-only JSONL ledger at
+  - `router/tracker.py`: `SavingsTracker`: append-only JSONL ledger at
     `~/.claude/token_savings.jsonl` (same pattern as the Claude-Token-Saver
     fork this was ported from) + `summarize()` for aggregate stats.
-  - `router/cli.py` — the CLI: `classify` / `route [--dry-run]` / `stats` /
+  - `router/cli.py`: the CLI: `classify` / `route [--dry-run]` / `stats` /
     `models`. Runs bare (`python3 router/cli.py ...`) or as a package
     (`python3 -m router.cli ...` from repo root, or `waterfall ...` after
-    `pip install -e .` — see `pyproject.toml`). `classify` and
+    `pip install -e .`, see `pyproject.toml`). `classify` and
     `route --dry-run` never touch the network.
   - **Model tiering**: `pick_cheap_models_by_tier("small"/"medium"/"large")`
     splits the price-sorted catalog into three bands; `tier_for_complexity()`
@@ -74,7 +74,7 @@ project once the naming/branding direction was clear.
     cheapest-selection and tiering. Fixed by rejecting `prompt_price <= 0` in
     the shared `_priced_candidates()` filter (2026-08-04); has a regression
     test (`test_pick_cheap_model_skips_negative_sentinel_pricing`).
-  - `router/hooks/user_prompt_submit.py` — a `UserPromptSubmit` command hook
+  - `router/hooks/user_prompt_submit.py`: a `UserPromptSubmit` command hook
     (project-scoped, wired in `.claude/settings.json`). Classifies every
     prompt submitted in this project (local, no network) and, when it looks
     routine, injects a one-line nudge via `hookSpecificOutput.additionalContext`
@@ -83,7 +83,7 @@ project once the naming/branding direction was clear.
     silent no-op. Needs `/hooks` (reload config) or a session restart to
     start firing, since `.claude/` didn't exist in this project when the
     hook was added.
-  - `router/hooks/pre_tool_use.py` — a `PreToolUse` command hook
+  - `router/hooks/pre_tool_use.py`: a `PreToolUse` command hook
     (project-scoped, wired in `.claude/settings.json`, matcher
     `Read|Bash|PowerShell`). The "Ringer" from `TOKEN_COMPOUNDING.md`:
     hard-blocks (not nudges) a `Read` with no offset/limit, or a single
@@ -108,7 +108,7 @@ project once the naming/branding direction was clear.
     on 2026-08-05 with no `/hooks` reload or restart needed --
     `.claude/settings.json` picked up the change automatically both
     times.
-  - `router/cache.py` — the last open item from `TOKEN_COMPOUNDING.md`
+  - `router/cache.py`: the last open item from `TOKEN_COMPOUNDING.md`
     (#9, cross-session dedup), shipped 2026-08-05. Disk-backed exact-match
     cache (`~/.claude/waterfall_response_cache.json`) keyed by a
     normalized hash of the *routed* text; wired into
@@ -123,7 +123,7 @@ project once the naming/branding direction was clear.
     shipped -- see that file's "The gap" section for what still isn't
     solved (the general reused-input compounding problem, as opposed to
     these specific footguns).
-  - `router/hook_log.py` + `waterfall hook-log` — append-only JSONL log
+  - `router/hook_log.py` + `waterfall hook-log`: append-only JSONL log
     (`~/.claude/waterfall_hook_log.jsonl`) of every real nudge/deny the
     two hooks fire, added 2026-08-05 so "is waterfall actually doing
     anything" has a real answer instead of an inference from noisy daily
@@ -152,7 +152,7 @@ project once the naming/branding direction was clear.
     evidence the same day: `themain.quest` and `pangaea.blog` (other
     repos, real sessions, not test data) both showed up nudged in the
     hook log within the hour.
-  - `router/usage_pace.py` + `waterfall usage-pace` — added 2026-08-07.
+  - `router/usage_pace.py` + `waterfall usage-pace`: added 2026-08-07.
     Claude Max/Pro plan quota %-used has to come from Claude Code's own
     usage display (Anthropic weighs cached/reused tokens far lighter
     than fresh ones for quota purposes, and neither that formula nor a
@@ -202,7 +202,7 @@ project once the naming/branding direction was clear.
     confirmed the section is cleanly absent otherwise. 6 new tests
     (`RenderUsagePaceTests` + 3 `RenderFullDashboardTests` cases), full
     suite green at 206 tests.
-  - `router/dashboard.py` + `waterfall dashboard` — added 2026-08-09.
+  - `router/dashboard.py` + `waterfall dashboard`: added 2026-08-09.
     Terminal ASCII bar charts (no browser/server) over real hook-log,
     savings-ledger, and claude-usage data: nudges/denials by day, total
     Ringer prevention (denials, tokens, $ equivalent -- parsed from the
@@ -249,14 +249,14 @@ project once the naming/branding direction was clear.
     sums from the tracker ledger (split by `backend_used`) so cache
     hits aren't double-counted inside the routing total.
   - **Desktop GUI shipped 2026-08-11** (`desktop/`, `waterfall desktop`):
-    local command center on `127.0.0.1:8765` with three tabs —
+    local command center on `127.0.0.1:8765` with three tabs:
     Dashboard (ledger + hooks), Cascade (classify / dry-run / live
     route), Agents (detect + launch Claude Code, Codex, Grok Build,
     OpenCode, Gemini, Cursor Agent). Stdlib HTTP + HTML only; optional
     `pywebview` via `waterfall desktop --native` or
     `pip install -e ".[desktop]"`. Patterns learned from OSS landscape
     (AionUi multi-agent glass, opcode usage chrome, Palot GUI-over-CLI,
-    OpenCode multi-surface) without forking — research recorded in
+    OpenCode multi-surface) without forking; research recorded in
     `DESKTOP_GUI_LANDSCAPE.md`. Template rule satisfied by reusing this
     repo's own `index.html` visual system rather than scaffolding a new
     Electron app from empty.
@@ -297,7 +297,7 @@ project once the naming/branding direction was clear.
     (`~/.waterfall/profile.json`). UX refs Linear/Figma/VS Code/Raycast.
     No em dashes in product UI. Full agent tool-loop still via peer CLIs
     (honest gap in `GAP_VS_CLAUDE_CODE.md`).
-  - `router/tests/` — unit tests (client, cascade fallback,
+  - `router/tests/`: unit tests (client, cascade fallback,
     tiering, sentinel-price regression, tracker, claude-usage, the
     Ringer hook, the response cache, the hook log, the nudge hook, the
     usage-pace calculator, the dashboard renderer, the installer's
@@ -307,7 +307,7 @@ project once the naming/branding direction was clear.
     (correctly surfaced a 401), and again on 2026-08-04 with Adam's real
     `OPENROUTER_API_KEY` -- `route "Write a one-line docstring..."` actually
     called OpenRouter, got real usage/cost back, and logged a ledger entry.
-- **`install.py`** — one-line installer (`curl -sSL .../install.py |
+- **`install.py`**: one-line installer (`curl -sSL .../install.py |
   python3`) for a beta tester's machine: clones/updates into
   `~/.waterfall`, installs the one dependency, and merges (never
   overwrites) the two hook entries into the tester's own
@@ -400,45 +400,73 @@ Distilled from a Nate B. Jones transcript on why LLM token usage compounds
 (every turn resends the whole conversation) and the countermeasures. These
 now shape both how this tool is used and what it should still grow into.
 **See `TOKEN_COMPOUNDING.md`** for the standalone version of this
-distillation plus a status table of countermeasures — **9 of 9 shipped
+distillation plus a status table of countermeasures: **9 of 9 shipped
 as of 2026-08-05** (the hard per-call cap, `router/hooks/pre_tool_use.py`,
 and the cross-session response cache, `router/cache.py`, both landed
 that day). That file's "The gap" section is the important honest part:
-shipping all 9 doesn't mean reused-input compounding is solved — every
+shipping all 9 doesn't mean reused-input compounding is solved: every
 mechanism here attacks a specific, narrow footgun (one huge file, one
 repeated ask), not a long thread's accumulated, non-repeating history,
 which is what actually drives the 65–96% reused-input share.
 
-- **Classify/split before you send** (`classify`, `route --dry-run`) — free,
+- **Classify/split before you send** (`classify`, `route --dry-run`): free,
   no network, the equivalent of "edit your mistake instead of retrying" and
   "ask for only what you need" turned into a command instead of a habit.
-- **Auto-fallback across models, not just retries** — shipped in
+- **Auto-fallback across models, not just retries**: shipped in
   `openrouter_api_client.py` (see above). A skill/CLI can't shrink a request
   that's already been sent; it *can* make sure a down/rate-limited cheap
   model doesn't force the whole call up to Claude.
-- **Ledger everything that gets routed away** (`tracker.py` / `stats`) — so
+- **Ledger everything that gets routed away** (`tracker.py` / `stats`), so
   "is this tool actually saving tokens" is answerable from data, not vibes.
   This is the `~/.claude/token_savings.jsonl` pattern, now implemented.
-- **Right model for the right job, not just "cheapest"** — model tiering
+- **Right model for the right job, not just "cheapest"**: model tiering
   (see above). "I don't want to use a powerful model for small tasks" is now
   a real selection axis, not just "always grab whatever's #1 by price."
 - **Level 2 shipped**: the `waterfall` skill (self-triggering) and the
   `UserPromptSubmit` hook (fully automatic, no Claude judgment call needed)
-  — both live as of 2026-08-04.
+  , both live as of 2026-08-04.
 - **Still open, matching the transcript's Level 3 idea**: hard per-call
-  token/size limits enforced client-side (Nate's "Ringer" idea) — the hook
+  token/size limits enforced client-side (Nate's "Ringer" idea): the hook
   only *nudges*, it doesn't cap or block anything yet.
 - **Two fixes from live testing (2026-08-04)**:
-  1. Hook's `MIN_WORDS` threshold lowered 12 → 6 — a real routine 8-word ask
+  1. Hook's `MIN_WORDS` threshold lowered 12 → 6: a real routine 8-word ask
      ("rename the variable x to userCount throughout utils.py") was getting
      silently skipped.
   2. Skill hardened with a verified-failure warning: routing that same
      prompt with no real `utils.py` in the repo made the free model
      **fabricate** a plausible-looking file from scratch and present it as
-     the real result — it didn't flag anything wrong. The skill now has a
+     the real result; it didn't flag anything wrong. The skill now has a
      hard rule (not just a caveat) to read the real file and embed its
      actual content before routing any "edit this existing file" task, or
      not route it at all. This is a load-bearing safety fix, not polish.
+- **Bare-arithmetic carve-out, 2026-08-14**: Adam's real complaint was
+  "we dont want to do 2+2 with fable" -- checked, and the classifier
+  already scored `2+2` correctly (`routing='free'`, 100% free). The
+  actual bug was the nudge hook's `MIN_WORDS=6` gate: it exists to
+  filter short conversational follow-ups the classifier can't safely
+  route without context (`"yes, look into why"`), but it gates on raw
+  length, so it silently swallowed short *self-contained* prompts like
+  `2+2` too -- exactly the case waterfall is supposed to catch. Fixed
+  with a narrow regex carve-out (`_ARITHMETIC_RE`) that lets bare
+  arithmetic bypass `MIN_WORDS`, without loosening the gate generally
+  -- deliberately not a broader "is this short prompt self-contained"
+  detector, since that's the same fuzzy-proxy-metric trap already
+  rejected once this session (the Stop-hook idea for flagging "looks
+  mechanical" responses). Live-verified: `2+2` now nudges
+  (`routing='free'`), `"yes, look into why"` still doesn't. 2 new
+  tests, full suite green at 208.
+  - Also checked and corrected a real misunderstanding in the same ask:
+    Adam pointed at `https://arena.ai/leaderboard/agent` expecting
+    per-user subscription/credit data to drive routing decisions --
+    fetched it and confirmed it's LMArena's Agent Arena, a
+    model-vs-model performance leaderboard (confirmed success,
+    steerability, tool hallucination, etc across 48 models), with zero
+    subscription/account data. Not the same site as Viberank (the real
+    per-user-usage leaderboard used earlier this session to find ICP
+    candidates). Flagged rather than silently building against a
+    misread source. A real, not-yet-built idea did fall out of this:
+    using Arena's per-model performance signals to make
+    `pick_cheap_models()` quality-aware instead of pure lowest-price.
 
 ## Not done yet
 
@@ -460,11 +488,11 @@ which is what actually drives the 65–96% reused-input share.
   just 5 test prompts / $0.0002 saved, all dev testing, not organic
   use). Revisit once the before/after above gives something worth
   showing.
-- No offer/pricing/buyer defined yet — this is a tool for Adam's own use
+- No offer/pricing/buyer defined yet: this is a tool for Adam's own use
   first; productizing it is a later decision, not blocking anything here.
 - Not yet run through Adam's "Summon" standardization pass (the
   NORTH_STAR.md / EVIDENCE.md / company/ORGANIZATION.md pattern seen in
-  the sibling `vercel.school` folder) — intentionally skipped since this
+  the sibling `vercel.school` folder), intentionally skipped since this
   isn't a company yet, just a tool. Run Summon on it if/when that's next.
 
 ## How to keep this useful
