@@ -24,6 +24,8 @@ import hook_log  # noqa: E402
 
 ROUTINE_PROMPT = "rename the variable x to userCount throughout utils.py"
 TOO_SHORT_PROMPT = "fix this"
+BARE_ARITHMETIC_PROMPT = "2+2"
+SHORT_FILLER_PROMPT = "yes, look into why"
 
 
 class NudgeTestCase(unittest.TestCase):
@@ -55,6 +57,22 @@ class MainBehaviorTests(NudgeTestCase):
         self.assertEqual(code, 0)
         self.assertIsNone(out)
         self.assertEqual(hook_log.load_entries(log_path=log_path), [])
+
+    def test_bare_arithmetic_nudges_despite_being_under_min_words(self) -> None:
+        log_path = Path(self.cwd) / "hook_log.jsonl"
+        code, out = self._run_main(BARE_ARITHMETIC_PROMPT, log_path)
+        self.assertEqual(code, 0)
+        self.assertIsNotNone(out, "bare arithmetic should nudge even though it's under MIN_WORDS")
+        self.assertIn("routing='free'", out["hookSpecificOutput"]["additionalContext"])
+
+    def test_short_conversational_filler_still_skipped(self) -> None:
+        # The arithmetic carve-out must stay narrow -- a short follow-up that
+        # leans on conversation history the classifier can't see should still
+        # be skipped, same as before this change.
+        log_path = Path(self.cwd) / "hook_log.jsonl"
+        code, out = self._run_main(SHORT_FILLER_PROMPT, log_path)
+        self.assertEqual(code, 0)
+        self.assertIsNone(out)
 
     def test_malformed_stdin_fails_open(self) -> None:
         stdin = io.StringIO("not json")

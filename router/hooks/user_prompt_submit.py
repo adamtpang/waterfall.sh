@@ -14,6 +14,7 @@ prints to stdout; it makes no network calls and sends nothing anywhere.
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -23,6 +24,15 @@ MIN_WORDS = 6  # skip trivial prompts -- not worth classifying, and noisy.
 # Was 12 until 2026-08-04 live testing showed real routine asks ("rename the
 # variable x to userCount throughout utils.py", 8 words) getting skipped.
 
+_ARITHMETIC_RE = re.compile(r"^[\d\s.]+(?:[-+*/^%][\d\s.]+)+$")
+# Bare arithmetic ("2+2") is short enough to fail MIN_WORDS but, unlike a
+# short conversational follow-up ("yes, look into why"), it's fully
+# self-contained -- answering it needs no conversation history, so it's
+# always safe to nudge on. MIN_WORDS exists specifically to filter the
+# former; without this carve-out it silently swallows the latter too,
+# which is how "2+2" and "yes, look into why" ended up treated the same
+# (both short) even though only one is actually unroutable.
+
 
 def main() -> int:
     try:
@@ -31,7 +41,8 @@ def main() -> int:
         return 0
 
     prompt = payload.get("user_prompt") or payload.get("prompt") or ""
-    if len(prompt.split()) < MIN_WORDS:
+    stripped = prompt.strip()
+    if len(prompt.split()) < MIN_WORDS and not _ARITHMETIC_RE.match(stripped):
         return 0
 
     try:
