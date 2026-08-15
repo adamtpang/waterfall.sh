@@ -89,7 +89,10 @@ def _deny_reason(file_path: str, size: int, tokens: int, cap_tokens: int, sugges
 
 def check_read(tool_input: dict, cwd: str, cap_tokens: int = CAP_TOKENS) -> str | None:
     """Return a deny reason if a whole-file Read would blow the cap, else None."""
-    if tool_input.get("offset") or tool_input.get("limit"):
+    # `pages` is the PDF equivalent of offset/limit (e.g. "1-10"); Read
+    # itself caps PDF requests at 20 pages, so a narrowed `pages` value is
+    # bounded content regardless of which 20 pages of a huge PDF.
+    if tool_input.get("offset") or tool_input.get("limit") or tool_input.get("pages"):
         return None  # caller already narrowed the read -- trust it
 
     file_path = tool_input.get("file_path")

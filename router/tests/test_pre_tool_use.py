@@ -68,6 +68,16 @@ class CheckReadTests(RingerTestCase):
         )
         self.assertIsNone(reason)
 
+    def test_large_pdf_with_pages_allowed(self) -> None:
+        # Read's `pages` param is the PDF equivalent of offset/limit -- a
+        # narrowed page range on a huge PDF must not be treated as a
+        # whole-file read (real gap hit live reading a 205-page book).
+        path = self._write("big.pdf", 1000)
+        reason = ringer.check_read(
+            {"file_path": path, "pages": "1-10"}, self.cwd, cap_tokens=CAP
+        )
+        self.assertIsNone(reason)
+
     def test_missing_file_path_allowed(self) -> None:
         self.assertIsNone(ringer.check_read({}, self.cwd, cap_tokens=CAP))
 
