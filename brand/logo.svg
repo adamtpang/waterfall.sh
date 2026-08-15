@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="waterfall">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#12203d"/>
+      <stop offset="100%" stop-color="#0b1220"/>
+    </linearGradient>
+    <linearGradient id="w" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#9ae0ff"/>
+      <stop offset="55%" stop-color="#5ec6ff"/>
+      <stop offset="100%" stop-color="#3aa8e8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <!-- Stylized W: four peaks falling like cascade -->
+  <path fill="url(#w)" d="
+    M 96 128
+    L 148 128
+    L 196 320
+    L 256 168
+    L 316 320
+    L 364 128
+    L 416 128
+    L 348 384
+    L 292 384
+    L 256 268
+    L 220 384
+    L 164 384
+    Z
+  "/>
+</svg>

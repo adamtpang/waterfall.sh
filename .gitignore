@@ -6,5 +6,7 @@ __pycache__/
 node_modules/
 *.egg-info/
 .claude/settings.local.json
-
-.vercel
+desktop-app/src-tauri/target/
+desktop-app/node_modules/
+dist/*.exe
+waterfall.exe

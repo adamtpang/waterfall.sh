@@ -1,0 +1,19 @@
+{
+  "name": "waterfall",
+  "private": true,
+  "version": "0.1.0",
+  "description": "waterfall.sh native desktop — cascade + peer agent launcher (Tauri shell, patterns from CC Switch / AionUi / OpenChamber)",
+  "type": "module",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-opener": "^2"
+  }
+}

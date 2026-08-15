@@ -55,22 +55,147 @@ def install_package(repo_dir: Path) -> None:
     _run([sys.executable, "-m", "pip", "install", "-q", "-e", str(repo_dir)])
 
 
+def user_bin_dir() -> Path:
+    return Path.home() / "bin"
+
+
+def _write_shim(name: str, python_module: str) -> Path:
+    """Write launchers in ~/bin so `watertop` / `waterfall` work even when
+    pip's Scripts directory is not on PATH.
+
+    On Windows we write BOTH:
+      - name.cmd  for PowerShell / cmd
+      - name      (bash script, no extension) for Git Bash / MSYS
+    Git Bash does not run bare `watertop` against watertop.cmd — it needs
+    an extensionless executable on PATH.
+    """
+    bin_dir = user_bin_dir()
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    py = sys.executable
+    # Git Bash wants POSIX-ish paths inside the script body
+    py_posix = py.replace("\\", "/")
+
+    written: list[Path] = []
+    if sys.platform == "win32":
+        cmd_path = bin_dir / f"{name}.cmd"
+        cmd_path.write_text(
+            "@echo off\r\n"
+            f'"{py}" -m {python_module} %*\r\n',
+            encoding="utf-8",
+        )
+        written.append(cmd_path)
+
+    # Extensionless bash shim (Git Bash, macOS, Linux, WSL)
+    bash_path = bin_dir / name
+    bash_path.write_text(
+        "#!/usr/bin/env bash\n"
+        f"# waterfall.sh — {name}\n"
+        f'exec "{py_posix}" -m {python_module} "$@"\n',
+        encoding="utf-8",
+        newline="\n",  # critical: LF only so Git Bash can exec it
+    )
+    try:
+        bash_path.chmod(bash_path.stat().st_mode | 0o111)
+    except OSError:
+        pass
+    written.append(bash_path)
+    return written[0]
+
+
+def ensure_user_bin_on_path() -> bool:
+    """Add ~/bin to the user PATH if missing. Returns True if a new shell
+    is needed for PATH to take effect."""
+    bin_dir = str(user_bin_dir())
+    if shutil.which("watertop") is not None:
+        return False
+
+    if sys.platform == "win32":
+        try:
+            import winreg
+
+            key = winreg.OpenKey(
+                winreg.HKEY_CURRENT_USER,
+                r"Environment",
+                0,
+                winreg.KEY_READ | winreg.KEY_SET_VALUE,
+            )
+            try:
+                current, _ = winreg.QueryValueEx(key, "Path")
+            except FileNotFoundError:
+                current = ""
+            parts = [p for p in current.split(";") if p]
+            if any(p.lower().rstrip("\\") == bin_dir.lower().rstrip("\\") for p in parts):
+                winreg.CloseKey(key)
+                return True  # already on user PATH; shell just hasn't picked it up
+            new_path = f"{bin_dir};{current}" if current else bin_dir
+            winreg.SetValueEx(key, "Path", 0, winreg.REG_EXPAND_SZ, new_path)
+            winreg.CloseKey(key)
+            # Broadcast PATH change so new processes can see it (best-effort)
+            try:
+                import ctypes
+
+                ctypes.windll.user32.SendMessageTimeoutW(  # type: ignore[attr-defined]
+                    0xFFFF, 0x001A, 0, "Environment", 0x0002, 5000, None
+                )
+            except Exception:
+                pass
+            return True
+        except OSError as exc:
+            print(f"Could not update user PATH automatically: {exc}", file=sys.stderr)
+            print(f"Add this folder to PATH manually: {bin_dir}")
+            return True
+
+    # Unix: append to ~/.profile if not present
+    profile = Path.home() / ".profile"
+    export_line = f'export PATH="{bin_dir}:$PATH"'
+    existing = profile.read_text(encoding="utf-8") if profile.is_file() else ""
+    if bin_dir not in existing:
+        with profile.open("a", encoding="utf-8") as f:
+            f.write(f"\n# waterfall.sh\n{export_line}\n")
+        print(f"Added {bin_dir} to PATH in {profile}")
+    return True
+
+
+def install_command_shims() -> None:
+    """Make `watertop` and `waterfall` one-word commands via ~/bin shims."""
+    _write_shim("waterfall", "router.cli")
+    _write_shim("watertop", "desktop.watertop")
+    bin_dir = user_bin_dir()
+    print(f"Wrote shims in {bin_dir}:")
+    for name in ("waterfall", "watertop"):
+        for p in sorted(bin_dir.glob(f"{name}*")):
+            print(f"  {p}")
+    needs_new_shell = ensure_user_bin_on_path()
+    if needs_new_shell and shutil.which("watertop") is None:
+        print(
+            "\nOpen a **new terminal**, then:\n"
+            "  watertop\n"
+            f"Or run now:\n  {bin_dir / 'watertop'}\n"
+            f"  {bin_dir / 'watertop.cmd'}   (PowerShell/cmd)"
+        )
+
+
 def check_waterfall_on_path() -> None:
-    """pip installs the console script into Python's user-scripts
-    directory, which isn't always on PATH (a known issue on Windows in
-    particular). Report the truth instead of silently leaving `waterfall`
-    broken with no explanation."""
-    if shutil.which("waterfall") is not None:
-        print("`waterfall` is on PATH and ready to use.")
+    """Confirm one-word commands resolve; install ~/bin shims if not."""
+    has_waterfall = shutil.which("waterfall") is not None
+    has_watertop = shutil.which("watertop") is not None
+    if has_waterfall and has_watertop:
+        print("`waterfall` and `watertop` are on PATH and ready to use.")
+        print("  waterfall  - classify / route / stats CLI")
+        print("  watertop   - desktop GUI (one word)")
+        return
+
+    print("Installing ~/bin shims so one-word commands work...")
+    install_command_shims()
+    has_waterfall = shutil.which("waterfall") is not None
+    has_watertop = shutil.which("watertop") is not None
+    if has_waterfall and has_watertop:
+        print("`waterfall` and `watertop` are on PATH and ready to use.")
+        print("  watertop   - desktop GUI")
         return
     print(
-        "\nNOTE: `waterfall` installed but isn't on PATH yet, so the bare "
-        "command won't resolve in a new terminal.\n"
-        "This is a real, known issue, not a bug in this installer -- pip "
-        "puts console scripts in a user-scripts directory that many "
-        "systems don't add to PATH automatically.\n"
-        "Until that's fixed, invoke it by full path instead:\n"
-        f'  python3 "{(INSTALL_DIR / "router" / "cli.py").as_posix()}" ...'
+        "Shims written. If `watertop` still isn't found in this shell, open a "
+        "new terminal (PATH updates often need that on Windows)."
     )
 
 
@@ -143,8 +268,8 @@ def main() -> int:
     check_waterfall_on_path()
     print(
         "\nDone. Start a new Claude Code session for the hooks to take effect.\n"
-        "\nAfter a few days of normal use, run `waterfall` on its own to see "
-        "the dashboard (or the full path shown above if it's not on PATH yet)."
+        "\n  watertop     — open the desktop GUI (one word)\n"
+        "  waterfall    — classify / route / stats / dashboard CLI\n"
     )
     return 0
 

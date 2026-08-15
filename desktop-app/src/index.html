@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>waterfall</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="/main.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="side-top">
+        <img class="logo" src="logo.png" width="28" height="28" alt="" />
+        <span class="product">waterfall</span>
+      </div>
+
+      <div class="side-actions">
+        <button type="button" class="new-btn" id="btn-add">Add project</button>
+        <button type="button" class="new-btn secondary" id="btn-new-chat" title="New chat in selected project">New chat</button>
+      </div>
+
+      <div class="side-label-row">
+        <span class="side-label">Projects &amp; sessions</span>
+        <button type="button" class="text-btn" id="btn-toggle-archived" title="Show archived">Archived</button>
+      </div>
+      <div class="side-controls">
+        <input type="search" id="proj-filter" class="side-filter" placeholder="Filter projects…" autocomplete="off" spellcheck="false" />
+        <select id="proj-sort" class="side-sort" title="Sort projects" aria-label="Sort projects">
+          <option value="activity">Activity</option>
+          <option value="name">Name</option>
+          <option value="sessions">Sessions</option>
+          <option value="path">Path</option>
+          <option value="manual">Manual</option>
+        </select>
+        <select id="proj-scope" class="side-sort" title="Filter scope" aria-label="Filter scope">
+          <option value="all">All</option>
+          <option value="pinned">Pinned</option>
+          <option value="discovered">Claude</option>
+          <option value="manual">Added</option>
+        </select>
+        <select id="sess-status" class="side-sort side-status" title="Session status" aria-label="Session status filter">
+          <option value="all">All status</option>
+          <option value="running">Running</option>
+          <option value="idle">Idle</option>
+          <option value="error">Error</option>
+        </select>
+      </div>
+      <p class="side-hint" id="proj-hint">Drag ⋮⋮ to reorder projects and chats</p>
+      <div class="project-scroll" id="project-list">
+        <div class="side-empty">Loading…</div>
+      </div>
+
+      <div class="side-bottom">
+        <div class="savings-mini" id="savings-mini" title="Token savings">
+          <span class="sm-label">Saved</span>
+          <span class="sm-val" id="sm-saved">$0</span>
+        </div>
+        <button type="button" class="icon-btn" id="btn-settings" title="Settings">⚙</button>
+      </div>
+    </aside>
+
+    <main class="main" id="main">
+      <div class="empty" id="empty-state">
+        <img src="logo.png" width="48" height="48" alt="" />
+        <h1>waterfall</h1>
+        <p>Pick a project, or add one. Sorted by last activity. Pin what matters.</p>
+      </div>
+
+      <div class="workspace hidden" id="workspace">
+        <header class="ws-header">
+          <div class="ws-title-block">
+            <h1 id="ws-title">Project</h1>
+            <p class="sess-title" id="ws-session"></p>
+            <p class="path" id="ws-path"></p>
+          </div>
+          <div class="ws-actions">
+            <button type="button" class="btn ghost" id="btn-new-chat-ws" title="Start a fresh chat">New chat</button>
+            <button type="button" class="btn ghost" id="btn-pin">Pin</button>
+            <button type="button" class="btn ghost" id="btn-archive">Archive</button>
+            <span class="ws-meta" id="ws-meta"></span>
+          </div>
+        </header>
+
+        <div class="chat-panel">
+          <div class="chat-log" id="chat-log" aria-live="polite">
+            <div class="chat-empty" id="chat-empty">
+              <p class="chat-empty-title">Start a message</p>
+              <p class="chat-empty-sub">Grok runs locally. Transcripts stay on this machine.</p>
+            </div>
+          </div>
+          <div class="compose">
+            <textarea id="prompt" placeholder="Message… Enter to send, Shift+Enter for newline" rows="2"></textarea>
+            <div class="compose-bar">
+              <select id="agent-select" aria-label="Agent" title="Saved as your default model"></select>
+              <div class="compose-tools">
+                <button type="button" class="btn subtle" id="btn-classify" title="Classify">Classify</button>
+                <button type="button" class="btn subtle" id="btn-dry" title="Dry-run cascade">Dry-run</button>
+                <button type="button" class="btn subtle" id="btn-route" title="Route via cascade">Route</button>
+                <button type="button" class="btn subtle" id="btn-open" title="External interactive TUI">TUI</button>
+              </div>
+              <button type="button" class="btn primary" id="btn-send">Send</button>
+            </div>
+          </div>
+          <pre class="out hidden" id="out"></pre>
+        </div>
+
+        <div class="peers-row" id="peers-row"></div>
+      </div>
+
+      <!-- Add project panel -->
+      <div class="settings hidden" id="add-panel">
+        <header class="ws-header"><h1>Add project</h1></header>
+        <div class="card">
+          <label class="field">Folder path
+            <input type="text" id="add-path" placeholder="C:\Users\adamp\Aether\my-project" />
+          </label>
+          <label class="field">Name (optional)
+            <input type="text" id="add-label" placeholder="my-project" />
+          </label>
+          <div class="row">
+            <button type="button" class="btn primary" id="btn-add-confirm">Add</button>
+            <button type="button" class="btn" id="btn-add-cancel">Cancel</button>
+          </div>
+          <p class="muted" id="add-err"></p>
+        </div>
+      </div>
+
+      <div class="settings hidden" id="settings">
+        <header class="ws-header"><h1>Settings</h1></header>
+        <div class="card">
+          <label class="field">Theme
+            <select id="theme-pick">
+              <option value="deep">Deep</option>
+              <option value="midnight">Midnight</option>
+              <option value="slate">Slate</option>
+            </select>
+          </label>
+          <label class="field">Accent
+            <input type="color" id="accent-pick" value="#5ec6ff" />
+          </label>
+          <label class="field">Default agent
+            <select id="default-agent"></select>
+          </label>
+          <button type="button" class="btn primary" id="btn-save">Save</button>
+        </div>
+        <div class="card">
+          <p class="muted" id="account-line">Local profile</p>
+          <label class="field">Email
+            <input type="email" id="email" placeholder="you@domain.com" />
+          </label>
+          <div class="row">
+            <button type="button" class="btn" id="btn-connect">Connect</button>
+            <button type="button" class="btn" id="btn-out">Sign out</button>
+          </div>
+        </div>
+        <button type="button" class="btn" id="btn-back">Back</button>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -2,7 +2,7 @@
 
 The actual routing logic. Ported (unchanged) from a Claude-Token-Saver
 fork built in the same Cowork session, stripped of everything that was
-Windows-GUI / browser-automation specific — this half was always plain,
+Windows-GUI / browser-automation specific; this half was always plain,
 portable Python.
 
 - `openrouter_api_client.py` -- real HTTP calls to OpenRouter, no browser.

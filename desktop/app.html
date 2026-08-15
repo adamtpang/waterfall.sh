@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>waterfall.sh — desktop</title>
+<style>
+  :root{
+    --board:#0b1220;
+    --board2:#0f1830;
+    --chalk:#e9edf2;
+    --dust:#9aa6b2;
+    --faint:#5c6873;
+    --line:#1c2740;
+    --accent:#5ec6ff;
+    --good:#3dd68c;
+    --warn:#f5a524;
+    --bad:#f31260;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Roboto,Helvetica,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{
+    background:var(--board);color:var(--chalk);font-family:var(--sans);
+    background-image:radial-gradient(900px 480px at 90% -10%, #12203d 0%, transparent 55%);
+    min-height:100vh;
+  }
+  header{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:16px 22px;border-bottom:1px solid var(--line);background:rgba(11,18,32,.92);
+    position:sticky;top:0;backdrop-filter:blur(8px);z-index:5;
+  }
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand h1{font-size:16px;letter-spacing:-.02em}
+  .brand span{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase}
+  .tabs{display:flex;gap:6px}
+  .tab{
+    font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+    padding:8px 12px;border-radius:8px;border:1px solid transparent;background:transparent;
+    color:var(--dust);cursor:pointer;
+  }
+  .tab:hover{color:var(--chalk);border-color:var(--line)}
+  .tab.active{color:var(--board);background:var(--accent);border-color:var(--accent)}
+  main{max-width:1080px;margin:0 auto;padding:22px}
+  .panel{display:none}
+  .panel.active{display:block}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  @media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+  .stat{
+    border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--board2);
+  }
+  .stat b{display:block;font-family:var(--mono);font-size:22px;color:var(--chalk)}
+  .stat span{display:block;margin-top:4px;font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+  .card{
+    border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--board2);margin-bottom:14px;
+  }
+  .card h2{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+  textarea,input[type=text]{
+    width:100%;background:#08101f;border:1px solid var(--line);border-radius:10px;color:var(--chalk);
+    font-family:var(--mono);font-size:13px;padding:12px 14px;resize:vertical;min-height:120px;
+  }
+  input[type=text]{min-height:0}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+  button.btn{
+    font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;
+    padding:10px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;
+    color:var(--chalk);cursor:pointer;
+  }
+  button.btn.primary{background:var(--chalk);color:var(--board);border-color:var(--chalk)}
+  button.btn.primary:hover{background:#fff}
+  button.btn:hover{border-color:var(--dust)}
+  button.btn:disabled{opacity:.45;cursor:not-allowed}
+  pre.out{
+    margin-top:12px;padding:12px 14px;border-radius:10px;background:#08101f;border:1px solid var(--line);
+    font-family:var(--mono);font-size:12px;color:var(--dust);white-space:pre-wrap;word-break:break-word;
+    max-height:320px;overflow:auto;
+  }
+  .agents{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+  .agent{
+    border:1px solid var(--line);border-radius:12px;padding:14px;background:#08101f;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .agent .name{font-weight:650;font-size:14px}
+  .agent .meta{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .pill{
+    display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:3px 8px;border-radius:999px;border:1px solid var(--line);width:fit-content;
+  }
+  .pill.on{color:var(--good);border-color:rgba(61,214,140,.35)}
+  .pill.off{color:var(--faint)}
+  .muted{color:var(--dust);font-size:13.5px;line-height:1.55;max-width:62ch}
+  .list{font-family:var(--mono);font-size:12px;color:var(--dust)}
+  .list .item{padding:8px 0;border-bottom:1px solid var(--line)}
+  .list .item:last-child{border-bottom:0}
+  .err{color:var(--bad)}
+  .ok{color:var(--good)}
+  footer{padding:8px 22px 20px;font-family:var(--mono);font-size:11px;color:var(--faint)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span>▽ waterfall</span>
+    <h1>desktop command center</h1>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="cascade">Cascade</button>
+    <button class="tab" data-tab="agents">Agents</button>
+  </nav>
+</header>
+
+<main>
+  <section class="panel active" id="panel-dashboard">
+    <div class="grid" id="stats-grid">
+      <div class="stat"><b id="s-prompts">—</b><span>prompts routed</span></div>
+      <div class="stat"><b id="s-tokens">—</b><span>tokens avoided</span></div>
+      <div class="stat"><b id="s-saved">—</b><span>est. $ saved</span></div>
+      <div class="stat"><b id="s-hooks">—</b><span>nudges + denials</span></div>
+    </div>
+    <div class="card">
+      <h2>OpenRouter</h2>
+      <p class="muted" id="or-status">Checking…</p>
+    </div>
+    <div class="card">
+      <h2>Recent hook activity</h2>
+      <div class="list" id="hook-list"><div class="item">Loading…</div></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-cascade">
+    <div class="card">
+      <h2>Classify / route</h2>
+      <p class="muted">Local classify is free. Route dry-run never hits the network. Live route uses OpenRouter cascade when configured.</p>
+      <textarea id="prompt" placeholder="Paste a prompt to cascade…"></textarea>
+      <div class="row">
+        <button class="btn primary" id="btn-classify">Classify</button>
+        <button class="btn" id="btn-dry">Route dry-run</button>
+        <button class="btn" id="btn-route">Route live</button>
+      </div>
+      <pre class="out" id="cascade-out">Results show here.</pre>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-agents">
+    <div class="card">
+      <h2>Coding agents on this machine</h2>
+      <p class="muted">Glass-over-CLI pattern (AionUi / Palot style): detect installed agents and launch them. Waterfall does not replace Claude, Codex, or Grok — it cascades work <em>to</em> cheaper models and launches the right shell when you need the full agent.</p>
+      <div class="row">
+        <input type="text" id="agent-cwd" placeholder="Working directory (optional)" style="flex:1;min-width:240px">
+        <button class="btn" id="btn-refresh-agents">Refresh</button>
+      </div>
+      <div class="agents" id="agents" style="margin-top:14px"></div>
+    </div>
+    <div class="card">
+      <h2>OSS map (why this exists)</h2>
+      <p class="muted">Learned from OpenCode desktop, AionUi multi-agent mode, opcode usage chrome, and Palot’s GUI-over-CLI approach. Full notes in <code>DESKTOP_GUI_LANDSCAPE.md</code>. This UI is waterfall-native, not a fork.</p>
+    </div>
+  </section>
+</main>
+<footer id="footer">waterfall desktop · local only · 127.0.0.1</footer>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+function fmtNum(n) {
+  if (n == null || Number.isNaN(n)) return "—";
+  if (Math.abs(n) >= 1000) return Number(n).toLocaleString();
+  return String(n);
+}
+
+function fmtMoney(n) {
+  if (n == null || Number.isNaN(n)) return "—";
+  return "$" + Number(n).toFixed(4);
+}
+
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || res.statusText);
+  return data;
+}
+
+document.querySelectorAll(".tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+    tab.classList.add("active");
+    $("panel-" + tab.dataset.tab).classList.add("active");
+  });
+});
+
+async function loadDashboard() {
+  const [status, stats, hooks] = await Promise.all([
+    api("/api/status"),
+    api("/api/stats?since_days=14"),
+    api("/api/hooks?since_days=14"),
+  ]);
+  $("s-prompts").textContent = fmtNum(stats.total_prompts);
+  $("s-tokens").textContent = fmtNum(stats.tokens_avoided);
+  $("s-saved").textContent = fmtMoney(stats.estimated_cost_saved);
+  $("s-hooks").textContent = fmtNum((hooks.nudge_count || 0) + (hooks.ringer_count || 0));
+  $("or-status").innerHTML = status.openrouter_configured
+    ? '<span class="ok">OPENROUTER_API_KEY configured</span> — live route available'
+    : '<span class="err">No OpenRouter key</span> — classify + dry-run still work. Set OPENROUTER_API_KEY or ~/.claude/openrouter_key.txt';
+  $("footer").textContent = `waterfall desktop · ${status.repo_root || "local"} · openrouter ${status.openrouter_configured ? "on" : "off"}`;
+
+  const list = $("hook-list");
+  if (!hooks.recent || !hooks.recent.length) {
+    list.innerHTML = '<div class="item">No hook events yet. Install global hooks (SETUP.md) to populate this.</div>';
+  } else {
+    list.innerHTML = hooks.recent.slice(0, 15).map((e) =>
+      `<div class="item"><span class="ok">${e.hook}</span> · ${e.project || "?"} · ${e.detail || ""}</div>`
+    ).join("");
+  }
+  return status;
+}
+
+function renderAgents(agents) {
+  const root = $("agents");
+  root.innerHTML = agents.map((a) => `
+    <div class="agent">
+      <div class="name">${a.label}</div>
+      <span class="pill ${a.available ? "on" : "off"}">${a.available ? "on PATH" : "not found"}</span>
+      <div class="meta">${a.path || a.command}</div>
+      <button class="btn primary" data-launch="${a.id}" ${a.available ? "" : "disabled"}>Launch</button>
+    </div>
+  `).join("");
+  root.querySelectorAll("[data-launch]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      try {
+        const body = {
+          agent: btn.dataset.launch,
+          cwd: $("agent-cwd").value.trim() || undefined,
+        };
+        const res = await api("/api/launch", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(body),
+        });
+        alert(res.ok ? (res.note || "Launched") : (res.error || "Failed"));
+      } catch (err) {
+        alert(String(err.message || err));
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+}
+
+async function runCascade(mode) {
+  const prompt = $("prompt").value.trim();
+  if (!prompt) {
+    $("cascade-out").textContent = "Enter a prompt first.";
+    return;
+  }
+  $("cascade-out").textContent = "Working…";
+  try {
+    let data;
+    if (mode === "classify") {
+      data = await api("/api/classify", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({prompt}),
+      });
+    } else {
+      data = await api("/api/route", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({prompt, dry_run: mode === "dry"}),
+      });
+    }
+    $("cascade-out").textContent = JSON.stringify(data, null, 2);
+  } catch (err) {
+    $("cascade-out").textContent = "Error: " + (err.message || err);
+  }
+}
+
+$("btn-classify").addEventListener("click", () => runCascade("classify"));
+$("btn-dry").addEventListener("click", () => runCascade("dry"));
+$("btn-route").addEventListener("click", () => runCascade("live"));
+$("btn-refresh-agents").addEventListener("click", async () => {
+  const data = await api("/api/agents");
+  renderAgents(data.agents || []);
+});
+
+(async () => {
+  try {
+    const status = await loadDashboard();
+    renderAgents(status.agents || []);
+  } catch (err) {
+    $("or-status").innerHTML = '<span class="err">Failed to load: ' + (err.message || err) + "</span>";
+  }
+})();
+</script>
+</body>
+</html>

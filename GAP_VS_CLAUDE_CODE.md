@@ -71,7 +71,7 @@ Parity of **agent intelligence** is subscription + local CLIs (Grok Build, Claud
 
 ## What “true feature parity” means (ordered)
 
-### P0 — Already shipping (do not regress)
+### P0: Already shipping (do not regress)
 
 1. Native maximized shell, W logo, aesthetic prefs  
 2. Project list from Claude sessions + manual add  
@@ -82,7 +82,7 @@ Parity of **agent intelligence** is subscription + local CLIs (Grok Build, Claud
 7. Peer launchers + Open TUI fallback  
 8. **Chat sessions + disk transcripts** (P1 partial): nested rows, status filter, `~/.waterfall/sessions/`  
 
-### P1 — Workflow parity (remaining)
+### P1: Workflow parity (remaining)
 
 | # | Deliverable | Why it closes Claude gap | Status |
 |---|-------------|---------------------------|--------|
@@ -102,7 +102,7 @@ a local socket, then feeds the answer back to the CLI via
 `--permission-prompt-tool`. Same borrow-the-pattern-not-the-code approach
 as #11's Composio note above.
 
-### P2 — Workspace parity
+### P2: Workspace parity
 
 | # | Deliverable |
 |---|-------------|
@@ -122,7 +122,7 @@ OpenMausBot (Electron multi-agent chat, one conversation per agent) is the
 same category as AionUi/OpenChamber, already covered by peers, see the
 "Never" list above.
 
-### P3 — Stretch / enterprise Claude surfaces
+### P3: Stretch / enterprise Claude surfaces
 
 | # | Deliverable |
 |---|-------------|

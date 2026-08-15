@@ -7,9 +7,13 @@ dependencies = ["requests>=2.31.0"]
 
 [project.scripts]
 waterfall = "router.cli:main"
+watertop = "desktop.watertop:main"
+
+[project.optional-dependencies]
+desktop = ["pywebview>=5.0"]
 
 [tool.setuptools]
-packages = ["router", "router.classifier"]
+packages = ["router", "router.classifier", "desktop"]
 
 [tool.setuptools.package-data]
 "router.classifier" = ["data/*.json"]

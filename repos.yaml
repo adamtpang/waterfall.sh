@@ -1,0 +1,22 @@
+# repos.yaml v0 — see github.com/adamtpang/repo-connect
+repo: waterfall.sh
+is: Cascade to the best model automatically. Classifies every prompt, routes the routine part to the cheapest capable model on OpenRouter, surfaces only the genuinely hard part to Claude. Built to make a Claude Code / Claude Pro plan's quota last the full day instead of the first hour.
+
+provides:
+  - id: smart-router
+    what: Classify -> split -> route -> stitch. The actual routing logic other quota-consuming tools could call before spending Claude quota on routine sub-tasks.
+    at: router/smart_router.py
+  - id: agent-launcher
+    what: The "glass over CLI" pattern for spinning up a coding agent as easily as opening an app, working detect_agents()/launch_agent() for Claude Code, Codex, Grok Build, and OpenCode, plus the OSS desktop-GUI landscape research (native shell over browser tab, don't reimplement the agent loop) other Aether projects wanting an "easy to spin up an agent session" UX should read before building their own.
+    at: desktop/server.py
+  - id: fleet-quota-dashboard
+    what: Real, fleet-wide Claude usage data (not just this repo's) -- claude-usage/hook-log/dashboard/usage-pace read ~/.claude/projects/* and the global hook log across every Aether project, since both hooks are installed globally. Answers "which real projects are driving quota usage right now" and "which quota bucket is the binding constraint before reset" with real numbers, not vibes -- exactly what a hub-level priority pass (FOCUS.md, ASAP_CHECKLIST.md) needs before deciding what to archive or pause.
+    at: router/dashboard.py
+
+stack: [python, openrouter-api]
+
+kin:
+  - repo: archimedes.life
+    why: Two real reasons. (1) archimedes.life's Fulcrum agents (lib/fulcrum/) shell out to the local `claude` CLI for their LLM steps, spending real Claude Code/Pro subscription quota. Their routine mechanical sub-steps (transcript cleanup, simple packaging) are exactly the class of task this router exists to intercept before it reaches Claude. (2) archimedes.life's Fulcrum Media/Capital/Labor agents currently ship as bespoke Next.js job-runner pages; watertop's agent-launcher pattern (see `provides.agent-launcher` above) and `DESKTOP_GUI_LANDSCAPE.md` are the reusable prior art for giving them a "spin up an agent as easily as Claude Code" form factor instead.
+  - repo: Aether
+    why: waterfall's two Claude Code hooks (the nudge hook and the Ringer hard-cap) are installed globally in ~/.claude/settings.json, not scoped to this repo -- they run across every project in the fleet, and its fleet-quota-dashboard (see provides above) reads usage spanning the whole workspace. This session used it directly for a real hub-level decision: identifying which projects (skill-supply, summon.guide, themain.quest, pokedex.life, and others) were actually driving quota usage, then cross-checking that against FOCUS.md's stated priorities to decide what to archive.
