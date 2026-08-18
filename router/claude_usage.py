@@ -281,3 +281,26 @@ def estimate_pct_used(since: datetime) -> float:
     turns = load_usage_turns(since=since)
     total = sum(t.total_input_seen for t in turns) + sum(t.output_tokens for t in turns)
     return round(total / EST_TOKENS_PER_PERCENT, 1)
+
+
+def estimate_pct_used_rolling(since: datetime) -> float:
+    """Same math as estimate_pct_used, for a rolling window (e.g. the
+    5-hour session limit) instead of a fixed weekly reset -- pass
+    `now - window_hours` as `since`. Rougher than the weekly estimate: the
+    single calibration point behind EST_TOKENS_PER_PERCENT was measured
+    against a full week's aggregate volume, not a 5-hour slice, and
+    Claude's real session-limit weighting may not scale linearly the same
+    way. Treat this as directional (is it climbing fast right now), not
+    precise."""
+    return estimate_pct_used(since)
+
+
+def estimate_pct_used_by_tier(since: datetime, tier: str) -> float:
+    """Same math, restricted to turns on one model tier (e.g. "fable") --
+    for a per-model weekly bucket. Rougher still: EST_TOKENS_PER_PERCENT
+    was calibrated against ALL-model aggregate volume, and a single tier's
+    real per-token quota weighting could differ meaningfully from the
+    blended average. Directional only, same as estimate_pct_used_rolling."""
+    turns = [t for t in load_usage_turns(since=since) if simplify_model(t.model) == tier]
+    total = sum(t.total_input_seen for t in turns) + sum(t.output_tokens for t in turns)
+    return round(total / EST_TOKENS_PER_PERCENT, 1)

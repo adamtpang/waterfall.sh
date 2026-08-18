@@ -8,9 +8,11 @@ dependencies = ["requests>=2.31.0"]
 [project.scripts]
 waterfall = "router.cli:main"
 watertop = "desktop.watertop:main"
+waterfall-tray = "desktop.quota_tray:main"
 
 [project.optional-dependencies]
 desktop = ["pywebview>=5.0"]
+tray = ["pystray>=0.19", "Pillow>=10.0"]
 
 [tool.setuptools]
 packages = ["router", "router.classifier", "desktop"]

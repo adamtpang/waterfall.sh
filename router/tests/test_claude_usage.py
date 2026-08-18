@@ -7,13 +7,18 @@ import json
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import claude_usage
 from claude_usage import (
     load_usage_turns, summarize, group_by_day, _pricing_for,
     simplify_model, group_by_day_and_model, top_projects_by_model,
+    estimate_pct_used, estimate_pct_used_rolling, estimate_pct_used_by_tier,
+    EST_TOKENS_PER_PERCENT,
 )
 
 
@@ -290,6 +295,55 @@ class TopProjectsByModelTests(_TranscriptFixtureMixin, unittest.TestCase):
         ])
         turns = load_usage_turns(transcript_files=[path])
         self.assertEqual(top_projects_by_model(turns, "opus"), [])
+
+
+class EstimatePctUsedTests(_TranscriptFixtureMixin, unittest.TestCase):
+    """estimate_pct_used* scan CLAUDE_PROJECTS_DIR internally (no
+    transcript_files passthrough), so these mock that module constant to
+    point at the temp fixture root -- the on-disk layout (<root>/<project>/
+    *.jsonl) already matches the real one."""
+
+    def _since(self):
+        return datetime(2026, 8, 9, 0, 0, tzinfo=timezone.utc)
+
+    def test_estimate_matches_manual_division(self) -> None:
+        self._write_transcript("proj-a", "s1.jsonl", [
+            _assistant_line("s1", "2026-08-09T10:00:00+00:00", "claude-sonnet-5",
+                             input_tokens=EST_TOKENS_PER_PERCENT * 2, output_tokens=0),
+        ])
+        with mock.patch.object(claude_usage, "CLAUDE_PROJECTS_DIR", self.root):
+            self.assertAlmostEqual(estimate_pct_used(self._since()), 2.0, places=1)
+
+    def test_estimate_zero_when_no_turns(self) -> None:
+        self.root.mkdir(exist_ok=True)
+        with mock.patch.object(claude_usage, "CLAUDE_PROJECTS_DIR", self.root):
+            self.assertEqual(estimate_pct_used(self._since()), 0.0)
+
+    def test_rolling_uses_same_math_as_estimate(self) -> None:
+        self._write_transcript("proj-a", "s1.jsonl", [
+            _assistant_line("s1", "2026-08-09T10:00:00+00:00", "claude-sonnet-5",
+                             input_tokens=EST_TOKENS_PER_PERCENT, output_tokens=0),
+        ])
+        with mock.patch.object(claude_usage, "CLAUDE_PROJECTS_DIR", self.root):
+            self.assertAlmostEqual(estimate_pct_used_rolling(self._since()), 1.0, places=1)
+
+    def test_by_tier_only_counts_matching_tier(self) -> None:
+        self._write_transcript("proj-a", "s1.jsonl", [
+            _assistant_line("s1", "2026-08-09T10:00:00+00:00", "claude-fable-5",
+                             input_tokens=EST_TOKENS_PER_PERCENT, output_tokens=0),
+            _assistant_line("s1", "2026-08-09T11:00:00+00:00", "claude-sonnet-5",
+                             input_tokens=EST_TOKENS_PER_PERCENT * 10, output_tokens=0),
+        ])
+        with mock.patch.object(claude_usage, "CLAUDE_PROJECTS_DIR", self.root):
+            self.assertAlmostEqual(estimate_pct_used_by_tier(self._since(), "fable"), 1.0, places=1)
+
+    def test_by_tier_empty_for_unused_tier(self) -> None:
+        self._write_transcript("proj-a", "s1.jsonl", [
+            _assistant_line("s1", "2026-08-09T10:00:00+00:00", "claude-sonnet-5",
+                             input_tokens=EST_TOKENS_PER_PERCENT, output_tokens=0),
+        ])
+        with mock.patch.object(claude_usage, "CLAUDE_PROJECTS_DIR", self.root):
+            self.assertEqual(estimate_pct_used_by_tier(self._since(), "fable"), 0.0)
 
 
 if __name__ == "__main__":
