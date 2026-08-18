@@ -486,6 +486,37 @@ which is what actually drives the 65–96% reused-input share.
 
 ## Not done yet
 
+- **A/B/C/D quota-safety plan shipped, 2026-08-18**, in response to Adam
+  running out of Claude usage the prior week and asking for everything
+  buildable to stop it happening again. Real fleet picture first
+  (checked, not assumed): of the four paid tools (Claude $200, Codex $20,
+  Grok $30, OpenRouter pay-per-token), only Claude exposes usable local
+  transcript data -- Codex's `.codex-global-state.json` has no usage/
+  token/cost keys (checked all 31), and Grok's usage monitoring is
+  OpenTelemetry-export-to-an-external-collector, enterprise-oriented and
+  off by default, not a local file. So: **A** `--bucket
+  LABEL=USED_PCT:WINDOW_HOURS:HOURS_REMAINING` on `usage-pace`/
+  `dashboard`, for a subscription with its own reset schedule (the
+  existing `--model-pct` wrongly assumes Claude's own weekly clock).
+  Also fixed the `--reset-hour` default (17 -> 16, the real reset is
+  4pm, not 5pm -- this session had been manually overriding it every
+  single call). **B** `router/quota_estimate.py`: a cached, tiered
+  (70/85/95%) automatic warning built on a rough local-transcript-volume
+  proxy (`claude_usage.estimate_pct_used`, calibrated from one real data
+  point -- 11.2B tokens at a real self-reported 92%), wired into the
+  nudge hook as a second check independent of the routing nudge, capped
+  to one real transcript scan per 30 minutes (a full scan takes tens of
+  seconds mid-session, so this is a real, documented cost, not free).
+  Also `waterfall claude-estimate` for on-demand checks. **C**
+  `router/scripts/quota_checkin.ps1` + two Windows Scheduled Tasks
+  (10am, 5pm daily), a native WinForms MessageBox reminder -- `msg.exe`
+  was the first idea, confirmed absent on this Windows Home machine
+  before building around it, a real dead end caught early rather than
+  discovered after scheduling something broken. **D** the Codex
+  investigation above. 42 new tests, full suite green at 251. Honest
+  limit: B's estimate is a rough proxy, not Anthropic's real formula --
+  it's a fallback for when Adam hasn't checked the real panel, never a
+  replacement for it.
 - **Re-check nudge-vs-routed compliance around 2026-08-17 (~3 days after
   the 2026-08-14 SKILL.md re-tightening)**: run `waterfall hook-log` and
   `waterfall stats`, compare nudges-fired and prompts-routed against the
