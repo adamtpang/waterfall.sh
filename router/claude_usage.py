@@ -258,3 +258,26 @@ def top_projects_by_model(
         if simplify_model(t.model) == tier:
             counts[t.project] = counts.get(t.project, 0) + 1
     return sorted(counts.items(), key=lambda kv: -kv[1])[:limit]
+
+
+# Rough, single-data-point calibration (2026-08-15): 11,206,650,304 raw
+# tokens processed (fresh input + cache writes + cache reads + output,
+# across every project) corresponded to Adam's real self-reported 92%
+# weekly Claude quota used, 96.9h into a 168h week. This is NOT Anthropic's
+# real internal quota-weighting formula (unpublished, and almost certainly
+# discounts cache reads the way API billing does) -- it's a rough linear
+# proxy from local data alone. Good enough for "you're probably getting
+# close" automatic warnings; not precise enough to trust over Claude
+# Code's own self-reported %, which always wins when you have it.
+EST_TOKENS_PER_PERCENT = 121_800_000
+
+
+def estimate_pct_used(since: datetime) -> float:
+    """Rough estimate of weekly quota %-used from real local token volume
+    processed since `since` (pass the last weekly reset boundary). See
+    EST_TOKENS_PER_PERCENT for the calibration and its caveat -- this is
+    an approximation, surfaced as one, never a substitute for the real
+    number when Claude Code's own display is checked."""
+    turns = load_usage_turns(since=since)
+    total = sum(t.total_input_seen for t in turns) + sum(t.output_tokens for t in turns)
+    return round(total / EST_TOKENS_PER_PERCENT, 1)

@@ -9,6 +9,8 @@ it's down or rate-limited), and log what that kept off Claude's plate.
     python3 -m router.cli claude-usage --by-day
     python3 -m router.cli hook-log --verbose
     python3 -m router.cli usage-pace --used-pct 22
+    python3 -m router.cli usage-pace --used-pct 84 --bucket codex=15:720:400 --bucket grok=60:720:200
+    python3 -m router.cli claude-estimate
     python3 -m router.cli dashboard
     python3 -m router.cli dashboard --used-pct 24 --session-pct 13 --session-hours-remaining 3.45 --model-pct fable=3
     python3 -m router.cli desktop
@@ -27,6 +29,8 @@ actually got kept off Claude.
 from __future__ import annotations
 
 import argparse
+import os
+import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -48,6 +52,26 @@ def _parse_model_pct(raw: str) -> tuple[str, float]:
         return model.strip(), float(pct)
     except ValueError:
         raise argparse.ArgumentTypeError(f"{pct!r} isn't a number in {raw!r}")
+
+
+def _parse_bucket(raw: str) -> tuple[str, float, float, float]:
+    """LABEL=USED_PCT:WINDOW_HOURS:HOURS_REMAINING -- for a subscription with
+    its own independent reset schedule (Codex, Grok, anything that isn't on
+    Claude's own weekly clock). --model-pct assumes Claude's own weekly
+    reset, which is wrong for a separately-billed product."""
+    if "=" not in raw:
+        raise argparse.ArgumentTypeError(f"expected LABEL=USED_PCT:WINDOW_HOURS:HOURS_REMAINING, got {raw!r}")
+    label, _, rest = raw.partition("=")
+    parts = rest.split(":")
+    if len(parts) != 3:
+        raise argparse.ArgumentTypeError(
+            f"expected LABEL=USED_PCT:WINDOW_HOURS:HOURS_REMAINING, got {raw!r}"
+        )
+    try:
+        used_pct, window_hours, hours_remaining = (float(p) for p in parts)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"non-numeric value in {raw!r}")
+    return label.strip(), used_pct, window_hours, hours_remaining
 
 
 def _read_prompt(args: argparse.Namespace) -> str:
@@ -246,38 +270,48 @@ def cmd_hook_log(args: argparse.Namespace) -> int:
 
 def _build_usage_pace_buckets(args: argparse.Namespace) -> list[usage_pace.BucketResult]:
     """Shared by `usage-pace` and `dashboard` -- same flags build the same
-    bucket list, so the two commands' guidance never disagrees. Returns []
-    if --used-pct wasn't given (dashboard's flags are all optional, unlike
-    usage-pace's required one)."""
-    if args.used_pct is None:
-        return []
+    bucket list, so the two commands' guidance never disagrees.
 
-    tz = timezone(timedelta(hours=args.utc_offset))
-    now = datetime.now(tz)
-    result = usage_pace.compute_pace(
-        used_pct=args.used_pct,
-        now=now,
-        reset_weekday=usage_pace.WEEKDAYS[args.reset_day.lower()],
-        reset_hour=args.reset_hour,
-    )
-    buckets = [usage_pace.BucketResult(
-        label="weekly (all models)", used_pct=result.used_pct, elapsed_pct=result.elapsed_pct,
-        pace_delta=result.pace_delta, status=result.status,
-        window_hours=usage_pace.HOURS_PER_WEEK, hours_remaining=result.hours_remaining,
-    )]
+    --used-pct/--session-pct/--model-pct all describe Claude's own account
+    (weekly reset, or Claude's per-model buckets which share that reset).
+    --bucket is for a DIFFERENT subscription entirely (Codex, Grok, anything
+    billed and reset on its own schedule) -- those are added regardless of
+    whether --used-pct was given, since they don't depend on Claude's clock
+    at all."""
+    buckets: list[usage_pace.BucketResult] = []
 
-    if args.session_pct is not None:
-        if args.session_hours_remaining is None:
-            print("--session-pct needs --session-hours-remaining too, skipping the session bucket", file=sys.stderr)
-        else:
-            buckets.append(usage_pace.compute_bucket_pace(
-                "5-hour session", args.session_pct, args.session_window_hours, args.session_hours_remaining,
-            ))
-
-    for model, pct in args.model_pct or []:
-        buckets.append(usage_pace.compute_bucket_pace(
-            f"weekly ({model})", pct, usage_pace.HOURS_PER_WEEK, result.hours_remaining,
+    if args.used_pct is not None:
+        tz = timezone(timedelta(hours=args.utc_offset))
+        now = datetime.now(tz)
+        result = usage_pace.compute_pace(
+            used_pct=args.used_pct,
+            now=now,
+            reset_weekday=usage_pace.WEEKDAYS[args.reset_day.lower()],
+            reset_hour=args.reset_hour,
+        )
+        buckets.append(usage_pace.BucketResult(
+            label="weekly (all models)", used_pct=result.used_pct, elapsed_pct=result.elapsed_pct,
+            pace_delta=result.pace_delta, status=result.status,
+            window_hours=usage_pace.HOURS_PER_WEEK, hours_remaining=result.hours_remaining,
         ))
+
+        if args.session_pct is not None:
+            if args.session_hours_remaining is None:
+                print("--session-pct needs --session-hours-remaining too, skipping the session bucket", file=sys.stderr)
+            else:
+                buckets.append(usage_pace.compute_bucket_pace(
+                    "5-hour session", args.session_pct, args.session_window_hours, args.session_hours_remaining,
+                ))
+
+        for model, pct in args.model_pct or []:
+            buckets.append(usage_pace.compute_bucket_pace(
+                f"weekly ({model})", pct, usage_pace.HOURS_PER_WEEK, result.hours_remaining,
+            ))
+    elif args.session_pct is not None or args.model_pct:
+        print("--session-pct/--model-pct describe Claude's own account and need --used-pct too, skipping", file=sys.stderr)
+
+    for label, used_pct, window_hours, hours_remaining in getattr(args, "bucket", None) or []:
+        buckets.append(usage_pace.compute_bucket_pace(label, used_pct, window_hours, hours_remaining))
 
     return buckets
 
@@ -312,6 +346,29 @@ def cmd_usage_pace(args: argparse.Namespace) -> int:
 
     if len(buckets) > 1:
         print(f"\n{usage_pace.guidance(buckets)}")
+    return 0
+
+
+def cmd_claude_estimate(args: argparse.Namespace) -> int:
+    import quota_estimate
+
+    tz = timezone(timedelta(hours=args.utc_offset))
+    now = datetime.now(tz)
+    reset_boundary = usage_pace._last_reset(now, usage_pace.WEEKDAYS[args.reset_day.lower()], args.reset_hour)
+
+    print("Rough local-only estimate -- NOT Claude Code's own number. Check the real")
+    print("usage panel for the precise figure; this is a fallback for when you haven't.")
+    print()
+    estimate = quota_estimate.get_estimate(
+        reset_boundary, now=now, cache_path=quota_estimate.DEFAULT_CACHE_PATH,
+        force=args.force_refresh,
+    )
+    age_min = (now - estimate.computed_at).total_seconds() / 60
+    print(f"estimated %-used: {estimate.estimated_pct:.1f}%")
+    print(f"as of:            {estimate.computed_at.strftime('%Y-%m-%d %H:%M')} ({age_min:.0f} min ago)")
+    print(f"reset boundary:   {reset_boundary.strftime('%Y-%m-%d %H:%M')} ({args.reset_day.title()} {args.reset_hour}:00)")
+    if estimate.last_warned_tier:
+        print(f"last tier warned: {estimate.last_warned_tier}%")
     return 0
 
 
@@ -367,6 +424,145 @@ def cmd_models(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_pick(args: argparse.Namespace) -> int:
+    """Sidebar-style Aether project picker."""
+    import picker
+    import projects as projmod
+
+    if args.project:
+        catalog = {p.name.lower(): p for p in projmod.list_projects()}
+        hit = catalog.get(args.project.lower())
+        if not hit:
+            found = __import__("tabs").resolve_project(args.project)
+            if not found:
+                print(f"not a project: {args.project}", file=sys.stderr)
+                return 1
+            hit = projmod.Project(found.name, str(found.path), found.pinned, "resolved")
+        return picker.act_on(hit, args.action, args.agent or __import__("tabs").default_agent())
+    return picker.run_picker(action=args.action, agent=args.agent)
+
+
+def cmd_license(args: argparse.Namespace) -> int:
+    import license as licmod
+
+    action = args.license_command or "status"
+    if action == "paid":
+        st = licmod.mark_paid()
+        print(f"licensed  {st['kind']}  {st['path']}")
+        print("next: waterfall remote open")
+        return 0
+    if action == "founder":
+        st = licmod.mark_founder()
+        print(f"licensed  {st['kind']}  {st['path']}")
+        return 0
+    st = licmod.status()
+    print(f"ok:    {st['ok']}")
+    print(f"kind:  {st['kind']}")
+    print(f"path:  {st['path']}")
+    if not st["ok"]:
+        print("after Stripe: waterfall license paid")
+        print("buy: https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J")
+        return 1
+    return 0
+
+
+def cmd_remote(args: argparse.Namespace) -> int:
+    """waterfall board (ACP host). Source lives under grok-remote/."""
+    repo_root = Path(__file__).resolve().parent.parent
+    gr = repo_root / "grok-remote" / "bin" / "gr"
+    if not gr.is_file():
+        print("waterfall board missing -- grok-remote/bin/gr not found", file=sys.stderr)
+        return 1
+    env = os.environ.copy()
+    env["GR_HOME"] = str(repo_root / "grok-remote")
+    grok_exe = Path.home() / ".grok" / "bin" / "grok.EXE"
+    if grok_exe.is_file():
+        env["GROK_BIN"] = str(grok_exe)
+    cmd = ["node", "--import", "tsx", str(gr), *list(args.remote_args or [])]
+    try:
+        rc = subprocess.call(cmd, env=env, cwd=str(repo_root / "grok-remote"))
+    except OSError as exc:
+        print(f"failed to launch waterfall board: {exc}", file=sys.stderr)
+        return 1
+    extra = list(args.remote_args or [])
+    if rc == 0 and (not extra or extra[0] in {"open", ""}):
+        try:
+            import pin_app
+            pin_app.pin()
+        except Exception:
+            pass
+    return rc
+
+
+def cmd_tabs(args: argparse.Namespace) -> int:
+    """Flip between project CLIs using the host terminal's real tabs."""
+    import tabs as tabmod
+
+    action = args.tabs_command or "list"
+    if action == "pin":
+        try:
+            proj = tabmod.pin_project(args.project)
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+        print(f"pinned {proj.name}  {proj.path}")
+        return 0
+
+    if action == "list":
+        host = tabmod.pick_host(args.host)
+        print(f"host:   {host.id if host else '(none on PATH -- install Windows Terminal)'}")
+        print(f"agent:  {args.agent or tabmod.default_agent()}")
+        print("fleet:")
+        for proj in tabmod.list_fleet():
+            mark = "*" if proj.pinned else " "
+            print(f"  {mark} {proj.name:<28} {proj.path}")
+        print()
+        print("open one:   waterfall tabs open <name>")
+        print("open all:   waterfall tabs mux")
+        print("flip tabs:  Ctrl+Tab in Windows Terminal")
+        return 0
+
+    try:
+        agent = args.agent or tabmod.default_agent()
+        if action == "open":
+            found = tabmod.resolve_project(args.project)
+            if not found:
+                print(f"not a project folder: {args.project}", file=sys.stderr)
+                return 1
+            fleet = [found]
+            new_window = False
+        else:
+            names = list(args.project or [])
+            if names:
+                fleet = []
+                for name in names:
+                    found = tabmod.resolve_project(name)
+                    if not found:
+                        print(f"not a project folder: {name}", file=sys.stderr)
+                        return 1
+                    fleet.append(found)
+            else:
+                fleet = tabmod.list_fleet()
+            new_window = not args.current_window
+
+        host = tabmod.pick_host(args.host)
+        if not host:
+            print("no tab host on PATH (need wt, wezterm, tmux, or zellij)", file=sys.stderr)
+            return 1
+        if host.id == "wt":
+            return tabmod.launch(tabmod.build_wt_command(fleet, agent, new_window=new_window), dry_run=args.dry_run)
+        if host.id == "wezterm":
+            code = 0
+            for cmd in tabmod.build_wezterm_commands(fleet, agent):
+                code = tabmod.launch(cmd, dry_run=args.dry_run) or code
+            return code
+        print(f"{host.id} is detected but only wt/wezterm are wired. Use --host wt.", file=sys.stderr)
+        return 1
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+
+
 def cmd_desktop(args: argparse.Namespace) -> int:
     """Open the waterfall desktop command center (local GUI)."""
     repo_root = Path(__file__).resolve().parent.parent
@@ -389,7 +585,7 @@ def cmd_desktop(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="waterfall",
-        description="Cascade to the best model. Automatically. Bare `waterfall` shows the dashboard.",
+        description="Cascade to the best model. Bare `waterfall` opens the local board.",
     )
     sub = p.add_subparsers(dest="command", required=False)
 
@@ -429,8 +625,8 @@ def build_parser() -> argparse.ArgumentParser:
                      help="your self-reported %% of weekly quota used, from Claude Code's own usage display")
     sp.add_argument("--reset-day", default="tuesday", choices=list(usage_pace.WEEKDAYS.keys()),
                      help="day of week the quota resets (default tuesday)")
-    sp.add_argument("--reset-hour", type=int, default=17,
-                     help="hour (0-23, local time) the quota resets (default 17 = 5pm)")
+    sp.add_argument("--reset-hour", type=int, default=16,
+                     help="hour (0-23, local time) the quota resets (default 16 = 4pm)")
     sp.add_argument("--utc-offset", type=float, default=8.0,
                      help="your UTC offset in hours (default 8 = SGT)")
     sp.add_argument("--session-pct", type=float, default=None,
@@ -441,7 +637,25 @@ def build_parser() -> argparse.ArgumentParser:
                      help="length of the session window in hours (default 5)")
     sp.add_argument("--model-pct", action="append", type=_parse_model_pct, default=[], metavar="MODEL=PCT",
                      help="a per-model weekly %% used, e.g. --model-pct fable=3 -- repeatable for several models")
+    sp.add_argument("--bucket", action="append", type=_parse_bucket, default=[],
+                     metavar="LABEL=USED_PCT:WINDOW_HOURS:HOURS_REMAINING",
+                     help="a different subscription with its OWN reset schedule (Codex, Grok, anything not "
+                          "on Claude's clock), e.g. --bucket codex=15:720:400 for 15%% used, 30-day window, "
+                          "400h remaining -- repeatable")
     sp.set_defaults(func=cmd_usage_pace)
+
+    sp = sub.add_parser("claude-estimate",
+                         help="rough local-only estimate of Claude weekly-quota %%-used, no manual input needed")
+    sp.add_argument("--reset-day", default="tuesday", choices=list(usage_pace.WEEKDAYS.keys()),
+                     help="day of week the quota resets (default tuesday)")
+    sp.add_argument("--reset-hour", type=int, default=16,
+                     help="hour (0-23, local time) the quota resets (default 16 = 4pm)")
+    sp.add_argument("--utc-offset", type=float, default=8.0,
+                     help="your UTC offset in hours (default 8 = SGT)")
+    sp.add_argument("--force-refresh", action="store_true",
+                     help="skip the cache and rescan local transcripts now (can take real time -- "
+                          "tens of seconds during an active session)")
+    sp.set_defaults(func=cmd_claude_estimate)
 
     sp = sub.add_parser("dashboard", help="terminal ASCII dashboard of real hook/routing/usage data")
     sp.add_argument("--since-days", type=int, default=None,
@@ -452,8 +666,8 @@ def build_parser() -> argparse.ArgumentParser:
                           "display -- adds the usage-pace guidance section (omit to skip it)")
     sp.add_argument("--reset-day", default="tuesday", choices=list(usage_pace.WEEKDAYS.keys()),
                      help="day of week the quota resets (default tuesday)")
-    sp.add_argument("--reset-hour", type=int, default=17,
-                     help="hour (0-23, local time) the quota resets (default 17 = 5pm)")
+    sp.add_argument("--reset-hour", type=int, default=16,
+                     help="hour (0-23, local time) the quota resets (default 16 = 4pm)")
     sp.add_argument("--utc-offset", type=float, default=8.0,
                      help="your UTC offset in hours (default 8 = SGT)")
     sp.add_argument("--session-pct", type=float, default=None,
@@ -464,12 +678,65 @@ def build_parser() -> argparse.ArgumentParser:
                      help="length of the session window in hours (default 5)")
     sp.add_argument("--model-pct", action="append", type=_parse_model_pct, default=[], metavar="MODEL=PCT",
                      help="a per-model weekly %% used, e.g. --model-pct fable=3 -- repeatable for several models")
+    sp.add_argument("--bucket", action="append", type=_parse_bucket, default=[],
+                     metavar="LABEL=USED_PCT:WINDOW_HOURS:HOURS_REMAINING",
+                     help="a different subscription with its OWN reset schedule (Codex, Grok, anything not "
+                          "on Claude's clock), e.g. --bucket codex=15:720:400 -- repeatable")
     sp.set_defaults(func=cmd_dashboard)
 
     sp = sub.add_parser("models", help="list the current cheapest capable OpenRouter models")
     sp.add_argument("--limit", type=int, default=5)
     sp.add_argument("--tier", choices=["small", "medium", "large"], help="preview a specific tier band instead of the flat cheapest list")
     sp.set_defaults(func=cmd_models)
+
+    sp = sub.add_parser(
+        "tabs",
+        help="flip between Aether projects as real terminal tabs (wt / wezterm)",
+    )
+    tabs_sub = sp.add_subparsers(dest="tabs_command", required=False)
+    tabs_flags = argparse.ArgumentParser(add_help=False)
+    tabs_flags.add_argument("--agent", choices=["grok", "claude", "codex", "opencode"], default=None)
+    tabs_flags.add_argument("--host", choices=["wt", "wezterm", "tmux", "zellij"], default=None)
+    tabs_flags.add_argument("--dry-run", action="store_true", help="print the host command, do not launch")
+    tabs_sub.add_parser("list", parents=[tabs_flags], help="show fleet + detected tab host")
+    op = tabs_sub.add_parser("open", parents=[tabs_flags], help="open one project in a new tab")
+    op.add_argument("project", help="folder name under Aether, or an absolute path")
+    mx = tabs_sub.add_parser("mux", parents=[tabs_flags], help="open the pinned fleet as tabs in one window")
+    mx.add_argument("project", nargs="*", help="optional project names; default is pinned fleet")
+    mx.add_argument(
+        "--current-window",
+        action="store_true",
+        help="add tabs to the current Windows Terminal window instead of a new one",
+    )
+    pn = tabs_sub.add_parser("pin", parents=[tabs_flags], help="pin a project into ~/.waterfall/projects.json")
+    pn.add_argument("project", help="folder name under Aether, or an absolute path")
+    # Bare `waterfall tabs` == list
+    sp.set_defaults(func=cmd_tabs, agent=None, host=None, dry_run=False, project=None, current_window=False)
+
+    sp = sub.add_parser("pick", help="sidebar project picker (Aether folders)")
+    sp.add_argument("project", nargs="?", help="skip the picker and act on this name")
+    sp.add_argument(
+        "--action",
+        choices=["remote", "tab", "both"],
+        default="remote",
+        help="remote = waterfall board agent in that cwd (default); tab = Windows Terminal; both = both",
+    )
+    sp.add_argument("--agent", choices=["grok", "claude", "codex", "opencode"], default=None)
+    sp.set_defaults(func=cmd_pick)
+
+    sp = sub.add_parser("license", help="show or mark the local $30 founding license")
+    lic_sub = sp.add_subparsers(dest="license_command", required=False)
+    lic_sub.add_parser("status", help="print license state")
+    lic_sub.add_parser("paid", help="mark paid after the Stripe checkout")
+    lic_sub.add_parser("founder", help="mark this machine as the founder copy")
+    sp.set_defaults(func=cmd_license)
+
+    sp = sub.add_parser(
+        "remote",
+        help="waterfall.sh board (multi-agent, local Windows)",
+    )
+    sp.add_argument("remote_args", nargs=argparse.REMAINDER, help="passed to gr (open, status, start, ...)")
+    sp.set_defaults(func=cmd_remote)
 
     sp = sub.add_parser(
         "desktop",
@@ -488,15 +755,36 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
+def open_board() -> int:
+    """Start the local board, pin a Desktop shortcut, open an app window."""
+    class _Args:
+        remote_args = ["open", "--local"]
+    rc = cmd_remote(_Args())  # type: ignore[arg-type]
+    try:
+        import pin_app
+        info = pin_app.pin()
+        opened = pin_app.open_app_window()
+        print(f"board  http://127.0.0.1:7910")
+        if info.get("written"):
+            print("pinned " + info["written"][0])
+        if opened:
+            print("window Helium --app (or default browser)")
+    except Exception as exc:
+        print(f"pin/open skipped: {exc}", file=sys.stderr)
+    return rc
+
+
 def main(argv: list[str] | None = None) -> int:
     if not SMART_ROUTER_AVAILABLE:
         print("classifier not importable -- run from the router/ directory or `pip install -e .`.", file=sys.stderr)
         return 1
+    raw = list(sys.argv[1:] if argv is None else argv)
+    if not raw:
+        return open_board()
     parser = build_parser()
-    args = parser.parse_args(argv)
+    args = parser.parse_args(raw)
     if args.command is None:
-        # bare `waterfall`, no subcommand -- show the dashboard
-        args = parser.parse_args(["dashboard"])
+        return open_board()
     return args.func(args)
 
 
