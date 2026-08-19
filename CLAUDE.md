@@ -483,6 +483,50 @@ which is what actually drives the 65–96% reused-input share.
     misread source. A real, not-yet-built idea did fall out of this:
     using Arena's per-model performance signals to make
     `pick_cheap_models()` quality-aware instead of pure lowest-price.
+- **Global Claude Code model/effort hygiene, 2026-08-19** -- outside this
+  repo's own files, but the real answer to "how do we get all my Claude
+  Code sessions to use the optimal model/effort automatically." Verified
+  against the real, current docs (not recalled from training data) plus
+  Adam's actual `~/.claude/settings.json` before acting:
+  1. **Global default fixed**: `~/.claude/settings.json` had
+     `"model": "claude-fable-5"` as the blanket default for every project
+     -- a real, concrete finding, not hypothetical, and plausibly a real
+     contributor to the heavy Fable usage seen in the dashboard earlier
+     this session. Changed to `"model": "sonnet"` +
+     `"effortLevel": "medium"`. Verified valid JSON after the edit.
+  2. **Per-project overrides**: real mechanism (a project's own
+     `.claude/settings.json` can set its own `model`/`effortLevel`,
+     overriding the global default just there), but deliberately NOT
+     applied blanket across the ~100+ Aether projects -- no grounded basis
+     to classify which ones genuinely need more than the new Sonnet/medium
+     default. Asked Adam directly; he said log the mechanism, don't guess.
+     Apply per-project only when a real need is named or the dashboard
+     (item 4) surfaces one.
+  3. **Real correction caught before shipping**: the original plan was to
+     add `model:`/`effort:` frontmatter to waterfall's own inline skill
+     for automatic cheap-model routing on known-routine invocations.
+     Checked the actual skills docs before building -- frontmatter model
+     override only takes effect when a skill runs via `context: fork`
+     (which forks it into a subagent, with the model coming from the
+     subagent's own `agent:`/frontmatter, not a bare `model:` key on a
+     plain inline skill). Would have silently done nothing. The real,
+     verified mechanism for "known routine task type -> automatically
+     cheap" is a genuine custom subagent (`.claude/agents/*.md`) with
+     `model:` in ITS OWN frontmatter, dispatched via the Agent tool's
+     `model` param (already used correctly earlier this session for
+     background research agents) or a `context: fork` skill pointing at
+     it. No fabricated example built -- no concrete, already-proven
+     routine task type was named to build one around.
+  4. **The feedback loop**: `waterfall dashboard`'s existing model-usage-
+     by-day / top-projects-by-model breakdown (shipped 2026-08-11) is the
+     real mechanism for catching drift -- periodically check which
+     projects show heavy Opus/Fable/high-effort use for what turned out
+     to be routine work, and correct that project's default via #2.
+     Calibration habit, not full automation, because full automation
+     isn't real here: confirmed (again) that no mechanism -- hook,
+     setting, anything -- lets model/effort vary automatically per-prompt
+     within a running session. `/model`/`/effort` are session-start
+     defaults or manual mid-session commands only.
 
 ## Not done yet
 
