@@ -266,10 +266,27 @@ def main() -> int:
     install_package(repo_dir)
     wire_hooks(repo_dir)
     check_waterfall_on_path()
+    try:
+        sys.path.insert(0, str(repo_dir / "router"))
+        import pin_app
+        pin_app.pin()
+    except Exception:
+        pass
     print(
-        "\nDone. Start a new Claude Code session for the hooks to take effect.\n"
-        "\n  watertop     — open the desktop GUI (one word)\n"
-        "  waterfall    — classify / route / stats / dashboard CLI\n"
+        "\nDone.\n"
+        "\n  waterfall license paid   # after the $30 Stripe checkout\n"
+        "  waterfall remote open    # local board, project rail, cascade\n"
+        "  waterfall classify ...   # cheapest capable model for the job\n"
+        "  watertop                 # older desktop shell\n"
+    )
+    print(
+        "\nKnown limits, stated plainly:\n"
+        "  - No signed installer yet. This script is the real download, on every OS.\n"
+        "  - The native desktop board (waterfall.exe, NSIS/MSI) is a Windows-only local\n"
+        "    build today, not a published release -- build it yourself:\n"
+        "    cd desktop-app && npm run tauri build\n"
+        "  - That desktop board hasn't been packaged for macOS or Linux yet.\n"
+        "    watertop (this install) is the real cross-platform board until it is.\n"
     )
     return 0
 

@@ -191,24 +191,24 @@
   <p class="maturity-note">Please don't plan your quota budget around the 💭 column yet.</p>
 
   <h2 class="sec" id="download">Download</h2>
-  <p class="secnote">Mac, Windows, Linux. The product runs on your machine. The site never talks to someone else’s localhost.</p>
+  <p class="secnote">Picked by what you actually want, not your OS. The product runs on your machine. The site never talks to someone else's localhost.</p>
   <div class="os">
     <article class="card">
-      <h3>Windows</h3>
-      <pre>pip install -e .
-waterfall license paid
-waterfall remote open</pre>
-      <p class="soon">Native .exe package is next. Today the board is `waterfall remote`.</p>
+      <h3>I just want the CLI</h3>
+      <pre>curl -sSL https://raw.githubusercontent.com/adamtpang/waterfall.sh/main/install.py | python3</pre>
+      <p class="soon">The real download today, on Windows, macOS, and Linux alike. Clones to ~/.waterfall, wires the hooks, puts `waterfall` and `watertop` on PATH. No signed installer exists yet — this script is it.</p>
     </article>
     <article class="card">
-      <h3>macOS</h3>
-      <pre>curl -sSL https://raw.githubusercontent.com/adamtpang/waterfall.sh/main/install.py | python3</pre>
-      <p class="soon">Signed .dmg is later. Installer is the real download now.</p>
+      <h3>I want the native desktop board</h3>
+      <pre>cd desktop-app
+npm run tauri build</pre>
+      <p class="soon">Windows only today (NSIS + MSI), and not published as a release yet — you build it yourself from source. macOS/Linux packaging isn't started.</p>
     </article>
     <article class="card">
-      <h3>Linux</h3>
-      <pre>curl -sSL https://raw.githubusercontent.com/adamtpang/waterfall.sh/main/install.py | python3</pre>
-      <p class="soon">Same installer. Board binds 127.0.0.1 only.</p>
+      <h3>I want to read the code first</h3>
+      <pre>git clone https://github.com/adamtpang/waterfall.sh
+cd waterfall.sh && pip install -e .</pre>
+      <p class="soon">Same install.py path, run by hand. Board binds 127.0.0.1 only, never talks out.</p>
     </article>
   </div>
 
