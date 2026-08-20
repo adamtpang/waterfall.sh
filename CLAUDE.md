@@ -56,8 +56,15 @@ project once the naming/branding direction was clear.
   - `router/tracker.py`: `SavingsTracker`: append-only JSONL ledger at
     `~/.claude/token_savings.jsonl` (same pattern as the Claude-Token-Saver
     fork this was ported from) + `summarize()` for aggregate stats.
+  - `router/tabs.py` + `waterfall tabs`: CLI project tabs. Does **not**
+    nest Grok's TUI. Opens real Windows Terminal tabs (`wt`) with
+    `grok --cwd <project>`. Fleet = pins in `~/.waterfall/projects.json`
+    plus optional `~/.waterfall/tabs.json`. Flip with Ctrl+Tab.
+  - `grok-remote/`: waterfall.sh board. ACP host started from Farina's
+    grok-remote (MIT), branded and cataloged for Aether. Launch:
+    `waterfall remote`. See `grok-remote/WINDOWS.md`.
   - `router/cli.py`: the CLI: `classify` / `route [--dry-run]` / `stats` /
-    `models`. Runs bare (`python3 router/cli.py ...`) or as a package
+    `models` / `tabs`. Runs bare (`python3 router/cli.py ...`) or as a package
     (`python3 -m router.cli ...` from repo root, or `waterfall ...` after
     `pip install -e .`, see `pyproject.toml`). `classify` and
     `route --dry-run` never touch the network.
@@ -527,6 +534,46 @@ which is what actually drives the 65–96% reused-input share.
      setting, anything -- lets model/effort vary automatically per-prompt
      within a running session. `/model`/`/effort` are session-start
      defaults or manual mid-session commands only.
+- **Fleet-wide Aether project classification, 2026-08-20**: applied the
+  per-project override mechanism from item 2 above for real, across the
+  whole ~117-project fleet, not just logged as a mechanism. Built a
+  cheap, deterministic (no LLM-per-project) classifier in a scratchpad
+  script over real filesystem/dependency signals (real agent/LLM SDK
+  dependency + file count for "complex", zero deps + near-empty for
+  "minimal", everything else inherits the sonnet/medium global default
+  as "routine"). Caught and fixed two real false positives before
+  writing anything: a "financial complexity" signal that was actually
+  matching the Aether Standard scaffold's generic Stripe boilerplate on
+  ~20 unrelated projects (dropped the signal entirely), and 6
+  `summon-*` CI/PR worktree directories that needed the same paused
+  treatment as `summon.company` without also catching the real, active
+  `summon.guide`. Result: 81 routine / 18 complex / 10 minimal / 8
+  paused-skipped. Wrote `.claude/settings.json` in 28 projects (merged
+  into existing settings, never overwrote; 16 more already had a real
+  `model` set and were left untouched), committed individually in each
+  of the 9 real git repos among them. Cross-referenced against those 16
+  pre-existing projects and found 12 of them used `sonnet` for what my
+  heuristic called "complex," not `opus` -- adjusted the 4 newly-written
+  complex projects (antlist, estimate, mastra-work, strummer-daw) from
+  opus/high to sonnet/high to match the apparently-deliberate existing
+  pattern rather than silently trusting the heuristic over real prior
+  signal.
+- **Visual color-coded usage-pace dashboard, 2026-08-20**: replaced the
+  terminal ASCII dashboard for the usage-pace feature specifically with
+  a real web page, `desktop/pace.html`, served at `/pace` on the
+  existing `waterfall desktop` server (127.0.0.1:8765). New
+  `desktop/server.py:api_pace()` reuses `usage_pace`/`quota_estimate`
+  exactly as the CLI does (single source of truth for the
+  green/yellow/red threshold, `STATUS_MARGIN`, computed server-side so
+  the color logic can't drift between the CLI and the page), falls back
+  to the automatic local estimate when no real `used_pct` is supplied,
+  and renders color-coded cards with progress bars (an elapsed-time
+  marker line), a day-of-week ceiling reference chart, and
+  live-editable inputs for weekly/session/per-model percentages. No new
+  dependencies, matches `DESIGN.md`'s brand token system. Live-verified
+  end to end with Adam's real numbers (30% weekly / 13% session / 3%
+  fable): guidance text matched the CLI's output exactly. 5 new tests,
+  full suite green at 261.
 
 ## Not done yet
 
@@ -589,8 +636,8 @@ which is what actually drives the 65–96% reused-input share.
   just 5 test prompts / $0.0002 saved, all dev testing, not organic
   use). Revisit once the before/after above gives something worth
   showing.
-- No offer/pricing/buyer defined yet: this is a tool for Adam's own use
-  first; productizing it is a later decision, not blocking anything here.
+- Offer is live: $30 founding one-time, `OFFER.md` / `offer.json`.
+  Spec for the product people buy: `PERFECT.md`.
 - Not yet run through Adam's "Summon" standardization pass (the
   NORTH_STAR.md / EVIDENCE.md / company/ORGANIZATION.md pattern seen in
   the sibling `vercel.school` folder), intentionally skipped since this
