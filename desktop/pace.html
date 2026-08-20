@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>waterfall — usage pace</title>
+<style>
+  :root {
+    --board: #0b1220;
+    --board2: #0f1830;
+    --chalk: #e9edf2;
+    --dust: #9aa6b2;
+    --faint: #5c6873;
+    --line: #1c2740;
+    --accent: #5ec6ff;
+    --accent-dim: #173447;
+    --good: #3dd68c;
+    --warn: #f5a524;
+    --bad: #f31260;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--board);
+    color: var(--chalk);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, Helvetica, sans-serif;
+    padding: 32px;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 28px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .logo {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--accent-dim);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent); font-weight: 700; font-size: 16px;
+  }
+  h1 { font-size: 18px; font-weight: 650; margin: 0; letter-spacing: -0.01em; }
+  .meta { color: var(--faint); font-size: 12px; font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace; }
+  .estimated-tag {
+    display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 6px;
+    background: var(--accent-dim); color: var(--accent); font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.12em; vertical-align: middle;
+  }
+
+  .guidance {
+    background: var(--board2); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 20px; font-size: 13px; color: var(--dust);
+    white-space: pre-line; line-height: 1.6;
+  }
+  .guidance strong { color: var(--chalk); }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .card {
+    background: var(--board2); border: 1px solid var(--line); border-radius: 14px;
+    padding: 18px; border-left: 3px solid var(--line);
+  }
+  .card.green { border-left-color: var(--good); }
+  .card.yellow { border-left-color: var(--warn); }
+  .card.red { border-left-color: var(--bad); }
+  .card-label {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--faint);
+    margin-bottom: 10px;
+  }
+  .card-pct { font-size: 32px; font-weight: 650; letter-spacing: -0.02em; margin-bottom: 2px; }
+  .card-status { font-size: 12px; color: var(--dust); margin-bottom: 14px; min-height: 32px; }
+  .bar-track { position: relative; height: 8px; background: var(--line); border-radius: 4px; overflow: visible; margin-bottom: 6px; }
+  .bar-fill { position: absolute; left: 0; top: 0; height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+  .card.green .bar-fill { background: var(--good); }
+  .card.yellow .bar-fill { background: var(--warn); }
+  .card.red .bar-fill { background: var(--bad); }
+  .bar-marker {
+    position: absolute; top: -3px; width: 2px; height: 14px; background: var(--chalk);
+    opacity: 0.6; transition: left 0.4s ease;
+  }
+  .bar-legend { display: flex; justify-content: space-between; font-size: 10px; color: var(--faint); font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace; }
+
+  .section-title {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--faint);
+    margin: 0 0 12px;
+  }
+  .week-track {
+    display: flex; align-items: flex-end; gap: 6px; height: 90px; margin-bottom: 8px;
+    background: var(--board2); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px 10px;
+  }
+  .day-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+  .day-bar { width: 100%; max-width: 26px; background: var(--line); border-radius: 4px 4px 0 0; position: relative; min-height: 2px; }
+  .day-bar.today { background: var(--accent-dim); }
+  .day-bar-fill { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--faint); border-radius: 4px 4px 0 0; }
+  .day-bar.today .day-bar-fill { background: var(--accent); }
+  .day-label { font-size: 10px; color: var(--faint); text-transform: uppercase; }
+  .day-label.today { color: var(--accent); font-weight: 650; }
+  .day-pct { font-size: 9px; color: var(--faint); font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace; }
+
+  .inputs {
+    background: var(--board2); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; margin-top: 20px;
+  }
+  .inputs-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .inputs label { font-size: 11px; color: var(--dust); display: flex; flex-direction: column; gap: 4px; }
+  .inputs input {
+    background: var(--board); border: 1px solid var(--line); border-radius: 8px;
+    color: var(--chalk); padding: 6px 8px; font-size: 13px; width: 90px;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  .inputs button {
+    background: var(--accent); border: none; border-radius: 9px; color: #061018;
+    padding: 8px 16px; font-size: 13px; font-weight: 650; cursor: pointer; align-self: flex-end;
+  }
+  .inputs button:hover { opacity: 0.9; }
+  .footnote { color: var(--faint); font-size: 11px; margin-top: 10px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">W</div>
+      <h1>usage pace</h1>
+    </div>
+    <div class="meta" id="now-meta">loading…</div>
+  </header>
+
+  <div class="guidance" id="guidance">Loading real usage data…</div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="section-title">this week's ceiling, by day</div>
+  <div class="week-track" id="week-track"></div>
+  <div class="footnote">The bar height is what %-used would be if you checked in at each day's reset-hour mark, tracking perfectly on pace. Today is highlighted.</div>
+
+  <div class="inputs">
+    <div class="section-title" style="margin-bottom:10px">update your real numbers</div>
+    <div class="inputs-row">
+      <label>weekly used %
+        <input type="number" id="in-used" step="0.1" placeholder="auto">
+      </label>
+      <label>session used %
+        <input type="number" id="in-session-pct" step="0.1">
+      </label>
+      <label>session hrs left
+        <input type="number" id="in-session-hrs" step="0.1">
+      </label>
+      <label>fable used %
+        <input type="number" id="in-fable" step="0.1">
+      </label>
+      <button onclick="refresh(true)">update</button>
+    </div>
+    <div class="footnote">Leave "weekly used %" blank to use waterfall's automatic local estimate (rough, not Claude Code's own number). Paste your real numbers from the usage panel for precision.</div>
+  </div>
+</div>
+
+<script>
+const state = { used: null, sessionPct: null, sessionHrs: null, fable: null };
+
+function fmtDelta(d) {
+  return (d >= 0 ? '+' : '') + d.toFixed(1);
+}
+
+function render(data) {
+  document.getElementById('now-meta').textContent =
+    new Date(data.now).toLocaleString(undefined, { weekday: 'long', hour: '2-digit', minute: '2-digit' }) +
+    (data.estimated ? '' : '');
+
+  const guidanceEl = document.getElementById('guidance');
+  if (data.guidance) {
+    guidanceEl.innerHTML = data.guidance
+      .split('\n')
+      .map(line => line.replace(/^(binding constraint:.*)$/, '<strong>$1</strong>'))
+      .join('\n');
+  } else {
+    guidanceEl.textContent = 'Only one clock reported — add session or per-model numbers below for a cross-bucket comparison.';
+  }
+
+  const cardsEl = document.getElementById('cards');
+  cardsEl.innerHTML = '';
+  for (const b of data.buckets) {
+    const card = document.createElement('div');
+    card.className = 'card ' + b.color;
+    const markerPct = Math.min(100, Math.max(0, b.elapsed_pct));
+    const fillPct = Math.min(100, Math.max(0, b.used_pct));
+    card.innerHTML = `
+      <div class="card-label">${b.label}</div>
+      <div class="card-pct">${b.used_pct.toFixed(1)}%</div>
+      <div class="card-status">${b.status} (${fmtDelta(b.pace_delta)} pts)</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${fillPct}%"></div>
+        <div class="bar-marker" style="left:${markerPct}%"></div>
+      </div>
+      <div class="bar-legend"><span>0%</span><span>used vs elapsed-time marker</span><span>100%</span></div>
+    `;
+    cardsEl.appendChild(card);
+  }
+
+  const weekEl = document.getElementById('week-track');
+  weekEl.innerHTML = '';
+  const todayName = new Date(data.now).toLocaleDateString(undefined, { weekday: 'long' }).toLowerCase();
+  for (const d of data.ceiling_by_day.slice(1)) {
+    const isToday = d.day === todayName;
+    const col = document.createElement('div');
+    col.className = 'day-col';
+    col.innerHTML = `
+      <div class="day-pct">${d.ceiling_pct}%</div>
+      <div class="day-bar ${isToday ? 'today' : ''}" style="height:${Math.max(4, d.ceiling_pct * 0.7)}px">
+        <div class="day-bar-fill" style="height:100%"></div>
+      </div>
+      <div class="day-label ${isToday ? 'today' : ''}">${d.day.slice(0, 3)}</div>
+    `;
+    weekEl.appendChild(col);
+  }
+}
+
+async function refresh(fromInputs) {
+  if (fromInputs) {
+    state.used = document.getElementById('in-used').value || null;
+    state.sessionPct = document.getElementById('in-session-pct').value || null;
+    state.sessionHrs = document.getElementById('in-session-hrs').value || null;
+    state.fable = document.getElementById('in-fable').value || null;
+  }
+  const params = new URLSearchParams();
+  if (state.used) params.set('used_pct', state.used);
+  if (state.sessionPct && state.sessionHrs) {
+    params.set('session_pct', state.sessionPct);
+    params.set('session_hours_remaining', state.sessionHrs);
+  }
+  if (state.fable) params.set('model_pct', 'fable=' + state.fable);
+
+  try {
+    const res = await fetch('/api/pace?' + params.toString());
+    const data = await res.json();
+    render(data);
+  } catch (e) {
+    document.getElementById('guidance').textContent = 'Could not reach waterfall desktop server: ' + e;
+  }
+}
+
+refresh(false);
+setInterval(() => refresh(false), 60000);
+</script>
+</body>
+</html>

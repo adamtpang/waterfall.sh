@@ -213,6 +213,113 @@ def api_hooks(since_days: Optional[int] = 14) -> dict[str, Any]:
     }
 
 
+SGT = timezone(timedelta(hours=8))
+RESET_WEEKDAY_NAME = "tuesday"
+RESET_HOUR = 16
+
+
+def _bucket_to_dict(b: Any) -> dict[str, Any]:
+    # Status -> a simple color band the UI maps to green/yellow/red, kept
+    # here (not guessed client-side in JS) so the one real threshold
+    # (usage_pace.STATUS_MARGIN) has a single source of truth.
+    import usage_pace
+
+    if b.pace_delta > usage_pace.STATUS_MARGIN:
+        color = "red"
+    elif b.pace_delta < -usage_pace.STATUS_MARGIN:
+        color = "green"
+    else:
+        color = "yellow"
+    return {
+        "label": b.label, "used_pct": b.used_pct, "elapsed_pct": b.elapsed_pct,
+        "pace_delta": b.pace_delta, "status": b.status, "color": color,
+        "window_hours": b.window_hours, "hours_remaining": b.hours_remaining,
+    }
+
+
+def api_pace(qs: dict[str, list[str]]) -> dict[str, Any]:
+    """Real usage-pace data for the visual dashboard. Mirrors `waterfall
+    usage-pace`'s own bucket-building logic (weekly all-models, 5-hour
+    session, per-model weekly, plus --bucket-style independent subscriptions)
+    -- same query-param shape as the CLI flags, all optional. When used_pct
+    is omitted, falls back to the automatic local-transcript estimate
+    (quota_estimate.py) so the dashboard shows *something* real without
+    requiring Adam to paste numbers first."""
+    import usage_pace
+    import quota_estimate as qe
+
+    def _first(key: str) -> Optional[str]:
+        v = qs.get(key)
+        return v[0] if v else None
+
+    now = datetime.now(SGT)
+    reset_boundary = usage_pace._last_reset(now, usage_pace.WEEKDAYS[RESET_WEEKDAY_NAME], RESET_HOUR)
+
+    used_pct_raw = _first("used_pct")
+    estimated = False
+    if used_pct_raw is not None:
+        used_pct = float(used_pct_raw)
+    else:
+        estimate = qe.get_estimate(reset_boundary, now=now, cache_path=qe.DEFAULT_CACHE_PATH)
+        used_pct = estimate.estimated_pct
+        estimated = True
+
+    result = usage_pace.compute_pace(
+        used_pct=used_pct, now=now,
+        reset_weekday=usage_pace.WEEKDAYS[RESET_WEEKDAY_NAME], reset_hour=RESET_HOUR,
+    )
+    buckets = [usage_pace.BucketResult(
+        label="weekly (all models)" + (" (est.)" if estimated else ""),
+        used_pct=result.used_pct, elapsed_pct=result.elapsed_pct,
+        pace_delta=result.pace_delta, status=result.status,
+        window_hours=usage_pace.HOURS_PER_WEEK, hours_remaining=result.hours_remaining,
+    )]
+
+    session_pct = _first("session_pct")
+    session_hours_remaining = _first("session_hours_remaining")
+    if session_pct is not None and session_hours_remaining is not None:
+        window = float(_first("session_window_hours") or 5.0)
+        buckets.append(usage_pace.compute_bucket_pace(
+            "5-hour session", float(session_pct), window, float(session_hours_remaining),
+        ))
+
+    for raw in qs.get("model_pct", []):
+        model, _, pct = raw.partition("=")
+        if model and pct:
+            buckets.append(usage_pace.compute_bucket_pace(
+                f"weekly ({model.strip()})", float(pct), usage_pace.HOURS_PER_WEEK, result.hours_remaining,
+            ))
+
+    for raw in qs.get("bucket", []):
+        label, _, rest = raw.partition("=")
+        parts = rest.split(":")
+        if label and len(parts) == 3:
+            try:
+                u, w, r = (float(x) for x in parts)
+                buckets.append(usage_pace.compute_bucket_pace(label.strip(), u, w, r))
+            except ValueError:
+                pass
+
+    # Day-of-week ceiling reference: elapsed_pct if you checked at each
+    # day's reset-hour mark, so the UI can show "today's ceiling is X%".
+    ceiling_by_day = []
+    day_names = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+    for i in range(8):
+        mark = reset_boundary + timedelta(hours=24 * i)
+        elapsed_pct = round(min(100.0, i * 24 / usage_pace.HOURS_PER_WEEK * 100), 1)
+        ceiling_by_day.append({"day": day_names[mark.weekday()], "date": mark.strftime("%Y-%m-%d"), "ceiling_pct": elapsed_pct})
+
+    return {
+        "now": now.isoformat(),
+        "reset_boundary": reset_boundary.isoformat(),
+        "next_reset": result.next_reset.isoformat(),
+        "buckets": [_bucket_to_dict(b) for b in buckets],
+        "guidance": usage_pace.guidance(buckets) if len(buckets) > 1 else None,
+        "ceiling_by_day": ceiling_by_day,
+        "estimated": estimated,
+    }
+
+
 def api_classify(prompt: str) -> dict[str, Any]:
     from smart_router import SmartRouter
 
@@ -334,6 +441,21 @@ class DesktopHandler(BaseHTTPRequestHandler):
                 self._send_json(404, {"error": "app.html missing"})
                 return
             self._send(200, html_path.read_bytes(), "text/html; charset=utf-8")
+            return
+
+        if path in ("/pace", "/pace.html"):
+            html_path = DESKTOP_DIR / "pace.html"
+            if not html_path.is_file():
+                self._send_json(404, {"error": "pace.html missing"})
+                return
+            self._send(200, html_path.read_bytes(), "text/html; charset=utf-8")
+            return
+
+        if path == "/api/pace":
+            try:
+                self._send_json(200, api_pace(qs))
+            except Exception as exc:  # noqa: BLE001 -- surface to UI, never crash server thread
+                self._send_json(500, {"error": str(exc), "type": type(exc).__name__})
             return
 
         if path == "/api/status":

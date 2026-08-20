@@ -121,6 +121,44 @@ class HttpServerTests(unittest.TestCase):
             urlopen(req, timeout=5)
         self.assertEqual(ctx.exception.code, 400)
 
+    def test_pace_page_served(self):
+        with urlopen(self.base + "/pace", timeout=5) as resp:
+            body = resp.read().decode("utf-8")
+            self.assertEqual(resp.status, 200)
+            self.assertIn("usage pace", body)
+
+    def test_pace_endpoint_no_params_falls_back_to_estimate(self):
+        status, data = self._get("/api/pace")
+        self.assertEqual(status, 200)
+        self.assertTrue(data["estimated"])
+        self.assertEqual(len(data["buckets"]), 1)
+        self.assertIn("(est.)", data["buckets"][0]["label"])
+        self.assertEqual(len(data["ceiling_by_day"]), 8)
+
+    def test_pace_endpoint_with_used_pct_is_not_estimated(self):
+        status, data = self._get("/api/pace?used_pct=30")
+        self.assertEqual(status, 200)
+        self.assertFalse(data["estimated"])
+        self.assertEqual(data["buckets"][0]["used_pct"], 30.0)
+        self.assertNotIn("(est.)", data["buckets"][0]["label"])
+
+    def test_pace_endpoint_multiple_buckets_include_guidance(self):
+        status, data = self._get(
+            "/api/pace?used_pct=30&session_pct=13&session_hours_remaining=3.45&model_pct=fable=3"
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(len(data["buckets"]), 3)
+        self.assertIsNotNone(data["guidance"])
+        self.assertIn("binding constraint", data["guidance"])
+
+    def test_pace_endpoint_color_coding(self):
+        # Comfortably under pace -> green
+        status, data = self._get("/api/pace?used_pct=5")
+        self.assertEqual(data["buckets"][0]["color"], "green")
+        # Way over pace -> red
+        status, data = self._get("/api/pace?used_pct=95")
+        self.assertEqual(data["buckets"][0]["color"], "red")
+
 
 if __name__ == "__main__":
     unittest.main()
