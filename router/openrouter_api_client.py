@@ -175,16 +175,25 @@ class OpenRouterClient:
         return models
 
     def _priced_candidates(self, min_context: int) -> list[tuple[float, str]]:
-        """Capable text-in/text-out models with a real positive prompt
+        """Capable text-in/text-out models with a real, non-sentinel prompt
         price, cheapest first. Shared by pick_cheap_models() and the tier
         picker so the filtering (and its bugs) only live in one place.
 
-        Excludes models with prompt price <= 0 -- that's not "free", it's
-        OpenRouter's `-1` sentinel for meta-routers like `openrouter/auto`
-        whose actual price varies by whatever they route to internally.
-        Sorting on that sentinel put them first in every pick regardless of
-        real cost, which silently defeated both cheapest-selection and
-        tiering until this was caught against the live catalog.
+        Excludes models with a NEGATIVE prompt price -- that's OpenRouter's
+        `-1` sentinel for meta-routers like `openrouter/auto` whose actual
+        price varies by whatever they route to internally. Sorting on that
+        sentinel put them first in every pick regardless of real cost, which
+        silently defeated both cheapest-selection and tiering until it was
+        caught against the live catalog.
+
+        A price of exactly 0 is NOT the sentinel -- it's a genuinely free
+        model, and those are the cheapest capable models in the catalog by
+        definition. The original guard used `<= 0`, which threw them out
+        along with the sentinel: 22 real free models (checked against the
+        live catalog on 2026-08-22), including `stealth/ox-alpha` at 1M
+        context, were invisible to a router whose entire job is finding the
+        cheapest capable model. Free models do carry tighter rate limits,
+        but that is exactly what the cascade fallback already handles.
         """
         models = self.list_models()
         candidates: list[tuple[float, str]] = []
@@ -204,7 +213,7 @@ class OpenRouterClient:
                 prompt_price = float(pricing.get("prompt", "inf"))
             except (TypeError, ValueError):
                 continue
-            if prompt_price <= 0:
+            if prompt_price < 0:
                 continue
             candidates.append((prompt_price, model_id))
         candidates.sort(key=lambda c: c[0])

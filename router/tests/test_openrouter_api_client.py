@@ -152,6 +152,25 @@ class OpenRouterClientTests(unittest.TestCase):
         self.assertEqual(client.pick_cheap_model(), "cheap/text-model")
         self.assertNotIn("openrouter/auto", client.pick_cheap_models(n=10))
 
+    def test_pick_cheap_model_keeps_genuinely_free_models(self) -> None:
+        # Regression, the inverse of the sentinel bug above: the guard that
+        # rejects the "-1" sentinel was written as `<= 0`, so it also threw
+        # out models priced at exactly 0 -- genuinely free, and by definition
+        # the cheapest capable models in the catalog. 22 real ones were being
+        # dropped against the live catalog (checked 2026-08-22), including
+        # stealth/ox-alpha at 1M context.
+        free_model = {
+            "id": "stealth/ox-alpha",
+            "context_length": 1048576,
+            "architecture": {"input_modalities": ["text"], "output_modalities": ["text"]},
+            "pricing": {"prompt": "0", "completion": "0"},
+        }
+        client = self._client()
+        client._models = [free_model] + SAMPLE_MODELS
+        # free beats every paid model, and the sentinel is still excluded
+        self.assertEqual(client.pick_cheap_model(), "stealth/ox-alpha")
+        self.assertIn("stealth/ox-alpha", client.pick_cheap_models(n=10))
+
     def test_pick_cheap_models_by_tier_splits_into_price_bands(self) -> None:
         client = self._client()
         client._models = TIERED_MODELS
