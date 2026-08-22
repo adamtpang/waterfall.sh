@@ -775,3 +775,36 @@ body {
 .field input[type=color] { padding: 4px; height: 40px; }
 .muted { color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 10px; }
 .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
+/* ── Cascade panel ── */
+.card-title {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
+}
+.muted.small { font-size: 11px; line-height: 1.5; }
+.field.grow { flex: 1 1 auto; min-width: 0; }
+.field.cx-narrow { flex: 0 0 130px; }
+.cascade-controls { align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+.cascade-controls select { width: 100%; }
+#cx-prompt {
+  width: 100%;
+  resize: vertical;
+  font-family: var(--mono, ui-monospace, Consolas, monospace);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.cx-out {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.28);
+  font-family: var(--mono, ui-monospace, Consolas, monospace);
+  font-size: 12.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 420px;
+  overflow: auto;
+}

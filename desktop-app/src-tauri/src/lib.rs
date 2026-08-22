@@ -1796,6 +1796,279 @@ fn sign_out() -> Result<UserProfile, String> {
     save_profile(profile)
 }
 
+// ---------------------------------------------------------------------------
+// OpenRouter cascade: one key, shared with the CLI.
+//
+// The key lives at ~/.claude/openrouter_key.txt, the exact same path
+// router/openrouter_api_client.py already reads (DEFAULT_KEY_FILE). Saving it
+// here means the desktop app and `waterfall route` use ONE key, not two copies
+// that drift. The OPENROUTER_API_KEY env var still wins when set, matching the
+// CLI's precedence exactly.
+//
+// Every request is made from Rust, never the webview, so the key is never
+// handed to JS. The UI only ever sees a masked preview and a "configured" flag.
+// ---------------------------------------------------------------------------
+
+const OPENROUTER_BASE: &str = "https://openrouter.ai/api/v1";
+
+fn openrouter_key_path() -> PathBuf {
+    home_dir().join(".claude").join("openrouter_key.txt")
+}
+
+/// Resolve the key the same way the CLI does: env var first, then the file.
+fn resolve_openrouter_key() -> String {
+    if let Ok(k) = std::env::var("OPENROUTER_API_KEY") {
+        let k = k.trim().to_string();
+        if !k.is_empty() {
+            return k;
+        }
+    }
+    fs::read_to_string(openrouter_key_path())
+        .map(|s| s.trim().to_string())
+        .unwrap_or_default()
+}
+
+fn mask_key(key: &str) -> String {
+    let n = key.chars().count();
+    if n == 0 {
+        return String::new();
+    }
+    if n <= 12 {
+        return "*".repeat(n);
+    }
+    let head: String = key.chars().take(8).collect();
+    let tail: String = key.chars().skip(n - 4).collect();
+    format!("{head}...{tail}")
+}
+
+#[derive(Serialize)]
+struct KeyStatus {
+    configured: bool,
+    /// "env" when OPENROUTER_API_KEY wins, "file" when read from disk, "" when absent.
+    source: String,
+    masked: String,
+    path: String,
+}
+
+#[tauri::command]
+fn openrouter_key_status() -> KeyStatus {
+    let from_env = std::env::var("OPENROUTER_API_KEY")
+        .map(|k| !k.trim().is_empty())
+        .unwrap_or(false);
+    let key = resolve_openrouter_key();
+    KeyStatus {
+        configured: !key.is_empty(),
+        source: if key.is_empty() {
+            String::new()
+        } else if from_env {
+            "env".into()
+        } else {
+            "file".into()
+        },
+        masked: mask_key(&key),
+        path: openrouter_key_path().to_string_lossy().to_string(),
+    }
+}
+
+#[tauri::command]
+fn save_openrouter_key(key: String) -> Result<KeyStatus, String> {
+    let key = key.trim().to_string();
+    if key.is_empty() {
+        return Err("key is empty".into());
+    }
+    let path = openrouter_key_path();
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    fs::write(&path, &key).map_err(|e| e.to_string())?;
+    Ok(openrouter_key_status())
+}
+
+#[tauri::command]
+fn clear_openrouter_key() -> Result<KeyStatus, String> {
+    let path = openrouter_key_path();
+    if path.is_file() {
+        fs::remove_file(&path).map_err(|e| e.to_string())?;
+    }
+    Ok(openrouter_key_status())
+}
+
+#[derive(Serialize, Clone)]
+struct CascadeModel {
+    id: String,
+    name: String,
+    context_length: u64,
+    prompt_price: f64,
+    /// True when prompt price is exactly 0. Free models sort first and are
+    /// genuinely the cheapest capable option, not a pricing sentinel.
+    free: bool,
+}
+
+/// Fetch the live catalog and return capable text models, cheapest first.
+///
+/// Mirrors router/openrouter_api_client.py::_priced_candidates: text in and
+/// text out, a real context length, and NEGATIVE prices excluded (OpenRouter's
+/// "-1" sentinel for meta-routers like openrouter/auto whose real price varies
+/// by what they route to internally). A price of exactly 0 is kept: those are
+/// real free models and belong at the front of a cheapest-first list.
+#[tauri::command]
+fn list_openrouter_models(min_context: Option<u64>) -> Result<Vec<CascadeModel>, String> {
+    let min_context = min_context.unwrap_or(0);
+    let client = reqwest::blocking::Client::builder()
+        .timeout(std::time::Duration::from_secs(30))
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let mut req = client.get(format!("{OPENROUTER_BASE}/models"));
+    let key = resolve_openrouter_key();
+    if !key.is_empty() {
+        req = req.bearer_auth(&key);
+    }
+    let resp = req.send().map_err(|e| e.to_string())?;
+    if !resp.status().is_success() {
+        return Err(format!("OpenRouter returned HTTP {}", resp.status()));
+    }
+    let body: serde_json::Value = resp.json().map_err(|e| e.to_string())?;
+    let items = body
+        .get("data")
+        .and_then(|d| d.as_array())
+        .ok_or("unexpected catalog shape: no `data` array")?;
+
+    let mut out: Vec<CascadeModel> = Vec::new();
+    for m in items {
+        let id = m.get("id").and_then(|v| v.as_str()).unwrap_or("");
+        if id.is_empty() || id.starts_with('~') {
+            continue;
+        }
+        let arch = m.get("architecture");
+        let has_mod = |field: &str, want: &str| -> bool {
+            arch.and_then(|a| a.get(field))
+                .and_then(|v| v.as_array())
+                .map(|arr| arr.iter().any(|x| x.as_str() == Some(want)))
+                .unwrap_or(false)
+        };
+        if !has_mod("input_modalities", "text") || !has_mod("output_modalities", "text") {
+            continue;
+        }
+        let ctx = m.get("context_length").and_then(|v| v.as_u64()).unwrap_or(0);
+        if ctx < min_context {
+            continue;
+        }
+        let price: f64 = match m
+            .get("pricing")
+            .and_then(|p| p.get("prompt"))
+            .and_then(|v| v.as_str())
+            .and_then(|s| s.parse::<f64>().ok())
+        {
+            Some(p) => p,
+            None => continue,
+        };
+        if price < 0.0 {
+            continue; // the "-1" meta-router sentinel, not a real price
+        }
+        out.push(CascadeModel {
+            id: id.to_string(),
+            name: m
+                .get("name")
+                .and_then(|v| v.as_str())
+                .unwrap_or(id)
+                .to_string(),
+            context_length: ctx,
+            prompt_price: price,
+            free: price == 0.0,
+        });
+    }
+    out.sort_by(|a, b| {
+        a.prompt_price
+            .partial_cmp(&b.prompt_price)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+    Ok(out)
+}
+
+#[derive(Serialize)]
+struct CascadeReply {
+    model: String,
+    content: String,
+    prompt_tokens: u64,
+    completion_tokens: u64,
+    cost: f64,
+    elapsed_ms: u128,
+}
+
+/// Send one prompt to one model. The key never leaves Rust.
+#[tauri::command]
+fn openrouter_chat(
+    model: String,
+    prompt: String,
+    max_tokens: Option<u64>,
+) -> Result<CascadeReply, String> {
+    let key = resolve_openrouter_key();
+    if key.is_empty() {
+        return Err("No OpenRouter key configured. Add one in Settings.".into());
+    }
+    let started = std::time::Instant::now();
+    let client = reqwest::blocking::Client::builder()
+        .timeout(std::time::Duration::from_secs(180))
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let payload = serde_json::json!({
+        "model": model,
+        "messages": [{ "role": "user", "content": prompt }],
+        "max_tokens": max_tokens.unwrap_or(1024),
+    });
+
+    let resp = client
+        .post(format!("{OPENROUTER_BASE}/chat/completions"))
+        .bearer_auth(&key)
+        .json(&payload)
+        .send()
+        .map_err(|e| e.to_string())?;
+
+    let status = resp.status();
+    let body: serde_json::Value = resp.json().map_err(|e| e.to_string())?;
+    if !status.is_success() {
+        let msg = body
+            .get("error")
+            .and_then(|e| e.get("message"))
+            .and_then(|v| v.as_str())
+            .unwrap_or("unknown error");
+        return Err(format!("HTTP {status}: {msg}"));
+    }
+
+    let content = body
+        .get("choices")
+        .and_then(|c| c.get(0))
+        .and_then(|c| c.get("message"))
+        .and_then(|m| m.get("content"))
+        .and_then(|v| v.as_str())
+        .unwrap_or("")
+        .to_string();
+    let usage = body.get("usage");
+    let num = |k: &str| -> u64 {
+        usage
+            .and_then(|u| u.get(k))
+            .and_then(|v| v.as_u64())
+            .unwrap_or(0)
+    };
+    Ok(CascadeReply {
+        model: body
+            .get("model")
+            .and_then(|v| v.as_str())
+            .unwrap_or(&model)
+            .to_string(),
+        content,
+        prompt_tokens: num("prompt_tokens"),
+        completion_tokens: num("completion_tokens"),
+        cost: usage
+            .and_then(|u| u.get("cost"))
+            .and_then(|v| v.as_f64())
+            .unwrap_or(0.0),
+        elapsed_ms: started.elapsed().as_millis(),
+    })
+}
+
 #[tauri::command]
 fn set_fullscreen(app: tauri::AppHandle, on: bool) -> Result<(), String> {
     if let Some(win) = app.get_webview_window("main") {
@@ -2519,6 +2792,11 @@ pub fn run() {
             process_note,
             get_profile,
             save_profile,
+            openrouter_key_status,
+            save_openrouter_key,
+            clear_openrouter_key,
+            list_openrouter_models,
+            openrouter_chat,
             begin_oauth,
             sign_out,
             set_fullscreen,
