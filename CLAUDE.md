@@ -608,6 +608,20 @@ which is what actually drives the 65–96% reused-input share.
   limit: B's estimate is a rough proxy, not Anthropic's real formula --
   it's a fallback for when Adam hasn't checked the real panel, never a
   replacement for it.
+  **C is OFF as of 2026-08-22**, at Adam's direct request ("stop the
+  periodic terminal reports"). Three separate things were producing
+  them, all found and stopped: the two Windows Scheduled Tasks
+  (`waterfall-quota-checkin-morning` / `-evening`) are **disabled**, not
+  deleted; the `desktop/quota_tray.py` tray app was killed; and its
+  autostart shortcut in the Startup folder was renamed to
+  `waterfall-quota-tray.lnk.disabled` so it does not come back at login.
+  All three are deliberately reversible (`Enable-ScheduledTask` for the
+  tasks, rename the `.lnk.disabled` back for the tray) -- nothing was
+  destroyed. This is consistent with the standing preference already
+  recorded in memory (no casually-spawned background processes or UIs;
+  monitoring stays alert-only), so treat C as an experiment that was
+  tried and switched off, not as infrastructure to restore by default.
+  A/B/D are untouched and still live.
 - **Re-check nudge-vs-routed compliance around 2026-08-17 (~3 days after
   the 2026-08-14 SKILL.md re-tightening)**: run `waterfall hook-log` and
   `waterfall stats`, compare nudges-fired and prompts-routed against the
