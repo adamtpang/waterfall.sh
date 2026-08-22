@@ -97,6 +97,7 @@ function show(mode) {
   $("workspace").classList.toggle("hidden", mode !== "work");
   $("settings").classList.toggle("hidden", mode !== "settings");
   $("add-panel").classList.toggle("hidden", mode !== "add");
+  $("cascade").classList.toggle("hidden", mode !== "cascade");
 }
 
 function relativeActivity(mtime) {
@@ -1179,6 +1180,7 @@ function openSettings() {
       : "Local profile on this device";
   $("email").value = o.email || "";
   show("settings");
+  refreshKeyStatus();
 }
 
 // ── Events ──
@@ -1404,3 +1406,162 @@ $("btn-settings").addEventListener("contextmenu", async (e) => {
     }
   })();
 })();
+
+// ── Cascade: one OpenRouter key, cheapest capable model ──
+//
+// Self-contained module. The key never enters this file: every call goes
+// through a Tauri command and Rust holds the secret, so the webview only ever
+// sees a masked preview. Catalog is fetched once per session and refiltered
+// client-side so changing "min context" costs no network.
+
+let cxCatalog = [];
+
+function cxPrice(m) {
+  if (m.free) return "free";
+  // OpenRouter prices are per-token; per-million reads better at a glance.
+  const perM = m.prompt_price * 1e6;
+  return "$" + (perM < 1 ? perM.toFixed(3) : perM.toFixed(2)) + "/M";
+}
+
+function cxContext(m) {
+  const c = m.context_length || 0;
+  if (c >= 1e6) return (c / 1e6).toFixed(c % 1e6 === 0 ? 0 : 1) + "M";
+  if (c >= 1000) return Math.round(c / 1000) + "K";
+  return String(c);
+}
+
+function renderCascadeModels() {
+  const min = parseInt($("cx-ctx").value, 10) || 0;
+  const sel = $("cx-model");
+  const previous = sel.value;
+  const rows = cxCatalog.filter((m) => (m.context_length || 0) >= min);
+
+  if (!rows.length) {
+    sel.innerHTML = '<option value="">No model matches that context size</option>';
+    $("cx-model-note").textContent = "";
+    return;
+  }
+  sel.innerHTML = rows
+    .map(
+      (m) =>
+        '<option value="' +
+        m.id +
+        '">' +
+        m.id +
+        "  ·  " +
+        cxPrice(m) +
+        "  ·  " +
+        cxContext(m) +
+        "</option>"
+    )
+    .join("");
+  // Keep the user's pick across a refilter when it still qualifies.
+  if (previous && rows.some((m) => m.id === previous)) sel.value = previous;
+
+  const freeCount = rows.filter((m) => m.free).length;
+  $("cx-model-note").textContent =
+    rows.length +
+    " capable text models, cheapest first. " +
+    freeCount +
+    " are free.";
+}
+
+async function loadCascadeModels(force) {
+  const sel = $("cx-model");
+  if (cxCatalog.length && !force) return renderCascadeModels();
+  sel.innerHTML = '<option value="">Loading catalog…</option>';
+  try {
+    cxCatalog = await invoke("list_openrouter_models", { minContext: 0 });
+    renderCascadeModels();
+  } catch (e) {
+    cxCatalog = [];
+    sel.innerHTML = '<option value="">Could not load catalog</option>';
+    $("cx-model-note").textContent = String(e);
+  }
+}
+
+async function refreshKeyStatus() {
+  try {
+    const s = await invoke("openrouter_key_status");
+    $("or-status").textContent = s.configured
+      ? "Key configured (" +
+        (s.source === "env" ? "from OPENROUTER_API_KEY" : "from file") +
+        "): " +
+        s.masked
+      : "No key configured. The cascade cannot run without one.";
+    $("or-path").textContent =
+      "Shared with the CLI at " +
+      s.path +
+      (s.source === "env"
+        ? ". The environment variable takes precedence over this file."
+        : "");
+  } catch (e) {
+    $("or-status").textContent = "Could not read key status: " + e;
+  }
+}
+
+async function openCascade() {
+  show("cascade");
+  await loadCascadeModels(false);
+}
+
+$("btn-cascade").addEventListener("click", openCascade);
+$("btn-cx-back").addEventListener("click", () => {
+  show(selected ? "work" : "empty");
+});
+$("cx-ctx").addEventListener("change", renderCascadeModels);
+$("btn-cx-refresh").addEventListener("click", () => loadCascadeModels(true));
+
+$("btn-cx-run").addEventListener("click", async () => {
+  const model = $("cx-model").value;
+  const prompt = $("cx-prompt").value.trim();
+  if (!model) return ($("cx-meta").textContent = "Pick a model first.");
+  if (!prompt) return ($("cx-meta").textContent = "Write a prompt first.");
+
+  const btn = $("btn-cx-run");
+  btn.disabled = true;
+  $("cx-meta").textContent = "Running…";
+  try {
+    const r = await invoke("openrouter_chat", { model, prompt, maxTokens: 1024 });
+    $("cx-out-card").classList.remove("hidden");
+    $("cx-out").textContent = r.content || "(empty response)";
+    $("cx-meta").textContent =
+      r.model +
+      "  ·  " +
+      r.prompt_tokens +
+      " in / " +
+      r.completion_tokens +
+      " out  ·  $" +
+      r.cost +
+      "  ·  " +
+      (r.elapsed_ms / 1000).toFixed(2) +
+      "s";
+  } catch (e) {
+    $("cx-meta").textContent = String(e);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+$("btn-or-save").addEventListener("click", async () => {
+  const key = $("or-key").value.trim();
+  if (!key) return ($("or-status").textContent = "Paste a key first.");
+  try {
+    await invoke("save_openrouter_key", { key });
+    $("or-key").value = "";
+    cxCatalog = []; // a new key can change what the catalog returns
+    await refreshKeyStatus();
+  } catch (e) {
+    $("or-status").textContent = "Could not save: " + e;
+  }
+});
+
+$("btn-or-clear").addEventListener("click", async () => {
+  try {
+    await invoke("clear_openrouter_key");
+    cxCatalog = [];
+    await refreshKeyStatus();
+  } catch (e) {
+    $("or-status").textContent = "Could not clear: " + e;
+  }
+});

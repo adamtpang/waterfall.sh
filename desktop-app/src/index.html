@@ -56,6 +56,7 @@
           <span class="sm-label">Saved</span>
           <span class="sm-val" id="sm-saved">$0</span>
         </div>
+        <button type="button" class="icon-btn" id="btn-cascade" title="Cascade (OpenRouter)">⑂</button>
         <button type="button" class="icon-btn" id="btn-settings" title="Settings">⚙</button>
       </div>
     </aside>
@@ -145,6 +146,18 @@
           <button type="button" class="btn primary" id="btn-save">Save</button>
         </div>
         <div class="card">
+          <h2 class="card-title">OpenRouter key</h2>
+          <p class="muted" id="or-status">Checking…</p>
+          <label class="field">API key
+            <input type="password" id="or-key" placeholder="sk-or-v1-…" autocomplete="off" spellcheck="false" />
+          </label>
+          <div class="row">
+            <button type="button" class="btn primary" id="btn-or-save">Save key</button>
+            <button type="button" class="btn" id="btn-or-clear">Clear</button>
+          </div>
+          <p class="muted small" id="or-path"></p>
+        </div>
+        <div class="card">
           <p class="muted" id="account-line">Local profile</p>
           <label class="field">Email
             <input type="email" id="email" placeholder="you@domain.com" />
@@ -155,6 +168,50 @@
           </div>
         </div>
         <button type="button" class="btn" id="btn-back">Back</button>
+      </div>
+
+      <div class="settings hidden" id="cascade">
+        <header class="ws-header">
+          <div class="ws-title-block">
+            <h1>Cascade</h1>
+            <p class="path">One OpenRouter key. Cheapest capable model first.</p>
+          </div>
+        </header>
+
+        <div class="card">
+          <div class="row cascade-controls">
+            <label class="field grow">Model
+              <select id="cx-model"><option value="">Loading catalog…</option></select>
+            </label>
+            <label class="field cx-narrow">Min context
+              <select id="cx-ctx">
+                <option value="0">any</option>
+                <option value="32000">32K+</option>
+                <option value="128000">128K+</option>
+                <option value="1000000">1M+</option>
+              </select>
+            </label>
+            <button type="button" class="btn" id="btn-cx-refresh" title="Refetch the live catalog">Refresh</button>
+          </div>
+          <p class="muted small" id="cx-model-note"></p>
+        </div>
+
+        <div class="card">
+          <label class="field">Prompt
+            <textarea id="cx-prompt" rows="5" placeholder="Send a routine task to the cheapest capable model…"></textarea>
+          </label>
+          <div class="row">
+            <button type="button" class="btn primary" id="btn-cx-run">Run</button>
+            <span class="muted small" id="cx-meta"></span>
+          </div>
+        </div>
+
+        <div class="card hidden" id="cx-out-card">
+          <h2 class="card-title">Output</h2>
+          <pre class="cx-out" id="cx-out"></pre>
+        </div>
+
+        <button type="button" class="btn" id="btn-cx-back">Back</button>
       </div>
     </main>
   </div>
