@@ -56,6 +56,8 @@
   .price-card .amt span{font-size:16px;color:var(--faint)}
   .price-card p{color:var(--dust);margin:10px 0 18px;font-size:14.5px}
   .price-card .btn{width:100%}
+  .price-card .btn.dl{margin-top:8px;gap:8px}
+  .dl-icon{font-family:var(--mono);font-size:15px;line-height:1;color:var(--accent)}
   .fine{display:block;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--faint)}
   .proof{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:36px}
   @media(max-width:640px){.proof{grid-template-columns:1fr}}
@@ -115,7 +117,10 @@
       <div class="amt">$30 <span>founding, once</span></div>
       <p>Unlock the board and the cascade. Test it on yourself. If it is not easier than opening another grok terminal, it is not done.</p>
       <a class="btn primary" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy waterfall</a>
-      <span class="fine">Stripe checkout. Then /thanks for install.</span>
+      <a class="btn ghost dl" href="https://github.com/adamtpang/waterfall.sh/releases/latest/download/waterfall_0.1.0_x64-setup.exe">
+        <span class="dl-icon">↓</span> Download for Windows
+      </a>
+      <span class="fine">v0.1.0 · 3.0 MB installer · unsigned, SmartScreen shows a warning</span>
     </aside>
   </section>
 
@@ -166,6 +171,8 @@
         <li>Hard per-call token cap (the Ringer)</li>
         <li>Global nudge hook, real hook-log audit trail</li>
         <li>Usage-pace + quota estimate, CLI and visual dashboard</li>
+        <li>Native Windows desktop app, published and downloadable (v0.1.0)</li>
+        <li>Cascade panel in the desktop app, one OpenRouter key shared with the CLI</li>
         <li>Desktop app: agent launcher for Claude, Codex, Grok, OpenCode</li>
         <li>Fleet-wide per-project model/effort config, applied across ~117 real repos</li>
       </ul>
@@ -174,8 +181,8 @@
       <h3>🚧 Being wired up</h3>
       <ul>
         <li>Skill self-triggering: still ~0.1% real-route conversion on nudges (measured, not guessed)</li>
-        <li>Signed installers for macOS/Linux — install.py works, no .dmg/AppImage yet</li>
-        <li>Windows .exe as the front-door download, not just a build artifact</li>
+        <li>Code signing — the Windows installer ships unsigned, so SmartScreen warns on first launch</li>
+        <li>macOS/Linux packaging for the native app — install.py works there, no .dmg/AppImage yet</li>
         <li>waterfall.sh domain — live at waterfallsh.vercel.app for now</li>
       </ul>
     </article>
@@ -196,13 +203,12 @@
     <article class="card">
       <h3>I just want the CLI</h3>
       <pre>curl -sSL https://raw.githubusercontent.com/adamtpang/waterfall.sh/main/install.py | python3</pre>
-      <p class="soon">The real download today, on Windows, macOS, and Linux alike. Clones to ~/.waterfall, wires the hooks, puts `waterfall` and `watertop` on PATH. No signed installer exists yet — this script is it.</p>
+      <p class="soon">Works on Windows, macOS, and Linux alike, and it is the only path on macOS and Linux. Clones to ~/.waterfall, wires the hooks, puts `waterfall` and `watertop` on PATH.</p>
     </article>
     <article class="card">
       <h3>I want the native desktop board</h3>
-      <pre>cd desktop-app
-npm run tauri build</pre>
-      <p class="soon">Windows only today (NSIS + MSI), and not published as a release yet — you build it yourself from source. macOS/Linux packaging isn't started.</p>
+      <pre>waterfall_0.1.0_x64-setup.exe</pre>
+      <p class="soon"><a href="https://github.com/adamtpang/waterfall.sh/releases/latest" style="color:var(--accent)">Download v0.1.0 for Windows</a> (NSIS 3.0 MB, or the MSI). Cascade panel, one shared OpenRouter key, agent launchers. Not code-signed, so SmartScreen warns on first launch: More info, then Run anyway. macOS/Linux packaging isn't started.</p>
     </article>
     <article class="card">
       <h3>I want to read the code first</h3>
