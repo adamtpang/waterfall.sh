@@ -250,6 +250,65 @@ class GenerateWithUsageFallbackTests(unittest.TestCase):
 
     @mock.patch("time.sleep", return_value=None)
     @mock.patch("requests.post")
+    def test_falls_back_when_a_model_returns_empty_content(self, mock_post, _sleep) -> None:
+        # Regression: a reasoning model can answer HTTP 200 with
+        # finish_reason="stop" and content=None, having spent its whole token
+        # budget on a separate `reasoning` field. Caught live against
+        # stealth/ox-alpha (2026-08-23), which matters because free models sort
+        # first and it is currently the top pick. That used to be reported as a
+        # successful route with an empty answer; it must cascade instead.
+        client = self._client()
+        mock_post.side_effect = [
+            _fake_response(
+                200,
+                {
+                    "choices": [{"message": {"content": None}, "finish_reason": "stop"}],
+                    "usage": {"prompt_tokens": 5, "completion_tokens": 900, "cost": 0},
+                },
+            ),
+            _fake_response(
+                200,
+                {
+                    "choices": [{"message": {"content": "real answer"}}],
+                    "usage": {"prompt_tokens": 5, "completion_tokens": 2, "cost": 0.0001},
+                },
+            ),
+        ]
+
+        result = client.generate_with_usage("hello", retries=0, fallback_models=2)
+
+        self.assertEqual(result.model, "pricey/text-model")
+        self.assertEqual(result.text, "real answer")
+        self.assertEqual(mock_post.call_count, 2)
+
+    @mock.patch("time.sleep", return_value=None)
+    @mock.patch("requests.post")
+    def test_whitespace_only_content_also_falls_back(self, mock_post, _sleep) -> None:
+        client = self._client()
+        mock_post.side_effect = [
+            _fake_response(
+                200,
+                {
+                    "choices": [{"message": {"content": "   \n  "}}],
+                    "usage": {"prompt_tokens": 5, "completion_tokens": 3, "cost": 0},
+                },
+            ),
+            _fake_response(
+                200,
+                {
+                    "choices": [{"message": {"content": "real answer"}}],
+                    "usage": {"prompt_tokens": 5, "completion_tokens": 2, "cost": 0.0001},
+                },
+            ),
+        ]
+
+        result = client.generate_with_usage("hello", retries=0, fallback_models=2)
+
+        self.assertEqual(result.text, "real answer")
+        self.assertEqual(mock_post.call_count, 2)
+
+    @mock.patch("time.sleep", return_value=None)
+    @mock.patch("requests.post")
     def test_raises_after_all_candidates_exhausted(self, mock_post, _sleep) -> None:
         client = self._client()
         mock_post.return_value = _fake_response(500, text="down")

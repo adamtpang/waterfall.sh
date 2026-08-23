@@ -394,6 +394,26 @@ class OpenRouterClient:
                     break
 
                 text = choices[0].get("message", {}).get("content", "") or ""
+                if not text.strip():
+                    # Empty content is a real failure, not a successful empty
+                    # answer, so cascade to the next candidate instead of
+                    # reporting success with nothing in it.
+                    #
+                    # Caught live against stealth/ox-alpha on 2026-08-23: it is
+                    # a reasoning model that emits its chain into a separate
+                    # `reasoning` field FIRST and only then writes `content`.
+                    # Given a modest max_tokens it spends the whole budget
+                    # reasoning and returns content=None with
+                    # finish_reason="stop" -- indistinguishable from success by
+                    # status code alone. It matters because free models sort
+                    # first, so ox-alpha is currently the top pick.
+                    last_error = OpenRouterError(
+                        f"{candidate_model} returned empty content "
+                        f"(finish_reason={choices[0].get('finish_reason')!r}); "
+                        "likely spent the whole token budget on reasoning"
+                    )
+                    break
+
                 usage = data.get("usage", {}) or {}
                 input_tokens = usage.get("prompt_tokens", 0)
                 output_tokens = usage.get("completion_tokens", 0)
