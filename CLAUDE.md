@@ -575,6 +575,41 @@ which is what actually drives the 65–96% reused-input share.
   fable): guidance text matched the CLI's output exactly. 5 new tests,
   full suite green at 261.
 
+- **stealth/ox-alpha characterized live through the desktop GUI,
+  2026-08-23**, because the free-model fix made it waterfall's #1 pick and
+  a default pick deserves to be tested, not assumed. Driven through
+  `waterfall desktop`'s Cascade tab (real clicks, real routes), then every
+  returned snippet was actually executed rather than eyeballed. Two real
+  findings, in order of how much they matter:
+  1. **It returns empty content when reasoning eats the token budget.**
+     ox-alpha writes its chain into a separate `reasoning` field FIRST and
+     only then writes `content`. At `max_tokens=900` it spent all 900 on
+     reasoning and answered HTTP 200 / `finish_reason="stop"` /
+     `content=None`; at 2000 it answered correctly. `reasoning_tokens`
+     reports `0` throughout, so the usage block does not reveal it either.
+     waterfall used to report that as a successful route with an empty
+     answer. Fixed: empty/whitespace content now cascades to the next
+     candidate (commit 368fc5f, 2 regression tests).
+  2. **Its code is good; its tests are not, on edge-case-heavy prompts.**
+     On a plain task (`chunk_by_size`) it produced correct code whose own
+     3 tests passed on execution. On a prompt with a deliberate trap
+     (`merge_intervals`, where sharing an endpoint must merge but a gap
+     must not) the implementation was correct against both stated spec
+     examples, but 2 of the 4 tests it wrote asserted the opposite of the
+     rule the function correctly implements, and the file failed on
+     import. Concretely: it asserted `(8,10)+(10,12)` stay separate when
+     they share endpoint 10 and must merge to `(8,12)`.
+     The failure mode to remember is that the output *looks* complete
+     (code plus tests) while containing tests that contradict the code, so
+     it reads as more verified than it is. This is why routed output gets
+     executed, not skimmed. Not a reason to drop ox-alpha as the top pick
+     -- it is free, fast, and its implementations held up -- but a real
+     reason to treat model-authored tests as unverified until run.
+  Also confirmed in the same pass: the response cache works end to end
+  through the GUI (identical routed text came back instantly, `$0`, `0 in
+  / 0 out`, `cache_hit: true`), and the OpenRouter key is pay-as-you-go
+  with no cap and $0 spent so far, with every ox-alpha call billing $0.
+
 ## Not done yet
 
 - **A/B/C/D quota-safety plan shipped, 2026-08-18**, in response to Adam
