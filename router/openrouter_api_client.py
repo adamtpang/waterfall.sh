@@ -29,9 +29,9 @@ import json
 import logging
 import os
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -86,13 +86,27 @@ class OpenRouterError(RuntimeError):
 
 @dataclass
 class GenerateResult:
-    """Full result of a generate() call, with token/cost accounting."""
+    """Full result of a generate() call, with token/cost accounting.
+
+    `queue` and `attempts` exist so the cascade is inspectable instead of a
+    black box. The client always ranked its candidates and always knew which
+    ones it burned through before one answered, but it used to discard that
+    and report only the winner, which made "why did it pick THAT model" and
+    "did it fall back, and why" unanswerable after the fact.
+
+    - `queue`: the ranked candidate models considered, cheapest first.
+    - `attempts`: one entry per model actually contacted, in order, each
+      `{"model", "status": "ok"|"failed", "reason", "elapsed_sec"}`. A model
+      later in `queue` than the last attempt was never contacted at all.
+    """
     text: str
     model: str
     input_tokens: int = 0
     output_tokens: int = 0
     cost_usd: float = 0.0
     elapsed_sec: float = 0.0
+    queue: List[str] = field(default_factory=list)
+    attempts: List[Dict[str, Any]] = field(default_factory=list)
 
 
 class OpenRouterClient:
@@ -339,6 +353,7 @@ class OpenRouterClient:
         }
 
         last_error: Optional[Exception] = None
+        attempts: List[Dict[str, Any]] = []
         for candidate_model in candidates:
             payload = {
                 "model": candidate_model,
@@ -421,6 +436,12 @@ class OpenRouterClient:
                 if cost is None:
                     cost = self._estimate_cost(candidate_model, input_tokens, output_tokens)
 
+                attempts.append({
+                    "model": candidate_model,
+                    "status": "ok",
+                    "reason": "",
+                    "elapsed_sec": round(elapsed, 2),
+                })
                 return GenerateResult(
                     text=text,
                     model=candidate_model,
@@ -428,8 +449,16 @@ class OpenRouterClient:
                     output_tokens=output_tokens,
                     cost_usd=cost,
                     elapsed_sec=round(elapsed, 2),
+                    queue=list(candidates),
+                    attempts=attempts,
                 )
 
+            attempts.append({
+                "model": candidate_model,
+                "status": "failed",
+                "reason": str(last_error) if last_error else "unknown",
+                "elapsed_sec": 0.0,
+            })
             logger.warning(
                 "Model %s exhausted (%d attempt(s)), falling back to next candidate: %s",
                 candidate_model, retries + 1, last_error,

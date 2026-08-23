@@ -103,6 +103,38 @@ def cmd_classify(args: argparse.Namespace) -> int:
     return 0
 
 
+def _print_model_queue(result) -> None:
+    """Show the cascade's ranked candidates and what happened to each.
+
+    "Cheapest capable model" is a decision waterfall makes on your behalf
+    every call, and it used to be invisible: you saw the winner with no way to
+    tell whether it was first pick or the third one after two failures.
+    Models listed below the last attempt were never contacted.
+    """
+    queue = list(getattr(result, "queue", []) or [])
+    attempts = list(getattr(result, "attempts", []) or [])
+
+    if getattr(result, "cache_hit", False):
+        print("\nmodel queue:  skipped, served from cache, no model contacted")
+        return
+    if not queue:
+        return
+
+    outcome = {a.get("model"): a for a in attempts}
+    print(f"\nmodel queue:  {len(queue)} candidate(s), cheapest first")
+    for i, name in enumerate(queue, 1):
+        got = outcome.get(name)
+        if got is None:
+            print(f"  {i}. {name}  [not needed]")
+        elif got.get("status") == "ok":
+            print(f"  {i}. {name}  [answered in {got.get('elapsed_sec', 0)}s]")
+        else:
+            reason = (got.get("reason") or "failed").splitlines()[0]
+            if len(reason) > 96:
+                reason = reason[:93] + "..."
+            print(f"  {i}. {name}  [failed: {reason}]")
+
+
 def cmd_route(args: argparse.Namespace) -> int:
     prompt = _read_prompt(args)
     router = SmartRouter()
@@ -142,6 +174,8 @@ def cmd_route(args: argparse.Namespace) -> int:
     print(f"cost (USD):   {result.cost_usd}")
     print(f"tokens:       {result.input_tokens} in / {result.output_tokens} out")
     print(f"elapsed:      {result.elapsed_sec}s")
+
+    _print_model_queue(result)
 
     if result.free_response:
         print("\n--- free model output ---")

@@ -22,65 +22,64 @@
 
 /* tokens live in /tokens.css, linked in <head> */
 
-/* ---------------------------------- shell -------------------------------- */
-.shell{display:grid;grid-template-columns:var(--rail-w) minmax(0,1fr);min-height:100vh}
-
-.sidebar{
-  background:var(--sidebar);color:var(--sidebar-foreground);
-  border-right:1px solid var(--sidebar-border);
-  display:flex;flex-direction:column;gap:4px;padding:12px;
-  position:sticky;top:0;height:100vh;
-}
-.sidebar-brand{display:flex;align-items:center;gap:9px;padding:8px 8px 14px}
-.sidebar-brand .mark{
-  width:28px;height:28px;border-radius:var(--radius-md);flex:none;
-  display:grid;place-items:center;background:var(--primary);color:var(--primary-foreground);
-  font-weight:800;font-size:14px;letter-spacing:-0.04em;box-shadow:var(--shadow-xs);
-}
-.sidebar-brand .name{font-weight:650;letter-spacing:-0.015em;font-size:14px}
-.sidebar-brand .sub{
-  font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;
-  color:var(--muted-foreground);
-}
-.nav-label{
-  font-family:var(--mono);font-size:10px;letter-spacing:0.13em;text-transform:uppercase;
-  color:var(--muted-foreground);padding:10px 8px 6px;
-}
-.nav-item{
-  display:flex;align-items:center;gap:10px;width:100%;
-  padding:8px 10px;border-radius:var(--radius-md);border:1px solid transparent;
-  background:transparent;color:var(--sidebar-foreground);
-  font:inherit;font-size:13.5px;font-weight:500;text-align:left;cursor:pointer;
-  text-decoration:none;transition:background 0.12s ease,color 0.12s ease;
-}
-.nav-item svg{width:16px;height:16px;flex:none;opacity:0.75}
-.nav-item:hover{background:var(--sidebar-accent)}
-.nav-item[aria-current="page"]{
-  background:var(--sidebar-accent);font-weight:600;
-  box-shadow:inset 2px 0 0 var(--primary);
-}
-.nav-item[aria-current="page"] svg{opacity:1;color:var(--primary)}
-.sidebar-foot{
-  margin-top:auto;padding:10px 8px 4px;border-top:1px solid var(--sidebar-border);
-  font-family:var(--mono);font-size:10.5px;color:var(--muted-foreground);
-  display:flex;flex-direction:column;gap:5px;
-}
-.dot{display:inline-block;width:6px;height:6px;border-radius:999px;background:var(--muted-foreground);margin-right:6px}
-.dot.on{background:var(--success);box-shadow:0 0 0 3px color-mix(in oklch,var(--success) 22%,transparent)}
-.dot.off{background:var(--destructive)}
-
-/* --------------------------------- header -------------------------------- */
-.header{
-  height:var(--header-h);position:sticky;top:0;z-index:20;
-  display:flex;align-items:center;gap:12px;padding:0 22px;
+/* ---------------------------------- shell --------------------------------
+   One top bar, no sidebar. With 3 sections a rail is the wrong control: the
+   convention is a top bar under ~5 destinations, and a sidebar only once a
+   product has real hierarchy (6+ sections). The rail was also carrying
+   decoration (a "Workspace" heading over three items) and a status footer,
+   which is what made it feel busy. Sections live in the bar; global
+   utilities (status, theme, refresh) sit on the right.
+--------------------------------------------------------------------------- */
+.topbar{
+  position:sticky; top:0; z-index:20;
+  display:flex; align-items:center; gap:8px;
+  padding:0 20px; height:var(--header-h);
   border-bottom:1px solid var(--border);
   background:color-mix(in oklch, var(--background) 82%, transparent);
   backdrop-filter:blur(10px) saturate(1.4);
 }
-.header h1{font-size:14.5px;font-weight:600;letter-spacing:-0.012em}
-.header .crumb{font-family:var(--mono);font-size:11px;color:var(--muted-foreground)}
-.header .spacer{flex:1}
-.content{padding:22px;max-width:1180px}
+.brand{ display:flex; align-items:center; gap:9px; margin-right:14px; flex:none; }
+.brand .mark{
+  width:26px; height:26px; border-radius:var(--radius-md); flex:none;
+  display:grid; place-items:center; background:var(--primary);
+  color:var(--primary-foreground); font-weight:800; font-size:13px;
+  letter-spacing:-0.04em; box-shadow:var(--shadow-xs);
+}
+.brand .name{ font-weight:650; font-size:14px; letter-spacing:-0.015em; }
+
+.nav-item{
+  display:inline-flex; align-items:center; gap:7px;
+  height:32px; padding:0 12px; border-radius:var(--radius-md);
+  border:1px solid transparent; background:transparent; color:var(--muted-foreground);
+  font:inherit; font-size:13.5px; font-weight:500; cursor:pointer;
+  text-decoration:none; white-space:nowrap;
+  transition:background 0.12s ease,color 0.12s ease;
+}
+.nav-item svg{ width:15px; height:15px; flex:none; }
+.nav-item:hover{ background:var(--accent); color:var(--accent-foreground); }
+.nav-item[aria-current="page"]{
+  background:var(--secondary); color:var(--foreground); font-weight:600;
+}
+.topbar .spacer{ flex:1; }
+
+/* status is one dot plus a word, not a footer block */
+.status{
+  display:inline-flex; align-items:center; gap:7px; margin-right:4px;
+  font-family:var(--mono); font-size:11px; color:var(--muted-foreground);
+  white-space:nowrap;
+}
+.dot{ width:6px; height:6px; border-radius:999px; background:var(--muted-foreground); flex:none; }
+.dot.on{ background:var(--success); box-shadow:0 0 0 3px color-mix(in oklch,var(--success) 22%,transparent); }
+.dot.off{ background:var(--destructive); }
+
+.content{ padding:22px; max-width:1180px; margin:0 auto; }
+
+@media (max-width:760px){
+  .topbar{ padding:0 12px; gap:5px; overflow-x:auto; }
+  .brand .name{ display:none; }
+  .status span{ display:none; }
+  .nav-item{ padding:0 9px; }
+}
 
 /* ---------------------------------- card --------------------------------- */
 .card{
@@ -230,6 +229,34 @@ kbd{
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 
+
+/* --------------------------------- queue ---------------------------------
+   Which models the cascade ranked, and what happened to each. Previously the
+   UI showed only the winner, so "why this model" and "did it fall back" were
+   unanswerable. Rows below the last attempt were never contacted. */
+.queue{ margin-top:12px; display:none; }
+.queue.show{ display:block; }
+.queue-head{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--muted-foreground); margin-bottom:7px;
+}
+.queue-row{
+  display:flex; align-items:center; gap:9px; padding:7px 11px;
+  border:1px solid var(--border); border-radius:var(--radius-md);
+  margin-bottom:5px; background:var(--background);
+  font-family:var(--mono); font-size:11.5px;
+}
+.queue-row .rank{ color:var(--muted-foreground); min-width:14px; }
+.queue-row .who{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.queue-row.ok{ border-color:color-mix(in oklch,var(--success) 40%,var(--border)); }
+.queue-row.ok .who{ color:var(--success); font-weight:600; }
+.queue-row.failed .who{ color:var(--destructive); text-decoration:line-through; }
+.queue-row.idle{ opacity:0.55; }
+.queue-row .why{
+  color:var(--muted-foreground); font-size:10.5px; max-width:46%;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
 /* -------------------------------- skeleton ------------------------------- */
 .skel{
   border-radius:6px;
@@ -250,68 +277,42 @@ kbd{
 .panel.active{display:block;animation:fade 0.18s ease}
 @keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
 code{font-family:var(--mono);font-size:0.92em;background:var(--muted);padding:1px 5px;border-radius:5px}
-
-@media (max-width:820px){
-  .shell{grid-template-columns:1fr}
-  .sidebar{
-    position:static;height:auto;flex-direction:row;align-items:center;overflow-x:auto;
-    border-right:0;border-bottom:1px solid var(--sidebar-border);
-  }
-  .sidebar-brand{padding:0 10px 0 4px}
-  .nav-label,.sidebar-foot{display:none}
-  .nav-item{width:auto}
-}
 </style>
 </head>
 <body>
-<div class="shell">
+<header class="topbar">
+  <div class="brand">
+    <div class="mark">W</div>
+    <div class="name">waterfall</div>
+  </div>
 
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="mark">W</div>
-      <div>
-        <div class="name">waterfall</div>
-        <div class="sub">cascade</div>
-      </div>
-    </div>
+  <button class="nav-item" data-tab="dashboard" aria-current="page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+    Dashboard
+  </button>
+  <button class="nav-item" data-tab="cascade">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6a2 2 0 0 0 2 2h5"/><path d="M11 12h5a2 2 0 0 1 2 2v6"/><path d="m15 17 3 3 3-3"/></svg>
+    Cascade
+  </button>
+  <button class="nav-item" data-tab="agents">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="12" rx="2"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/><circle cx="9.5" cy="13" r="1"/><circle cx="14.5" cy="13" r="1"/></svg>
+    Agents
+  </button>
 
-    <div class="nav-label">Workspace</div>
-    <button class="nav-item" data-tab="dashboard" aria-current="page">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
-      Dashboard
-    </button>
-    <button class="nav-item" data-tab="cascade">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6a2 2 0 0 0 2 2h5"/><path d="M11 12h5a2 2 0 0 1 2 2v6"/><path d="m15 17 3 3 3-3"/><path d="m1 7 3-3 3 3"/></svg>
-      Cascade
-    </button>
-    <button class="nav-item" data-tab="agents">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="12" rx="2"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/><circle cx="9.5" cy="13" r="1"/><circle cx="14.5" cy="13" r="1"/></svg>
-      Agents
-    </button>
-    <a class="nav-item" href="/pace" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-      Usage pace
-    </a>
+  <div class="spacer"></div>
 
-    <div class="sidebar-foot">
-      <div id="foot-or"><span class="dot"></span>checking OpenRouter</div>
-      <div id="foot-root">local only, 127.0.0.1</div>
-    </div>
-  </aside>
-
-  <div>
-    <header class="header">
-      <h1 id="page-title">Dashboard</h1>
-      <span class="crumb" id="page-crumb">savings and hook activity</span>
-      <div class="spacer"></div>
-      <button class="btn btn-ghost btn-icon" id="btn-theme" title="Toggle theme" aria-label="Toggle theme">
-        <svg id="icon-theme" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-      </button>
-      <button class="btn btn-outline btn-sm" id="btn-reload">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
-        Refresh
-      </button>
-    </header>
+  <span class="status" id="status-or" title="OpenRouter connection"><span class="dot"></span><span>checking</span></span>
+  <a class="nav-item" href="/pace" target="_blank" rel="noopener" title="Usage pace (opens a new tab)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    Pace
+  </a>
+  <button class="btn btn-ghost btn-icon" id="btn-theme" title="Toggle theme" aria-label="Toggle theme">
+    <svg id="icon-theme" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+  </button>
+  <button class="btn btn-ghost btn-icon" id="btn-reload" title="Refresh" aria-label="Refresh">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+  </button>
+</header>
 
     <main class="content">
 
@@ -375,6 +376,7 @@ code{font-family:var(--mono);font-size:0.92em;background:var(--muted);padding:1p
               <span class="hint"><kbd>Ctrl</kbd><kbd>Enter</kbd> to route</span>
             </div>
             <div class="result-bar" id="result-bar"></div>
+            <div class="queue" id="queue"></div>
             <pre class="out placeholder" id="cascade-out">Results show here.</pre>
           </div>
         </div>
@@ -402,18 +404,10 @@ code{font-family:var(--mono);font-size:0.92em;background:var(--muted);padding:1p
         </div>
       </section>
 
-    </main>
-  </div>
-</div>
+</main>
 
 <script>
 const $ = (id) => document.getElementById(id);
-
-const PAGES = {
-  dashboard: ["Dashboard", "savings and hook activity"],
-  cascade:   ["Cascade", "classify, dry run, or route for real"],
-  agents:    ["Agents", "detect and launch what is installed"],
-};
 
 /* --------------------------------- theme --------------------------------- */
 const SUN = '<path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>';
@@ -465,9 +459,6 @@ document.querySelectorAll(".nav-item[data-tab]").forEach((item) => {
     document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
     item.setAttribute("aria-current", "page");
     $("panel-" + item.dataset.tab).classList.add("active");
-    const page = PAGES[item.dataset.tab];
-    $("page-title").textContent = page[0];
-    $("page-crumb").textContent = page[1];
   });
 });
 
@@ -494,9 +485,11 @@ async function loadDashboard() {
     '<span class="badge badge-warning">' + fmtNum(hooks.ringer_count || 0) + ' denials</span>';
 
   const on = !!status.openrouter_configured;
-  $("foot-or").innerHTML = '<span class="dot ' + (on ? "on" : "off") + '"></span>' +
-    (on ? "OpenRouter connected" : "no OpenRouter key");
-  $("foot-root").textContent = status.repo_root || "local only, 127.0.0.1";
+  const chip = $("status-or");
+  chip.innerHTML = '<span class="dot ' + (on ? "on" : "off") + '"></span><span>' +
+    (on ? "openrouter" : "no key") + "</span>";
+  chip.title = (on ? "OpenRouter connected" : "No OpenRouter key, classify and dry run still work")
+    + "  |  " + (status.repo_root || "local only, 127.0.0.1");
 
   const list = $("hook-list");
   if (!hooks.recent || !hooks.recent.length) {
@@ -560,6 +553,37 @@ function badge(kind, text) {
   return '<span class="badge badge-' + kind + ' badge-mono">' + esc(text) + '</span>';
 }
 
+function renderQueue(d) {
+  const box = $("queue");
+  const queue = (d && d.queue) || [];
+  const attempts = (d && d.attempts) || [];
+
+  if (d && d.cache_hit) {
+    box.className = "queue show";
+    box.innerHTML = '<div class="queue-head">model queue</div>' +
+      '<div class="queue-row idle"><span class="who">skipped, served from cache, no model contacted</span></div>';
+    return;
+  }
+  if (!queue.length) { box.className = "queue"; box.innerHTML = ""; return; }
+
+  const byModel = {};
+  attempts.forEach((a) => { byModel[a.model] = a; });
+
+  box.className = "queue show";
+  box.innerHTML = '<div class="queue-head">model queue, cheapest first (' + queue.length + ')</div>' +
+    queue.map((name, i) => {
+      const got = byModel[name];
+      let cls = "idle", why = "not needed";
+      if (got && got.status === "ok") { cls = "ok"; why = "answered in " + (got.elapsed_sec || 0) + "s"; }
+      else if (got) { cls = "failed"; why = (got.reason || "failed").split("\n")[0]; }
+      return '<div class="queue-row ' + cls + '">' +
+        '<span class="rank">' + (i + 1) + '</span>' +
+        '<span class="who">' + esc(name) + '</span>' +
+        '<span class="why" title="' + esc(why) + '">' + esc(why) + '</span>' +
+      '</div>';
+    }).join("");
+}
+
 function renderResultBar(d) {
   const bar = $("result-bar");
   if (!d || d.routing == null) { bar.innerHTML = ""; return; }
@@ -596,6 +620,7 @@ async function runCascade(mode) {
   out.classList.remove("placeholder");
   out.textContent = mode === "live" ? "Routing through the cascade..." : "Working...";
   $("result-bar").innerHTML = "";
+  $("queue").className = "queue";
   try {
     const body = mode === "classify" ? {prompt} : {prompt, dry_run: mode === "dry"};
     const data = await api(mode === "classify" ? "/api/classify" : "/api/route", {
@@ -604,9 +629,11 @@ async function runCascade(mode) {
       body: JSON.stringify(body),
     });
     renderResultBar(data);
+    renderQueue(data);
     out.textContent = JSON.stringify(data, null, 2);
   } catch (err) {
     $("result-bar").innerHTML = badge("destructive", "failed");
+    $("queue").className = "queue";
     out.textContent = "Error: " + (err.message || err);
   } finally {
     BUTTONS.forEach((b) => { $(b).disabled = false; });
@@ -630,7 +657,7 @@ async function boot() {
     const status = await loadDashboard();
     renderAgents(status.agents || []);
   } catch (err) {
-    $("foot-or").innerHTML = '<span class="dot off"></span>failed to load';
+    $("status-or").innerHTML = '<span class="dot off"></span><span>offline</span>';
     $("hook-list").innerHTML = '<div class="empty">Failed to load: ' + esc(err.message || err) + '</div>';
   }
 }

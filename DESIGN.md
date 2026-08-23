@@ -121,6 +121,14 @@ both `app.html` and `pace.html`. That file is the single source of truth for
 the palette; do not re-declare colors per page, which is exactly how surfaces
 drift out of sync. Page-specific component CSS stays inline in each page.
 
+**Navigation is a top bar, not a sidebar** (changed 2026-08-23). With three
+sections a rail is the wrong control: the convention is a top bar under about
+five destinations, and a sidebar only once a product has real hierarchy (six or
+more sections). The old rail also carried a "Workspace" heading over three
+items and a status footer, which is what made it read as busy. Sections sit on
+the left of the bar, global utilities (OpenRouter status dot, theme, refresh)
+on the right. Revisit only if the app grows past five real sections.
+
 **Component classes** available in `desktop/app.html`: `.card` with
 `.card-header`/`.card-title`/`.card-desc`/`.card-content`, `.metric` section
 cards, `.badge` (`-primary/-secondary/-outline/-success/-warning/-destructive`,
