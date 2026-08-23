@@ -3,115 +3,171 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>waterfall — usage pace</title>
+<title>waterfall usage pace</title>
+<link rel="stylesheet" href="/tokens.css">
 <style>
-  :root {
-    --board: #0b1220;
-    --board2: #0f1830;
-    --chalk: #e9edf2;
-    --dust: #9aa6b2;
-    --faint: #5c6873;
-    --line: #1c2740;
-    --accent: #5ec6ff;
-    --accent-dim: #173447;
-    --good: #3dd68c;
-    --warn: #f5a524;
-    --bad: #f31260;
+  /* Palette and reset come from /tokens.css (shared with app.html).
+     Only pace-specific components live here. Class names are load-bearing:
+     the JS sets `card green|yellow|red` and `day-bar today`. */
+
+  body{ padding:0 0 48px; }
+  .wrap{ max-width:1080px; margin:0 auto; padding:26px 22px 0; }
+
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; flex-wrap:wrap; margin-bottom:22px;
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--board);
-    color: var(--chalk);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, Helvetica, sans-serif;
-    padding: 32px;
-    min-height: 100vh;
+  .brand{ display:flex; align-items:center; gap:11px; }
+  .logo{
+    width:30px; height:30px; border-radius:var(--radius-md); flex:none;
+    display:grid; place-items:center; box-shadow:var(--shadow-xs);
+    background:var(--primary); color:var(--primary-foreground);
+    font-weight:800; font-size:15px; letter-spacing:-0.04em;
   }
-  .wrap { max-width: 880px; margin: 0 auto; }
-  header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 28px; }
-  .brand { display: flex; align-items: center; gap: 10px; }
-  .logo {
-    width: 28px; height: 28px; border-radius: 8px;
-    background: var(--accent-dim);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--accent); font-weight: 700; font-size: 16px;
-  }
-  h1 { font-size: 18px; font-weight: 650; margin: 0; letter-spacing: -0.01em; }
-  .meta { color: var(--faint); font-size: 12px; font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace; }
-  .estimated-tag {
-    display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 6px;
-    background: var(--accent-dim); color: var(--accent); font-size: 10px;
-    text-transform: uppercase; letter-spacing: 0.12em; vertical-align: middle;
+  h1{ font-size:17px; font-weight:650; letter-spacing:-0.02em; }
+  .meta{
+    font-family:var(--mono); font-size:11.5px; color:var(--muted-foreground);
+    font-variant-numeric:tabular-nums;
   }
 
-  .guidance {
-    background: var(--board2); border: 1px solid var(--line); border-radius: 12px;
-    padding: 16px 18px; margin-bottom: 20px; font-size: 13px; color: var(--dust);
-    white-space: pre-line; line-height: 1.6;
+  .guidance{
+    background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius-xl); box-shadow:var(--shadow-sm);
+    padding:16px 19px; margin-bottom:20px;
+    font-family:var(--mono); font-size:12.5px; line-height:1.75;
+    color:var(--muted-foreground); white-space:pre-wrap;
   }
-  .guidance strong { color: var(--chalk); }
+  .guidance strong{ color:var(--foreground); font-weight:650; }
 
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 28px; }
-  .card {
-    background: var(--board2); border: 1px solid var(--line); border-radius: 14px;
-    padding: 18px; border-left: 3px solid var(--line);
+  /* ------------------------------- cards -------------------------------- */
+  .cards{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(268px,1fr));
+    gap:14px; margin-bottom:26px;
   }
-  .card.green { border-left-color: var(--good); }
-  .card.yellow { border-left-color: var(--warn); }
-  .card.red { border-left-color: var(--bad); }
-  .card-label {
-    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
-    font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--faint);
-    margin-bottom: 10px;
+  .card{
+    background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius-xl); box-shadow:var(--shadow-sm);
+    padding:17px 19px; position:relative; overflow:hidden;
+    border-left:3px solid var(--border);
   }
-  .card-pct { font-size: 32px; font-weight: 650; letter-spacing: -0.02em; margin-bottom: 2px; }
-  .card-status { font-size: 12px; color: var(--dust); margin-bottom: 14px; min-height: 32px; }
-  .bar-track { position: relative; height: 8px; background: var(--line); border-radius: 4px; overflow: visible; margin-bottom: 6px; }
-  .bar-fill { position: absolute; left: 0; top: 0; height: 100%; border-radius: 4px; transition: width 0.4s ease; }
-  .card.green .bar-fill { background: var(--good); }
-  .card.yellow .bar-fill { background: var(--warn); }
-  .card.red .bar-fill { background: var(--bad); }
-  .bar-marker {
-    position: absolute; top: -3px; width: 2px; height: 14px; background: var(--chalk);
-    opacity: 0.6; transition: left 0.4s ease;
-  }
-  .bar-legend { display: flex; justify-content: space-between; font-size: 10px; color: var(--faint); font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace; }
+  /* status drives the accent rail, the bar, and the pct color together */
+  .card.green  { border-left-color:var(--success); }
+  .card.yellow { border-left-color:var(--warning); }
+  .card.red    { border-left-color:var(--destructive); }
 
-  .section-title {
-    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
-    font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--faint);
-    margin: 0 0 12px;
+  .card-label{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:0.12em;
+    text-transform:uppercase; color:var(--muted-foreground); margin-bottom:7px;
   }
-  .week-track {
-    display: flex; align-items: flex-end; gap: 6px; height: 90px; margin-bottom: 8px;
-    background: var(--board2); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px 10px;
+  .card-pct{
+    font-size:29px; font-weight:650; letter-spacing:-0.03em; line-height:1.1;
+    font-variant-numeric:tabular-nums; margin-bottom:5px;
   }
-  .day-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
-  .day-bar { width: 100%; max-width: 26px; background: var(--line); border-radius: 4px 4px 0 0; position: relative; min-height: 2px; }
-  .day-bar.today { background: var(--accent-dim); }
-  .day-bar-fill { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--faint); border-radius: 4px 4px 0 0; }
-  .day-bar.today .day-bar-fill { background: var(--accent); }
-  .day-label { font-size: 10px; color: var(--faint); text-transform: uppercase; }
-  .day-label.today { color: var(--accent); font-weight: 650; }
-  .day-pct { font-size: 9px; color: var(--faint); font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace; }
+  .card.green  .card-pct{ color:var(--success); }
+  .card.yellow .card-pct{ color:var(--warning); }
+  .card.red    .card-pct{ color:var(--destructive); }
 
-  .inputs {
-    background: var(--board2); border: 1px solid var(--line); border-radius: 12px;
-    padding: 16px 18px; margin-top: 20px;
+  .card-status{
+    font-size:12.5px; line-height:1.5; color:var(--muted-foreground);
+    margin-bottom:14px; min-height:34px;
   }
-  .inputs-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .inputs label { font-size: 11px; color: var(--dust); display: flex; flex-direction: column; gap: 4px; }
-  .inputs input {
-    background: var(--board); border: 1px solid var(--line); border-radius: 8px;
-    color: var(--chalk); padding: 6px 8px; font-size: 13px; width: 90px;
-    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+  /* ------------------------------- bars --------------------------------- */
+  .bar-track{
+    position:relative; height:8px; border-radius:999px;
+    background:var(--muted); border:1px solid var(--border); overflow:hidden;
   }
-  .inputs button {
-    background: var(--accent); border: none; border-radius: 9px; color: #061018;
-    padding: 8px 16px; font-size: 13px; font-weight: 650; cursor: pointer; align-self: flex-end;
+  .bar-fill{
+    height:100%; border-radius:999px; background:var(--muted-foreground);
+    transition:width 0.45s cubic-bezier(0.22,1,0.36,1);
   }
-  .inputs button:hover { opacity: 0.9; }
-  .footnote { color: var(--faint); font-size: 11px; margin-top: 10px; line-height: 1.5; }
+  .card.green  .bar-fill{ background:var(--success); }
+  .card.yellow .bar-fill{ background:var(--warning); }
+  .card.red    .bar-fill{ background:var(--destructive); }
+
+  /* the elapsed-time marker: where you WOULD be if perfectly on pace */
+  .bar-marker{
+    position:absolute; top:-3px; bottom:-3px; width:2px;
+    background:var(--foreground); opacity:0.55; border-radius:2px;
+  }
+  .bar-legend{
+    margin-top:8px; font-family:var(--mono); font-size:10.5px;
+    color:var(--muted-foreground); font-variant-numeric:tabular-nums;
+    display:flex; justify-content:space-between; gap:10px;
+  }
+
+  /* ------------------------------ week track ---------------------------- */
+  .section-title{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:0.13em;
+    text-transform:uppercase; color:var(--muted-foreground); margin-bottom:11px;
+  }
+  .week-track{
+    display:grid; grid-template-columns:repeat(7,1fr); gap:8px;
+    background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius-xl); box-shadow:var(--shadow-sm); padding:16px;
+  }
+  .day-bar{
+    height:96px; border-radius:var(--radius-sm); background:var(--muted);
+    border:1px solid var(--border);
+    display:flex; align-items:flex-end; overflow:hidden;
+  }
+  .day-bar.today{
+    border-color:color-mix(in oklch,var(--primary) 45%,var(--border));
+    background:color-mix(in oklch,var(--primary) 10%,transparent);
+  }
+  .day-bar-fill{
+    width:100%; background:var(--muted-foreground); opacity:0.5;
+    border-radius:0 0 5px 5px;
+    transition:height 0.45s cubic-bezier(0.22,1,0.36,1);
+  }
+  .day-bar.today .day-bar-fill{ background:var(--primary); opacity:1; }
+  .day-label{
+    margin-top:7px; text-align:center; font-family:var(--mono);
+    font-size:10.5px; color:var(--muted-foreground); text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .day-label.today{ color:var(--primary); font-weight:650; }
+  .day-pct{
+    text-align:center; font-family:var(--mono); font-size:10.5px;
+    color:var(--muted-foreground); font-variant-numeric:tabular-nums;
+  }
+
+  .footnote{
+    margin-top:11px; font-size:12px; line-height:1.6;
+    color:var(--muted-foreground); max-width:76ch;
+  }
+
+  /* ------------------------------- inputs ------------------------------- */
+  .inputs{
+    margin-top:26px; background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius-xl); box-shadow:var(--shadow-sm); padding:18px 20px;
+  }
+  .inputs-row{ display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+  .inputs-row label{
+    display:flex; flex-direction:column; gap:6px; flex:1; min-width:132px;
+    font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--muted-foreground);
+  }
+  .inputs-row input{
+    background:var(--background); color:var(--foreground);
+    border:1px solid var(--input); border-radius:var(--radius-md);
+    font-family:var(--mono); font-size:13px; padding:9px 12px; width:100%;
+    font-variant-numeric:tabular-nums;
+    transition:border-color 0.12s ease,box-shadow 0.12s ease;
+  }
+  .inputs-row button{
+    height:36px; padding:0 17px; border-radius:var(--radius-md); border:1px solid transparent;
+    background:var(--primary); color:var(--primary-foreground);
+    font:inherit; font-size:13.5px; font-weight:550; cursor:pointer;
+    box-shadow:var(--shadow-xs); transition:background 0.12s ease;
+  }
+  .inputs-row button:hover{ background:color-mix(in oklch,var(--primary) 88%,var(--foreground)); }
+
+  @media (max-width:720px){
+    .week-track{ grid-template-columns:repeat(7,1fr); gap:5px; padding:12px; }
+    .day-bar{ height:74px; }
+    .day-label,.day-pct{ font-size:9px; }
+  }
 </style>
 </head>
 <body>
@@ -172,7 +228,7 @@ function render(data) {
       .map(line => line.replace(/^(binding constraint:.*)$/, '<strong>$1</strong>'))
       .join('\n');
   } else {
-    guidanceEl.textContent = 'Only one clock reported — add session or per-model numbers below for a cross-bucket comparison.';
+    guidanceEl.textContent = 'Only one clock reported, add session or per-model numbers below for a cross-bucket comparison.';
   }
 
   const cardsEl = document.getElementById('cards');

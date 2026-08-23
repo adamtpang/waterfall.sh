@@ -451,6 +451,14 @@ class DesktopHandler(BaseHTTPRequestHandler):
             self._send(200, html_path.read_bytes(), "text/html; charset=utf-8")
             return
 
+        if path == "/tokens.css":
+            css_path = DESKTOP_DIR / "tokens.css"
+            if not css_path.is_file():
+                self._send_json(404, {"error": "tokens.css missing"})
+                return
+            self._send(200, css_path.read_bytes(), "text/css; charset=utf-8")
+            return
+
         if path == "/api/pace":
             try:
                 self._send_json(200, api_pace(qs))

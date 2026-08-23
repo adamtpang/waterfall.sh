@@ -116,6 +116,11 @@ One real layout bug was caught and fixed during that pass: the shell grid used
 shrink below the 1180px content, forcing the whole page to scroll sideways.
 `minmax(0,1fr)` is required, not optional.
 
+**Tokens live in `desktop/tokens.css`**, served at `/tokens.css` and linked by
+both `app.html` and `pace.html`. That file is the single source of truth for
+the palette; do not re-declare colors per page, which is exactly how surfaces
+drift out of sync. Page-specific component CSS stays inline in each page.
+
 **Component classes** available in `desktop/app.html`: `.card` with
 `.card-header`/`.card-title`/`.card-desc`/`.card-content`, `.metric` section
 cards, `.badge` (`-primary/-secondary/-outline/-success/-warning/-destructive`,

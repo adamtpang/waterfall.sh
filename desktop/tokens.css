@@ -1,0 +1,146 @@
+/* waterfall.sh shared design tokens.
+
+   shadcn/ui's semantic token system, ported by hand to plain CSS so every
+   surface (app.html, pace.html) reads from ONE source. DESIGN.md requires
+   these surfaces to match; duplicating the palette per page is how they stop
+   matching. Brand hexes were converted to OKLCH exactly, not re-picked.
+
+   Served at /tokens.css by desktop/server.py.
+*/
+
+:root{
+  /* light pass */
+  --background:oklch(0.9911 0.0020 250.00);
+  --foreground:oklch(0.1831 0.0309 263.38);
+  --card:oklch(1 0 0);
+  --card-foreground:oklch(0.1831 0.0309 263.38);
+  --popover:oklch(1 0 0);
+  --popover-foreground:oklch(0.1831 0.0309 263.38);
+  --primary:oklch(0.5150 0.1400 235.50);
+  --primary-foreground:oklch(0.9900 0 0);
+  --secondary:oklch(0.9650 0.0070 250.00);
+  --secondary-foreground:oklch(0.2400 0.0400 263.38);
+  --muted:oklch(0.9650 0.0070 250.00);
+  --muted-foreground:oklch(0.5111 0.0228 245.92);
+  --accent:oklch(0.9500 0.0180 240.00);
+  --accent-foreground:oklch(0.2400 0.0400 263.38);
+  --destructive:oklch(0.5800 0.2200 11.33);
+  --destructive-foreground:oklch(0.9900 0 0);
+  --success:oklch(0.5900 0.1400 157.29);
+  --warning:oklch(0.6600 0.1500 72.33);
+  --border:oklch(0.9200 0.0090 250.00);
+  --input:oklch(0.9000 0.0110 250.00);
+  --ring:oklch(0.5150 0.1400 235.50);
+  --sidebar:oklch(0.9780 0.0040 250.00);
+  --sidebar-foreground:oklch(0.1831 0.0309 263.38);
+  --sidebar-border:oklch(0.9150 0.0090 250.00);
+  --sidebar-accent:oklch(0.9450 0.0110 245.00);
+  --chart-1:oklch(0.5500 0.1400 235.50);
+  --chart-2:oklch(0.5900 0.1400 157.29);
+  --chart-3:oklch(0.6600 0.1500 72.33);
+  --chart-4:oklch(0.5800 0.2200 11.33);
+  --chart-5:oklch(0.5400 0.1200 285.00);
+
+  --radius:0.625rem;
+  --radius-sm:calc(var(--radius) - 4px);
+  --radius-md:calc(var(--radius) - 2px);
+  --radius-lg:var(--radius);
+  --radius-xl:calc(var(--radius) + 4px);
+
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Roboto,Helvetica,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+
+  --shadow-xs:0 1px 2px 0 oklch(0.18 0.03 263 / 0.05);
+  --shadow-sm:0 1px 3px 0 oklch(0.18 0.03 263 / 0.07), 0 1px 2px -1px oklch(0.18 0.03 263 / 0.07);
+
+  --rail-w:236px;
+  --header-h:56px;
+}
+
+/* dark is the default when the viewer has no explicit preference set */
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --background:oklch(0.1831 0.0309 263.38);
+    --foreground:oklch(0.9445 0.0080 253.85);
+    --card:oklch(0.2149 0.0492 266.79);
+    --card-foreground:oklch(0.9445 0.0080 253.85);
+    --popover:oklch(0.2149 0.0492 266.79);
+    --popover-foreground:oklch(0.9445 0.0080 253.85);
+    --primary:oklch(0.7877 0.1258 235.50);
+    --primary-foreground:oklch(0.1831 0.0309 263.38);
+    --secondary:oklch(0.2757 0.0491 265.28);
+    --secondary-foreground:oklch(0.9445 0.0080 253.85);
+    --muted:oklch(0.2600 0.0460 265.28);
+    --muted-foreground:oklch(0.7195 0.0221 248.14);
+    --accent:oklch(0.3050 0.0530 265.28);
+    --accent-foreground:oklch(0.9445 0.0080 253.85);
+    --destructive:oklch(0.6192 0.2419 11.33);
+    --destructive-foreground:oklch(0.9900 0 0);
+    --success:oklch(0.7794 0.1655 157.29);
+    --warning:oklch(0.7819 0.1585 72.33);
+    --border:oklch(1 0 0 / 10%);
+    --input:oklch(1 0 0 / 14%);
+    --ring:oklch(0.7877 0.1258 235.50);
+    --sidebar:oklch(0.1719 0.0281 257.96);
+    --sidebar-foreground:oklch(0.9445 0.0080 253.85);
+    --sidebar-border:oklch(1 0 0 / 8%);
+    --sidebar-accent:oklch(0.2600 0.0460 265.28);
+    --chart-1:oklch(0.7877 0.1258 235.50);
+    --chart-2:oklch(0.7794 0.1655 157.29);
+    --chart-3:oklch(0.7819 0.1585 72.33);
+    --chart-4:oklch(0.6192 0.2419 11.33);
+    --chart-5:oklch(0.7000 0.1300 285.00);
+    --shadow-xs:0 1px 2px 0 oklch(0 0 0 / 0.30);
+    --shadow-sm:0 1px 3px 0 oklch(0 0 0 / 0.38), 0 1px 2px -1px oklch(0 0 0 / 0.38);
+  }
+}
+
+:root[data-theme="dark"]{
+  --background:oklch(0.1831 0.0309 263.38);
+  --foreground:oklch(0.9445 0.0080 253.85);
+  --card:oklch(0.2149 0.0492 266.79);
+  --card-foreground:oklch(0.9445 0.0080 253.85);
+  --popover:oklch(0.2149 0.0492 266.79);
+  --popover-foreground:oklch(0.9445 0.0080 253.85);
+  --primary:oklch(0.7877 0.1258 235.50);
+  --primary-foreground:oklch(0.1831 0.0309 263.38);
+  --secondary:oklch(0.2757 0.0491 265.28);
+  --secondary-foreground:oklch(0.9445 0.0080 253.85);
+  --muted:oklch(0.2600 0.0460 265.28);
+  --muted-foreground:oklch(0.7195 0.0221 248.14);
+  --accent:oklch(0.3050 0.0530 265.28);
+  --accent-foreground:oklch(0.9445 0.0080 253.85);
+  --destructive:oklch(0.6192 0.2419 11.33);
+  --destructive-foreground:oklch(0.9900 0 0);
+  --success:oklch(0.7794 0.1655 157.29);
+  --warning:oklch(0.7819 0.1585 72.33);
+  --border:oklch(1 0 0 / 10%);
+  --input:oklch(1 0 0 / 14%);
+  --ring:oklch(0.7877 0.1258 235.50);
+  --sidebar:oklch(0.1719 0.0281 257.96);
+  --sidebar-foreground:oklch(0.9445 0.0080 253.85);
+  --sidebar-border:oklch(1 0 0 / 8%);
+  --sidebar-accent:oklch(0.2600 0.0460 265.28);
+  --chart-1:oklch(0.7877 0.1258 235.50);
+  --chart-2:oklch(0.7794 0.1655 157.29);
+  --chart-3:oklch(0.7819 0.1585 72.33);
+  --chart-4:oklch(0.6192 0.2419 11.33);
+  --chart-5:oklch(0.7000 0.1300 285.00);
+  --shadow-xs:0 1px 2px 0 oklch(0 0 0 / 0.30);
+  --shadow-sm:0 1px 3px 0 oklch(0 0 0 / 0.38), 0 1px 2px -1px oklch(0 0 0 / 0.38);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--background);color:var(--foreground);
+  font-family:var(--sans);font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  min-height:100vh;
+}
+::selection{background:color-mix(in oklch, var(--primary) 28%, transparent)}
+
+:where(a,button,input,textarea,[tabindex]):focus-visible{
+  outline:none;border-color:var(--ring);
+  box-shadow:0 0 0 3px color-mix(in oklch, var(--ring) 45%, transparent);
+}
