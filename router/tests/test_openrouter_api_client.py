@@ -250,6 +250,49 @@ class GenerateWithUsageFallbackTests(unittest.TestCase):
 
     @mock.patch("time.sleep", return_value=None)
     @mock.patch("requests.post")
+    def test_records_queue_and_attempts_on_first_pick(self, mock_post, _sleep) -> None:
+        # The cascade always ranked its candidates; it used to throw that away
+        # and report only the winner. The queue must survive even when the
+        # first model answers and nothing else is contacted.
+        client = self._client()
+        mock_post.side_effect = [
+            _fake_response(200, {
+                "choices": [{"message": {"content": "hi"}}],
+                "usage": {"prompt_tokens": 5, "completion_tokens": 2, "cost": 0.0001},
+            }),
+        ]
+
+        result = client.generate_with_usage("hello", retries=0, fallback_models=2)
+
+        self.assertEqual(result.queue, ["cheap/text-model", "pricey/text-model"])
+        self.assertEqual(len(result.attempts), 1)
+        self.assertEqual(result.attempts[0]["model"], "cheap/text-model")
+        self.assertEqual(result.attempts[0]["status"], "ok")
+        # the second candidate was ranked but never contacted
+        self.assertEqual(mock_post.call_count, 1)
+
+    @mock.patch("time.sleep", return_value=None)
+    @mock.patch("requests.post")
+    def test_attempts_record_the_failure_that_caused_a_fallback(self, mock_post, _sleep) -> None:
+        client = self._client()
+        mock_post.side_effect = [
+            _fake_response(500, text="server on fire"),
+            _fake_response(200, {
+                "choices": [{"message": {"content": "hi"}}],
+                "usage": {"prompt_tokens": 5, "completion_tokens": 2, "cost": 0.0001},
+            }),
+        ]
+
+        result = client.generate_with_usage("hello", retries=0, fallback_models=2)
+
+        self.assertEqual([a["status"] for a in result.attempts], ["failed", "ok"])
+        self.assertEqual(result.attempts[0]["model"], "cheap/text-model")
+        self.assertTrue(result.attempts[0]["reason"], "a failed attempt must say why")
+        self.assertEqual(result.attempts[1]["model"], "pricey/text-model")
+        self.assertEqual(result.model, "pricey/text-model")
+
+    @mock.patch("time.sleep", return_value=None)
+    @mock.patch("requests.post")
     def test_falls_back_when_a_model_returns_empty_content(self, mock_post, _sleep) -> None:
         # Regression: a reasoning model can answer HTTP 200 with
         # finish_reason="stop" and content=None, having spent its whole token

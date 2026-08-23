@@ -362,6 +362,8 @@ def api_route(prompt: str, dry_run: bool = True, log: bool = True) -> dict[str, 
     base["dry_run"] = False
     base["routed"] = True
     base["cache_hit"] = bool(getattr(result, "cache_hit", False))
+    base["queue"] = list(getattr(result, "queue", []) or [])
+    base["attempts"] = list(getattr(result, "attempts", []) or [])
     base["model_used"] = getattr(result, "model_used", "") or ""
     base["model_tier"] = getattr(result, "model_tier", "") or ""
     base["cost_usd"] = float(getattr(result, "cost_usd", 0.0) or 0.0)
@@ -449,6 +451,14 @@ class DesktopHandler(BaseHTTPRequestHandler):
                 self._send_json(404, {"error": "pace.html missing"})
                 return
             self._send(200, html_path.read_bytes(), "text/html; charset=utf-8")
+            return
+
+        if path == "/favicon.svg":
+            ico = DESKTOP_DIR / "favicon.svg"
+            if not ico.is_file():
+                self._send_json(404, {"error": "favicon.svg missing"})
+                return
+            self._send(200, ico.read_bytes(), "image/svg+xml")
             return
 
         if path == "/tokens.css":

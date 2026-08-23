@@ -7,7 +7,7 @@ the split: easy parts → Gemini/free via CDP, hard parts → Claude via CDP.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
@@ -78,6 +78,11 @@ class ApiRoutingResult:
     elapsed_sec: float
     final_claude_prompt: str
     cache_hit: bool = False
+    # The cascade's ranked candidates and what actually happened to each, so
+    # "why this model" and "did it fall back" stay answerable after the fact.
+    # On a cache hit both are empty: no model was contacted at all.
+    queue: list = field(default_factory=list)
+    attempts: list = field(default_factory=list)
 
 
 class SmartRouter:
@@ -217,4 +222,6 @@ class SmartRouter:
             elapsed_sec=gen.elapsed_sec if gen else 0.0,
             final_claude_prompt=final_claude_prompt,
             cache_hit=cache_hit,
+            queue=list(getattr(gen, "queue", []) or []) if gen else [],
+            attempts=list(getattr(gen, "attempts", []) or []) if gen else [],
         )
