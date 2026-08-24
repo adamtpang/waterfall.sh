@@ -610,6 +610,59 @@ which is what actually drives the 65–96% reused-input share.
   / 0 out`, `cache_hit: true`), and the OpenRouter key is pay-as-you-go
   with no cap and $0 spent so far, with every ox-alpha call billing $0.
 
+- **UI rebuilt in shadcn's design language, model queue made visible,
+  2026-08-23/24.** Four things landed; the last one is the one to read first
+  if you are resuming cold.
+  1. **`desktop/tokens.css` is now the single source of truth for the
+     palette**, served at `/tokens.css` and linked by BOTH `app.html` and
+     `pace.html`. shadcn's semantic OKLCH token pairs plus the derived
+     `--radius` scale, hand-ported as plain CSS. Deliberately NOT the real
+     shadcn library: that is React plus Tailwind plus a build step, and these
+     pages are served off the stdlib HTTP server, so `pip install -e .` has to
+     stay the whole install story. Brand hexes were converted to OKLCH
+     numerically, not re-picked, so deep water is still
+     `oklch(0.1831 0.0309 263.38)`. Full token table in `DESIGN.md`.
+  2. **Navigation is a top bar, not a sidebar.** With three sections a rail is
+     the wrong control (convention: top bar under ~5 destinations, sidebar at
+     6+). Do not re-add a sidebar unless the app grows past five real
+     sections.
+  3. **The model queue is now visible** (`waterfall route`, and the Cascade
+     tab). `GenerateResult` carries `queue` (ranked candidates) and `attempts`
+     (what happened to each), threaded through `ApiRoutingResult` to the CLI
+     and the desktop API. The cascade always had this and used to discard it,
+     which made "why that model" and "did it fall back" unanswerable. It paid
+     off on the first live run: ox-alpha returned **429 rate limited** and the
+     cascade silently fell through to `dots-3-note-preview`. That had been
+     invisible.
+  4. **Real incident worth remembering: `~/.claude/openrouter_key.txt` held a
+     REVOKED key.** Everything worked only because a valid key lives in the
+     login-shell environment and was masking it. Any non-login shell, or a
+     fresh install following the documented setup, got a 401. Repaired from
+     the login env (old file backed up alongside). **Still unresolved: nobody
+     knows where that env var is actually set.** It is not in `.bashrc`,
+     `.bash_profile`, `.profile`, or any Windows env scope (User, Machine, or
+     Process), yet `bash -lc` has it. Until that is found, the same silent
+     breakage can recur.
+  Also fixed in passing: `/favicon.svg` had no server route (404 on both
+  pages); a stray `}` left by a bad edit silently killed the mobile media
+  block AND the active-tab styling; a mangled newline escape broke a JS string
+  literal and left the whole page inert. Suite green at 266.
+
+- **New global skill: `beautify`** (`~/.claude/skills/beautify/`, user-scoped,
+  available in every project, NOT in this repo). Its job is to refuse to
+  design from scratch: source real prior art first, then apply shadcn's system
+  to whatever stack the project actually is, including stacks the shadcn CLI
+  cannot touch (plain HTML, Python-served templates, Tauri, no build step).
+  Ships `scripts/hex_to_oklch.py` (exact brand conversion, verified against
+  this repo's four shipped values) and `scripts/verify_ui.js` (WCAG contrast,
+  overflow, token resolution against a live page, for when screenshots are
+  unavailable). `references/design-sources.md` records every design resource
+  with its real HTTP status. **Key finding: Mobbin is 403 to agents and its
+  free tier is 4 apps / 3 collections, so it cannot be an agent research
+  source.** Refero is JS-rendered and returns only a page title. The
+  agent-usable sources are shadcn blocks/themes/registries, tweakcn, Godly,
+  SaaS Landing Page.
+
 ## Not done yet
 
 - **A/B/C/D quota-safety plan shipped, 2026-08-18**, in response to Adam
