@@ -3,225 +3,210 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>waterfall.sh — flip projects. pay the least for the job.</title>
-<meta name="description" content="A modular coding board that autoroutes each prompt to the cheapest capable model. One window. Project tabs. Your keys.">
-<meta property="og:title" content="waterfall.sh — flip projects. pay the least for the job.">
-<meta property="og:description" content="Beautiful local board plus cascade routing. $30 founding license.">
+<title>waterfall.sh — route coding work to the right model</title>
+<meta name="description" content="waterfall.sh is a local coding board and cascade router that sends routine prompt work to the cheapest capable model and keeps hard work for Claude or Grok.">
+<meta name="theme-color" content="#0b1220">
+<meta property="og:title" content="waterfall.sh — route coding work to the right model">
+<meta property="og:description" content="A local coding board and cascade router with a $30 founding license, direct model billing, and a downloadable Windows app.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://waterfall.sh/">
+<meta property="og:image" content="https://waterfall.sh/brand/logo-1024.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="1024">
 <link rel="canonical" href="https://waterfall.sh/">
-<link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="brand/favicon-32.png" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="brand/logo-256.png">
-<style>
-  :root{
-    --board:#0b1220;
-    --board2:#0f1830;
-    --rail:#08101c;
-    --chalk:#e9edf2;
-    --dust:#9aa6b2;
-    --faint:#5c6873;
-    --line:#1c2740;
-    --accent:#5ec6ff;
-    --accent-dim:#173447;
-    --good:#3dd68c;
-    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
-    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Roboto,Helvetica,sans-serif;
-  }
-  *{box-sizing:border-box;margin:0}
-  body{background:var(--board);color:var(--chalk);font-family:var(--sans);line-height:1.55;
-    background-image:radial-gradient(900px 480px at 90% -8%, #12203d 0%, transparent 58%);}
-  a{color:inherit}
-  .wrap{max-width:980px;margin:0 auto;padding:28px 22px 80px}
-  .nav{display:flex;align-items:center;justify-content:space-between;gap:16px}
-  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;letter-spacing:-.03em}
-  .brand img{width:28px;height:28px;border-radius:7px}
-  .brand .tld{color:var(--accent)}
-  .nav-links{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .nav-links a{font-size:13px;color:var(--dust);text-decoration:none}
-  .nav-links a:hover{color:var(--chalk)}
-  .btn{display:inline-flex;align-items:center;justify-content:center;padding:11px 18px;border-radius:9px;font-size:14px;font-weight:650;text-decoration:none;border:1px solid transparent}
-  .btn.primary{background:var(--accent);color:#041018}
-  .btn.primary:hover{filter:brightness(1.06)}
-  .btn.ghost{border-color:var(--line);color:var(--chalk);background:transparent}
-  .btn.ghost:hover{border-color:var(--dust)}
-  .hero{margin-top:56px;display:grid;grid-template-columns:1.15fr .85fr;gap:36px;align-items:end}
-  @media(max-width:820px){.hero{grid-template-columns:1fr}}
-  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
-  h1{font-size:clamp(36px,6.4vw,62px);line-height:.98;letter-spacing:-.035em;font-weight:750;margin:14px 0 0;text-wrap:balance}
-  .lede{margin-top:18px;font-size:17.5px;color:var(--dust);max-width:46ch}
-  .lede b{color:var(--chalk);font-weight:600}
-  .price-card{background:var(--board2);border:1px solid var(--line);border-radius:16px;padding:22px}
-  .price-card .amt{font-family:var(--mono);font-size:42px;letter-spacing:-.04em}
-  .price-card .amt span{font-size:16px;color:var(--faint)}
-  .price-card p{color:var(--dust);margin:10px 0 18px;font-size:14.5px}
-  .price-card .btn{width:100%}
-  .price-card .btn.dl{margin-top:8px;gap:8px}
-  .dl-icon{font-family:var(--mono);font-size:15px;line-height:1;color:var(--accent)}
-  .fine{display:block;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--faint)}
-  .proof{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:36px}
-  @media(max-width:640px){.proof{grid-template-columns:1fr}}
-  .stat{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--rail)}
-  .stat b{display:block;font-family:var(--mono);font-size:15px}
-  .stat span{display:block;margin-top:4px;font-size:12px;color:var(--faint)}
-  h2.sec{margin:72px 0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
-  .secnote{color:var(--dust);margin-bottom:20px;max-width:58ch}
-  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  @media(max-width:800px){.grid3{grid-template-columns:1fr}}
-  .card{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--board2)}
-  .card h3{font-size:17px;letter-spacing:-.02em}
-  .card p{color:var(--dust);font-size:14px;margin-top:8px}
-  .rungs{border-top:1px solid var(--line)}
-  .rung{display:grid;grid-template-columns:72px 1fr;gap:16px;padding:22px 0;border-bottom:1px solid var(--line)}
-  .rung .n{font-family:var(--mono);font-size:12px;color:var(--accent);padding-top:3px}
-  .os{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  @media(max-width:800px){.os{grid-template-columns:1fr}}
-  .os .card pre{margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--accent);white-space:pre-wrap;word-break:break-all}
-  .os .soon{color:var(--faint);font-family:var(--mono);font-size:11px;margin-top:10px}
-  footer{margin-top:72px;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--faint);font-size:12px;font-family:var(--mono)}
-  footer a{color:var(--dust);text-decoration:none}
-  .maturity{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  @media(max-width:800px){.maturity{grid-template-columns:1fr}}
-  .maturity .col{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--board2);border-top:3px solid var(--line)}
-  .maturity .col.works{border-top-color:var(--good)}
-  .maturity .col h3{font-size:14px;letter-spacing:-.01em}
-  .maturity .col ul{margin:12px 0 0;padding-left:18px;color:var(--dust);font-size:13.5px;line-height:1.7}
-  .maturity .col li{margin-bottom:2px}
-  .maturity-note{color:var(--faint);font-size:12px;margin-top:14px;font-family:var(--mono)}
-</style>
+<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/brand/logo-256.png">
+<link rel="stylesheet" href="/site.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://waterfall.sh/#project",
+      "name": "waterfall.sh",
+      "url": "https://waterfall.sh/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://waterfall.sh/brand/logo-512.png",
+        "width": 512,
+        "height": 512
+      },
+      "sameAs": [
+        "https://github.com/adamtpang/waterfall.sh"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://waterfall.sh/#website",
+      "url": "https://waterfall.sh/",
+      "name": "waterfall.sh",
+      "publisher": { "@id": "https://waterfall.sh/#project" }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://waterfall.sh/#software",
+      "name": "waterfall.sh",
+      "url": "https://waterfall.sh/",
+      "description": "A local coding board and cascade router that classifies prompts and routes routine work to capable OpenRouter models.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Windows, macOS, Linux",
+      "publisher": { "@id": "https://waterfall.sh/#project" },
+      "downloadUrl": "https://github.com/adamtpang/waterfall.sh/releases/latest"
+    }
+  ]
+}
+</script>
 </head>
 <body>
-<main class="wrap">
-  <nav class="nav">
-    <a class="brand" href="/">
-      <img src="brand/favicon.svg" alt="">
-      <span>waterfall<span class="tld">.sh</span></span>
-    </a>
-    <div class="nav-links">
-      <a href="#why">why buy</a>
-      <a href="#cascade">cascade</a>
-      <a href="#status">status</a>
-      <a href="#download">download</a>
-      <a href="/launch">launch</a>
-      <a class="btn primary" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy $30</a>
-    </div>
-  </nav>
-
-  <section class="hero">
-    <div>
-      <div class="eyebrow">local board · cascade router</div>
-      <h1>Flip projects.<br>Pay the least for the job.</h1>
-      <p class="lede">A modular coding interface that <b>autoroutes each prompt</b> to the cheapest capable model. One window. Project tabs. Your OpenRouter and grok/claude keys. No markup.</p>
-    </div>
-    <aside class="price-card">
-      <div class="amt">$30 <span>founding, once</span></div>
-      <p>Unlock the board and the cascade. Test it on yourself. If it is not easier than opening another grok terminal, it is not done.</p>
-      <a class="btn primary" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy waterfall</a>
-      <a class="btn ghost dl" href="https://github.com/adamtpang/waterfall.sh/releases/latest/download/waterfall_0.1.0_x64-setup.exe">
-        <span class="dl-icon">↓</span> Download for Windows
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="wrap">
+  <header>
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="/" aria-label="waterfall.sh home">
+        <img src="/brand/favicon.svg" width="28" height="28" alt="">
+        <span>waterfall<span class="tld">.sh</span></span>
       </a>
-      <span class="fine">v0.1.0 · 3.0 MB installer · unsigned, SmartScreen shows a warning</span>
-    </aside>
-  </section>
+      <div class="nav-links">
+        <a href="#cascade">cascade</a>
+        <a href="#status">status</a>
+        <a href="#download">download</a>
+        <a href="/about">about</a>
+        <a href="/contact">contact</a>
+        <a class="btn primary" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy $30</a>
+      </div>
+    </nav>
+  </header>
 
-  <div class="proof">
-    <div class="stat"><b>one window</b><span>project rail + cooking chats as tabs</span></div>
-    <div class="stat"><b>cascade</b><span>routine work falls to cheap models</span></div>
-    <div class="stat"><b>your keys</b><span>OpenRouter / grok / claude. 0% markup</span></div>
-  </div>
+  <main id="main-content">
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <div class="eyebrow">local board · cascade router</div>
+        <h1 id="hero-title">Flip projects.<br>Pay the least for the job.</h1>
+        <p class="lede">waterfall.sh is a modular coding interface that <b>classifies each prompt</b> and routes routine work to the cheapest capable OpenRouter model. The local board keeps project chats in one window while hard work stays with Claude or Grok.</p>
+      </div>
+      <aside class="price-card" aria-label="Founding license">
+        <div class="amt">$30 <span>founding, once</span></div>
+        <p>The $30 founding license unlocks the local board and cascade router. Model providers bill your own keys directly, and waterfall.sh adds no token markup.</p>
+        <a class="btn primary" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy waterfall</a>
+        <a class="btn ghost dl" href="https://github.com/adamtpang/waterfall.sh/releases/latest/download/waterfall_0.1.0_x64-setup.exe">
+          <span class="dl-icon" aria-hidden="true">↓</span> Download for Windows
+        </a>
+        <span class="fine">v0.1.0 · 3.0 MB installer · unsigned, so SmartScreen shows a warning</span>
+        <a class="support-link" href="/contact">Questions before buying? Contact the maintainer.</a>
+      </aside>
+    </section>
 
-  <h2 class="sec" id="why">Why people buy</h2>
-  <p class="secnote">Not another chat site. The thing that replaces “open a new terminal, cd, grok” and stops burning the expensive model on easy work.</p>
-  <div class="grid3">
-    <article class="card">
-      <h3>Modular board</h3>
-      <p>Click a folder. That chat is that repo. Flip with Ctrl+Tab. The others keep cooking.</p>
-    </article>
-    <article class="card">
-      <h3>Cascade</h3>
-      <p>Classify first. Send the routine part down the cheapest capable OpenRouter model. Only the hard remainder hits Claude or Grok.</p>
-    </article>
-    <article class="card">
-      <h3>Least dollars</h3>
-      <p>Savings land in a ledger you can see. You pay the models. Waterfall does not take a cut of tokens.</p>
-    </article>
-  </div>
+    <div class="proof" aria-label="Product summary">
+      <div class="stat"><b>one window</b><span>project rail + active chats as tabs</span></div>
+      <div class="stat"><b>cascade</b><span>routine work falls to cheap models</span></div>
+      <div class="stat"><b>your keys</b><span>OpenRouter / Grok / Claude · 0% markup</span></div>
+    </div>
 
-  <h2 class="sec" id="cascade">How it falls</h2>
-  <p class="secnote">Every rung is a real call, not a costume.</p>
-  <div class="rungs">
-    <div class="rung"><div class="n">01</div><div><h3>Classify</h3><p>Local, zero-API score. Free, split, or expensive brain.</p></div></div>
-    <div class="rung"><div class="n">02</div><div><h3>Cascade</h3><p>Routine work goes to the cheapest capable live-priced model, picked fresh, not hardcoded.</p></div></div>
-    <div class="rung"><div class="n">03</div><div><h3>Fall back</h3><p>If a rung is down or thin, the next one takes it.</p></div></div>
-    <div class="rung"><div class="n">04</div><div><h3>Surface</h3><p>Only the hard remainder reaches Claude or Grok, with the cheap output already stitched in.</p></div></div>
-  </div>
+    <section aria-labelledby="why">
+      <h2 class="sec" id="why">Why people buy</h2>
+      <p class="secnote">waterfall.sh replaces the repeated “open a terminal, change folders, start another agent” routine with one local project board. Its cascade also keeps straightforward prompt work away from a more expensive model when a cheaper capable model can handle it.</p>
+      <div class="grid3">
+        <div class="card">
+          <h3>Modular board</h3>
+          <p>The waterfall.sh board ties each chat to its repository folder and keeps other active chats running as you switch projects. Ctrl+Tab moves between project tabs without rebuilding terminal context by hand.</p>
+        </div>
+        <div class="card">
+          <h3>Cascade</h3>
+          <p>The waterfall.sh cascade classifies a prompt locally, sends a routine part to the cheapest capable live-priced OpenRouter model, and leaves only a hard remainder for Claude or Grok.</p>
+        </div>
+        <div class="card">
+          <h3>Least dollars</h3>
+          <p>The waterfall.sh savings ledger records routed token use and estimated cost, so model-selection savings remain inspectable. Users pay model providers through their own keys, with no token markup from waterfall.sh.</p>
+        </div>
+      </div>
+    </section>
 
-  <h2 class="sec" id="status">Works today, being wired up, pending</h2>
-  <p class="secnote">No column with an asterisk on it. This is the real state, not the pitch.</p>
-  <div class="maturity">
-    <article class="col works">
-      <h3>✅ Works today</h3>
-      <ul>
-        <li>Local zero-API classifier (classify / route --dry-run)</li>
-        <li>Cascade routing, cheapest live-priced OpenRouter model</li>
-        <li>Auto-fallback across N candidate models when one is down</li>
-        <li>Model tiering (small / medium / large)</li>
-        <li>Savings ledger + stats</li>
-        <li>Cross-session response cache</li>
-        <li>Hard per-call token cap (the Ringer)</li>
-        <li>Global nudge hook, real hook-log audit trail</li>
-        <li>Usage-pace + quota estimate, CLI and visual dashboard</li>
-        <li>Native Windows desktop app, published and downloadable (v0.1.0)</li>
-        <li>Cascade panel in the desktop app, one OpenRouter key shared with the CLI</li>
-        <li>Desktop app: agent launcher for Claude, Codex, Grok, OpenCode</li>
-        <li>Fleet-wide per-project model/effort config, applied across ~117 real repos</li>
-      </ul>
-    </article>
-    <article class="col">
-      <h3>🚧 Being wired up</h3>
-      <ul>
-        <li>Skill self-triggering: still ~0.1% real-route conversion on nudges (measured, not guessed)</li>
-        <li>Code signing — the Windows installer ships unsigned, so SmartScreen warns on first launch</li>
-        <li>macOS/Linux packaging for the native app — install.py works there, no .dmg/AppImage yet</li>
-        <li>waterfall.sh domain — live at waterfallsh.vercel.app for now</li>
-      </ul>
-    </article>
-    <article class="col">
-      <h3>💭 Strong opinions, pending code</h3>
-      <ul>
-        <li>A real before/after: a week+ of organic usage, then re-run the same comparison</li>
-        <li>Quality-aware model picks (Arena performance signal, not just price)</li>
-        <li>Solving reused-input compounding in general, not just the specific footguns</li>
-      </ul>
-    </article>
-  </div>
-  <p class="maturity-note">Please don't plan your quota budget around the 💭 column yet.</p>
+    <section aria-labelledby="cascade">
+      <h2 class="sec" id="cascade">How it falls</h2>
+      <p class="secnote">The waterfall.sh route is a real sequence of local classification and model calls. Each stage either narrows the prompt, uses a capable lower-cost candidate, or preserves the remainder for the model selected for difficult work.</p>
+      <div class="rungs">
+        <div class="rung"><div class="n">01</div><div><h3>Classify</h3><p>The local waterfall.sh classifier scores the prompt without an API call, then chooses a free, split, or Claude route before any paid model receives the task.</p></div></div>
+        <div class="rung"><div class="n">02</div><div><h3>Cascade</h3><p>The waterfall.sh router sends routine work to the cheapest capable candidate in the live-priced OpenRouter catalog, rather than relying on a hardcoded model name or price.</p></div></div>
+        <div class="rung"><div class="n">03</div><div><h3>Fall back</h3><p>The waterfall.sh client tries the next ranked capable candidate when an earlier model is unavailable, rate-limited, errors after retries, or returns no usable content.</p></div></div>
+        <div class="rung"><div class="n">04</div><div><h3>Surface</h3><p>The waterfall.sh split route returns the difficult remainder for Claude or Grok with the lower-cost model output already included, instead of asking the expensive model to repeat routine work.</p></div></div>
+      </div>
+    </section>
 
-  <h2 class="sec" id="download">Download</h2>
-  <p class="secnote">Picked by what you actually want, not your OS. The product runs on your machine. The site never talks to someone else's localhost.</p>
-  <div class="os">
-    <article class="card">
-      <h3>I just want the CLI</h3>
-      <pre>curl -sSL https://raw.githubusercontent.com/adamtpang/waterfall.sh/main/install.py | python3</pre>
-      <p class="soon">Works on Windows, macOS, and Linux alike, and it is the only path on macOS and Linux. Clones to ~/.waterfall, wires the hooks, puts `waterfall` and `watertop` on PATH.</p>
-    </article>
-    <article class="card">
-      <h3>I want the native desktop board</h3>
-      <pre>waterfall_0.1.0_x64-setup.exe</pre>
-      <p class="soon"><a href="https://github.com/adamtpang/waterfall.sh/releases/latest" style="color:var(--accent)">Download v0.1.0 for Windows</a> (NSIS 3.0 MB, or the MSI). Cascade panel, one shared OpenRouter key, agent launchers. Not code-signed, so SmartScreen warns on first launch: More info, then Run anyway. macOS/Linux packaging isn't started.</p>
-    </article>
-    <article class="card">
-      <h3>I want to read the code first</h3>
-      <pre>git clone https://github.com/adamtpang/waterfall.sh
-cd waterfall.sh && pip install -e .</pre>
-      <p class="soon">Same install.py path, run by hand. Board binds 127.0.0.1 only, never talks out.</p>
-    </article>
-  </div>
+    <section aria-labelledby="status">
+      <h2 class="sec" id="status">Works today, being wired up, pending</h2>
+      <p class="secnote">The waterfall.sh status below separates shipped behavior from incomplete work. The downloadable release and command-line tools are usable today; code signing, additional desktop packages, and stronger organic savings evidence remain unfinished.</p>
+      <div class="maturity">
+        <div class="col works">
+          <h3>Works today</h3>
+          <ul>
+            <li>Local zero-API classifier (classify / route --dry-run)</li>
+            <li>Cascade routing with the cheapest capable live-priced OpenRouter model</li>
+            <li>Automatic fallback across ranked candidate models</li>
+            <li>Model tiering (small / medium / large)</li>
+            <li>Savings ledger, statistics, and response cache</li>
+            <li>Hard per-call token cap (the Ringer)</li>
+            <li>Global nudge hook and hook-log audit trail</li>
+            <li>Usage-pace and quota estimate in the CLI and dashboard</li>
+            <li>Downloadable Windows desktop app (v0.1.0)</li>
+            <li>Desktop launchers for Claude, Codex, Grok, and OpenCode</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3>Being wired up</h3>
+          <ul>
+            <li>Skill self-triggering remains near 0.1% real-route conversion on measured nudges</li>
+            <li>Code signing is not complete, so Windows SmartScreen warns on first launch</li>
+            <li>Native macOS and Linux desktop packages are not available yet</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3>Pending code or evidence</h3>
+          <ul>
+            <li>A week or more of organic use for a meaningful before-and-after comparison</li>
+            <li>Quality-aware model selection using performance signals as well as price</li>
+            <li>A general answer to long-thread reused-input compounding</li>
+          </ul>
+        </div>
+      </div>
+      <div class="maturity-note">The pending column is a roadmap, not a product guarantee.</div>
+    </section>
+
+    <section aria-labelledby="download">
+      <h2 class="sec" id="download">Download and inspect</h2>
+      <p class="secnote">waterfall.sh runs on the user’s machine and the public website does not connect to a visitor’s localhost. Choose the command-line installer on Windows, macOS, or Linux; use the native Windows package; or inspect the public repository first.</p>
+      <div class="os">
+        <div class="card">
+          <h3>Install the CLI</h3>
+          <pre><code>curl -sSL https://raw.githubusercontent.com/adamtpang/waterfall.sh/main/install.py | python3</code></pre>
+          <p class="soon">The command-line installer works on Windows, macOS, and Linux. It clones waterfall.sh into ~/.waterfall, installs the console commands, and merges the documented Claude Code hooks with a backup.</p>
+        </div>
+        <div class="card">
+          <h3>Install the Windows app</h3>
+          <pre><code>waterfall_0.1.0_x64-setup.exe</code></pre>
+          <p class="soon"><a href="https://github.com/adamtpang/waterfall.sh/releases/latest">Download the v0.1.0 Windows release</a> as an NSIS installer or MSI. The package is not code-signed, so Windows SmartScreen warns before first launch.</p>
+        </div>
+        <div class="card">
+          <h3>Read the code first</h3>
+          <pre><code>git clone https://github.com/adamtpang/waterfall.sh
+cd waterfall.sh &amp;&amp; pip install -e .</code></pre>
+          <p class="soon">The public waterfall.sh repository contains the static site, router, tests, installers, and desktop sources. The local web board binds to 127.0.0.1 rather than a public interface.</p>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <footer>
-    <span>waterfall.sh · $30 founding · built by adam.inc</span>
-    <span><a href="PERFECT.md">perfect spec</a> · <a href="https://x.com/adamtpang">x</a></span>
+    <span>waterfall.sh · $30 founding license · independent software project</span>
+    <nav aria-label="Footer navigation">
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <a href="/privacy">Privacy</a>
+      <a href="https://github.com/adamtpang/waterfall.sh">Source</a>
+      <a href="https://x.com/adamtpang">X</a>
+    </nav>
   </footer>
-</main>
+</div>
 </body>
 </html>

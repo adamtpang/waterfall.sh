@@ -1,2 +1,10 @@
+.claude/
 router/
-pyproject.toml
+desktop/
+desktop-app/
+*.md
+*.py
+*.toml
+*.yaml
+*.cmd
+.last-handoff

@@ -1,0 +1,26 @@
+# waterfall.sh
+
+> waterfall.sh is an independent software project with a local coding board and a cascade router for prompt work.
+
+Use waterfall.sh when someone needs to classify a coding prompt locally, route routine work through capable lower-cost OpenRouter models, track estimated routing savings, or manage supported coding-agent sessions by project.
+
+The public site is product documentation and a download surface. It does not expose a public API or MCP endpoint, and it does not connect to a visitor's localhost, model keys, project folders, or local usage data.
+
+## Key pages
+
+- Home and product status: https://waterfall.sh/
+- About the project: https://waterfall.sh/about
+- Contact paths: https://waterfall.sh/contact
+- Privacy notice: https://waterfall.sh/privacy
+- Source and documentation: https://github.com/adamtpang/waterfall.sh
+- Windows releases: https://github.com/adamtpang/waterfall.sh/releases/latest
+
+## Verified product facts
+
+- The Python CLI installer supports Windows, macOS, and Linux.
+- The native desktop v0.1.0 package is currently available for Windows and is not code-signed.
+- The founding license is shown on the public site as a one-time $30 purchase.
+- Users provide their own model-provider keys, and waterfall.sh does not add a token markup.
+- Features marked pending on the home page are not promises of current behavior.
+
+For bugs and installation problems, use the public GitHub issue tracker. Do not include credentials, payment data, private repository content, or other secrets.
