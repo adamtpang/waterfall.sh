@@ -1,28 +1,40 @@
 # waterfall.sh
 
-> A developer workshop and local coding board that classifies prompts, routes routine work to cheaper capable models, falls back across providers, and tracks savings.
+> waterfall.sh is an independent software project with a local coding board and a cascade router for prompt work.
+
+Use waterfall.sh when someone needs to classify a coding prompt locally, route routine work through capable lower-cost OpenRouter models, track estimated routing savings, or manage supported coding-agent sessions by project.
+
+The public site is product documentation and a download surface. It does not expose a public API or MCP endpoint, and it does not connect to a visitor's localhost, model keys, project folders, or local usage data.
+
+## Key pages
+
+- Home and product status: https://waterfall.sh/
+- Free developer workshop: https://waterfall.sh/workshop/
+- Machine-readable workshop catalog: https://waterfall.sh/workshop/catalog.json
+- About the project: https://waterfall.sh/about
+- Contact paths: https://waterfall.sh/contact
+- Privacy notice: https://waterfall.sh/privacy
+- Source and documentation: https://github.com/adamtpang/waterfall.sh
+- Windows releases: https://github.com/adamtpang/waterfall.sh/releases/latest
 
 ## Free developer workshop
 
-- [Workshop index](https://waterfall.sh/workshop/): Dated catalog of models, IDEs, agent skills, and MCP servers.
-- [Machine-readable catalog](https://waterfall.sh/workshop/catalog.json): JSON source for every catalog card.
-- [Curation and workflow guide](https://waterfall.sh/workshop/README.md): Claude plus Codex workflow, methodology, and refresh cadence.
-- [Public-safe audit](https://waterfall.sh/workshop/AUDIT.md): What was reviewed, retained, linked, sanitized, or kept private.
-- [Next skill](https://waterfall.sh/workshop/skills/next/SKILL.md): Present evidence-grounded next-step choices and wait.
-- [Research report skill](https://waterfall.sh/workshop/skills/research-report/SKILL.md): Current research with primary sources and explicit uncertainty.
-- [Waterfall skill](https://waterfall.sh/workshop/skills/waterfall/SKILL.md): Route self-contained routine work while protecting secrets and context-heavy tasks.
-
-## Product and source
-
-- [Repository](https://github.com/adamtpang/waterfall.sh)
-- [README](https://github.com/adamtpang/waterfall.sh/blob/main/README.md)
-- [Token compounding notes](https://github.com/adamtpang/waterfall.sh/blob/main/TOKEN_COMPOUNDING.md)
-- [Setup](https://github.com/adamtpang/waterfall.sh/blob/main/SETUP.md)
-
-## Catalog rules
-
-- Treat model ranks, pricing, and plan access as dated snapshots.
-- Prefer primary and official sources.
+- Curation and workflow guide: https://waterfall.sh/workshop/README.md
+- Public-safe skill and MCP audit: https://waterfall.sh/workshop/AUDIT.md
+- Next-step skill: https://waterfall.sh/workshop/skills/next/SKILL.md
+- Research-report skill: https://waterfall.sh/workshop/skills/research-report/SKILL.md
+- Waterfall routing skill: https://waterfall.sh/workshop/skills/waterfall/SKILL.md
+- Model ranks, pricing, and plan access are dated snapshots.
 - Registry presence is not a security endorsement.
 - Free means no Waterfall paywall. Upstream licenses, terms, and inference costs still apply.
-- No credentials, private paths, account identifiers, or personal workflow data are published.
+- Raw credentials, private paths, account identifiers, and personal workflow data are excluded.
+
+## Verified product facts
+
+- The Python CLI installer supports Windows, macOS, and Linux.
+- The native desktop v0.1.0 package is currently available for Windows and is not code-signed.
+- The founding license is shown on the public site as a one-time $30 purchase.
+- Users provide their own model-provider keys, and waterfall.sh does not add a token markup.
+- Features marked pending on the home page are not promises of current behavior.
+
+For bugs and installation problems, use the public GitHub issue tracker. Do not include credentials, payment data, private repository content, or other secrets.
