@@ -10,3 +10,4 @@ desktop-app/src-tauri/target/
 desktop-app/node_modules/
 dist/*.exe
 waterfall.exe
+.env*

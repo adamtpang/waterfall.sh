@@ -17,17 +17,14 @@ project once the naming/branding direction was clear.
 
 ## Current state (as of this handoff)
 
-- **Domain**: not purchased yet, Adam explicitly declined on 2026-08-04
-  ($22/yr quoted, confirmed available, he said not yet). Live now at
-  https://waterfallsh.vercel.app instead -- project `waterfall.sh` under
-  team `adamtpangs-projects`, linked to the
-  github.com/adamtpang/waterfall.sh repo (auto-deploys on push to `main`).
-  Buy the domain and attach it to this same project whenever Adam says go
-  (`get_purchase_quote` -> confirm with him -> `buy_domain`; already
-  quoted once, quote expires in 5 min so re-quote when it's time).
-- **Landing page**: `index.html` + `vercel.json` + `robots.txt` +
-  `sitemap.xml`: plain static HTML, zero build step. **Needs
-  `.vercelignore` excluding `router/` and `pyproject.toml`, and
+- **Domain**: https://waterfall.sh is live and aliased to the `waterfall.sh`
+  Vercel project under team `adamtpangs-projects`, linked to
+  github.com/adamtpang/waterfall.sh (auto-deploys on push to `main`). The
+  older 2026-08-04 notes saying the custom domain was not yet live are stale.
+- **Landing page**: `index.html`, shared `site.css`, static About/Contact/
+  Privacy pages, `llms.txt`, `robots.txt`, and `sitemap.xml`: plain static
+  files with zero application build step. **Needs `.vercelignore` to exclude
+  the Python/router/desktop source and internal Markdown handoffs, and
   `"framework": null` in `vercel.json`** -- without both, Vercel
   auto-detects the sibling Python CLI (`pyproject.toml` at repo root) and
   tries to build this as a Python serverless app instead of a static site,
@@ -36,6 +33,16 @@ project once the naming/branding direction was clear.
   (same dark chalkboard-style theme, mono/hand font pairing) for
   consistency across Adam's project portfolio. Swap the accent color /
   copy freely, the structure is just a starting point.
+- **Lightmark production pass, 2026-08-29**: https://waterfall.sh scored
+  exactly 100/A with all 11 scorecards at 100 and zero findings at
+  `2026-08-29T06:31:01.325Z`. The pass added truthful Organization,
+  WebSite, and SoftwareApplication JSON-LD; CSP and `nosniff`; explicit
+  image dimensions; substantial trust pages; `/llms.txt`; a public
+  GitHub/X contact path; and self-contained product copy. Feature cards no
+  longer use `<article>`, because the landing page is product content, not
+  editorial content requiring invented author/date provenance. Keep the
+  root rewrite to `/index`: prebuilt Vercel deployments otherwise expose
+  the clean `/index` asset but return 404 for `/`.
 - **Developer workshop**: `workshop/` is the public, no-paywall resource hub
   for dated model, IDE, agent-skill, and MCP picks. `catalog.json` is the
   machine-readable source; `index.html` renders it without a build step;

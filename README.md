@@ -11,8 +11,10 @@ plan's quota last the full day instead of the first hour.
 
 ```
 DESIGN.md, brand/                                   Design system + logo (SVG/PNG/ICO)
-index.html, vercel.json, robots.txt, sitemap.xml   Landing page (static, zero build)
-workshop/                                           Free model, IDE, skill, and MCP catalog
+index.html, site.css, vercel.json                  Landing page (static, zero build)
+about.html, contact.html, privacy.html, llms.txt   Public trust + agent guidance pages
+robots.txt, sitemap.xml                            Crawler policy + route index
+workshop/                                          Free model, IDE, skill, and MCP catalog
 router/                                             The actual routing logic (Python)
   openrouter_api_client.py                          Direct OpenRouter API client
   smart_router.py                                   Classify -> split -> route -> stitch
@@ -42,7 +44,7 @@ cold project into the other.
 
 ```bash
 npx vercel deploy        # ships to a *.vercel.app URL
-npx vercel --prod        # once waterfall.sh is purchased and attached
+npx vercel --prod        # deploys production and updates https://waterfall.sh
 ```
 
 ## Quick start (router)
