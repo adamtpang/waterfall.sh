@@ -12,6 +12,7 @@ plan's quota last the full day instead of the first hour.
 ```
 DESIGN.md, brand/                                   Design system + logo (SVG/PNG/ICO)
 index.html, vercel.json, robots.txt, sitemap.xml   Landing page (static, zero build)
+workshop/                                           Free model, IDE, skill, and MCP catalog
 router/                                             The actual routing logic (Python)
   openrouter_api_client.py                          Direct OpenRouter API client
   smart_router.py                                   Classify -> split -> route -> stitch
@@ -21,6 +22,21 @@ desktop/                                            Local desktop GUI (dashboard
 DESKTOP_GUI_LANDSCAPE.md                            OSS research for coding-agent desktop UIs
 CLAUDE.md                                           Full project handoff / status -- read this first
 ```
+
+## Free developer workshop
+
+[`workshop/`](workshop/) is the public, dated catalog of models, coding
+surfaces, skills, and MCP servers that survived a real usage audit. It includes
+three sanitized starter skills and a machine-readable `catalog.json`.
+
+The curation rule is simple: every pick names a job, evidence, a reason not to
+use it, an official source, and a checked date. Third-party work is linked
+upstream instead of copied when licensing is unclear. Private paths,
+credentials, account data, and personal automations are never published.
+
+For a Claude plus Codex setup, use both during the week: one owns the change,
+the other plans or reviews. Do not wait for one plan to hit zero before moving a
+cold project into the other.
 
 ## Quick start (landing page)
 

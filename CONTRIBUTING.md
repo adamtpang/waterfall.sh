@@ -29,6 +29,18 @@ reselling the code is not.
   models) is a real, live data source that isn't wired in yet.
 - Anything in `CLAUDE.md`'s "Not done yet" section.
 
+## Workshop submissions
+
+The free resource catalog lives in `workshop/catalog.json`. A catalog change
+must include an official source, the recurring task it serves, a checked date,
+and one honest reason not to enable it. Treat pricing, plan access, and benchmark
+ranks as dated snapshots.
+
+Do not submit affiliate links, copied credentials, local configuration, absolute
+paths, account identifiers, private project details, or third-party skill source
+without a license that clearly covers the exact artifact. Registry presence and
+GitHub stars are discovery signals, not security or quality endorsements.
+
 ## Reporting a bug
 
 Open a GitHub issue with the real command you ran, the real output, and (if

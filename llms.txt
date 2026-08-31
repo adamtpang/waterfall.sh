@@ -1,0 +1,28 @@
+# waterfall.sh
+
+> A developer workshop and local coding board that classifies prompts, routes routine work to cheaper capable models, falls back across providers, and tracks savings.
+
+## Free developer workshop
+
+- [Workshop index](https://waterfall.sh/workshop/): Dated catalog of models, IDEs, agent skills, and MCP servers.
+- [Machine-readable catalog](https://waterfall.sh/workshop/catalog.json): JSON source for every catalog card.
+- [Curation and workflow guide](https://waterfall.sh/workshop/README.md): Claude plus Codex workflow, methodology, and refresh cadence.
+- [Public-safe audit](https://waterfall.sh/workshop/AUDIT.md): What was reviewed, retained, linked, sanitized, or kept private.
+- [Next skill](https://waterfall.sh/workshop/skills/next/SKILL.md): Present evidence-grounded next-step choices and wait.
+- [Research report skill](https://waterfall.sh/workshop/skills/research-report/SKILL.md): Current research with primary sources and explicit uncertainty.
+- [Waterfall skill](https://waterfall.sh/workshop/skills/waterfall/SKILL.md): Route self-contained routine work while protecting secrets and context-heavy tasks.
+
+## Product and source
+
+- [Repository](https://github.com/adamtpang/waterfall.sh)
+- [README](https://github.com/adamtpang/waterfall.sh/blob/main/README.md)
+- [Token compounding notes](https://github.com/adamtpang/waterfall.sh/blob/main/TOKEN_COMPOUNDING.md)
+- [Setup](https://github.com/adamtpang/waterfall.sh/blob/main/SETUP.md)
+
+## Catalog rules
+
+- Treat model ranks, pricing, and plan access as dated snapshots.
+- Prefer primary and official sources.
+- Registry presence is not a security endorsement.
+- Free means no Waterfall paywall. Upstream licenses, terms, and inference costs still apply.
+- No credentials, private paths, account identifiers, or personal workflow data are published.
