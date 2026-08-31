@@ -58,6 +58,13 @@ async function makeHarness({
 } = {}) {
   const root = element({ innerHTML: '<div class="empty">Loading the workshop catalog...</div>' });
   const search = element({ value: '' });
+  const snapshot = Object.fromEntries([
+    'snapshot-checked',
+    'snapshot-active',
+    'snapshot-removed',
+    'snapshot-public',
+    'snapshot-affiliate',
+  ].map(id => [id, element({ textContent: '' })]));
   const filters = ['all', 'models', 'ides', 'skills', 'mcps'].map(filter =>
     element({ dataset: { filter } }),
   );
@@ -69,7 +76,9 @@ async function makeHarness({
   const context = {
     document: {
       getElementById(id) {
-        return id === 'catalog-root' ? root : search;
+        if (id === 'catalog-root') return root;
+        if (id === 'search') return search;
+        return snapshot[id];
       },
       querySelectorAll() {
         return filters;
@@ -90,7 +99,7 @@ async function makeHarness({
 
   vm.runInNewContext(workshopScript, context, { filename: 'workshop/index.html' });
   await settle();
-  return { filters, historyCalls, location, root, search };
+  return { filters, historyCalls, location, root, search, snapshot };
 }
 
 
@@ -108,6 +117,8 @@ test('successful load renders every catalog shelf and item', async () => {
     assert.match(harness.root.innerHTML, new RegExp(`data-shelf="${collection.id}"`));
   }
   assert.equal(pressed(harness, 'all'), 'true');
+  assert.equal(harness.snapshot['snapshot-checked'].textContent, `Checked ${catalog.updated_at}`);
+  assert.equal(harness.snapshot['snapshot-active'].textContent, String(catalog.audit.active_skills));
 });
 
 
@@ -232,6 +243,8 @@ test('network and JSON failures use the same recoverable error state', async () 
 
 test('catalog values and tags are escaped before insertion into HTML', async () => {
   const unsafeCatalog = {
+    updated_at: catalog.updated_at,
+    audit: catalog.audit,
     collections: [{
       id: 'models',
       title: '<Models>',
@@ -269,9 +282,20 @@ test('missing optional tags and an empty collection render safely', async () => 
   assert.match(taggedHarness.root.innerHTML, /Agent Arena/);
 
   const emptyHarness = await makeHarness({
-    response: Promise.resolve(responseFor({ collections: [{ id: 'models', title: 'Models', summary: '', items: [] }] })),
+    response: Promise.resolve(responseFor({
+      updated_at: catalog.updated_at,
+      audit: catalog.audit,
+      collections: [{ id: 'models', title: 'Models', summary: '', items: [] }],
+    })),
   });
   assert.equal(emptyHarness.root.innerHTML, '<div class="empty">No entries match that search.</div>');
 });
 
 
+test('malformed tags use the recoverable load-failure state', async () => {
+  const malformed = structuredClone(catalog);
+  malformed.collections[0].items[0].tags = 'agent';
+  const harness = await makeHarness({ response: Promise.resolve(responseFor(malformed)) });
+
+  assert.match(harness.root.innerHTML, /interactive catalog could not load/);
+});

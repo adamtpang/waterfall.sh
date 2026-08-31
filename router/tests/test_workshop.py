@@ -27,14 +27,12 @@ class WorkshopCatalogTests(unittest.TestCase):
         self.assertTrue(self.catalog["summary"].strip())
         self.assertGreaterEqual(len(self.catalog["principles"]), 4)
         self.assertEqual(
-            {
-                "active_skills": 130,
-                "unused_skills_removed": 84,
-                "public_starter_skills": 3,
-                "affiliate_links": 0,
-            },
-            self.catalog["audit"],
+            {"active_skills", "unused_skills_removed", "public_starter_skills", "affiliate_links"},
+            set(self.catalog["audit"]),
         )
+        for value in self.catalog["audit"].values():
+            self.assertIsInstance(value, int)
+            self.assertGreaterEqual(value, 0)
 
         required = {"id", "title", "summary", "items"}
         for collection in self.catalog["collections"]:
@@ -68,7 +66,9 @@ class WorkshopCatalogTests(unittest.TestCase):
                 self.assertFalse(required - set(item), f"{item.get('id')} is missing fields")
                 self.assertTrue(item["url"].startswith(("https://", "/workshop/")))
                 self.assertTrue(item["avoid"].strip())
+                self.assertIsInstance(item["tags"], list)
                 self.assertTrue(item["tags"])
+                self.assertTrue(all(isinstance(tag, str) and tag.strip() for tag in item["tags"]))
                 self.assertIn(item["default_state"], allowed_states)
                 self.assertIn(item["volatility"], allowed_volatility)
                 self.assertIn(item["refresh_cadence"], allowed_refresh)
@@ -132,18 +132,24 @@ class WorkshopCatalogTests(unittest.TestCase):
         self.assertIn("https://waterfall.sh/workshop/", sitemap)
         self.assertIn("workshop/catalog.json", llms)
 
-    def test_visible_snapshot_matches_catalog_metadata(self):
+    def test_visible_snapshot_uses_catalog_metadata(self):
         workshop_html = (WORKSHOP / "index.html").read_text(encoding="utf-8")
-        audit = self.catalog["audit"]
-        self.assertIn(f"Checked {self.catalog['updated_at']}", workshop_html)
-        for value in audit.values():
-            self.assertRegex(workshop_html, rf">{value}<")
+        workshop_js = (WORKSHOP / "workshop.js").read_text(encoding="utf-8")
+        for snapshot_id in (
+            "snapshot-checked",
+            "snapshot-active",
+            "snapshot-removed",
+            "snapshot-public",
+            "snapshot-affiliate",
+        ):
+            self.assertIn(f'id="{snapshot_id}"', workshop_html)
+            self.assertIn(f"'{snapshot_id}'", workshop_js)
         public_skills = sum(
             item["publisher"] == "Waterfall Workshop"
             for collection in self.catalog["collections"]
             for item in collection["items"]
         )
-        self.assertEqual(audit["public_starter_skills"], public_skills)
+        self.assertEqual(self.catalog["audit"]["public_starter_skills"], public_skills)
 
     def test_static_site_has_no_javascript_and_load_failure_fallbacks(self):
         workshop_html = (WORKSHOP / "index.html").read_text(encoding="utf-8")

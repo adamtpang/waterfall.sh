@@ -51,6 +51,19 @@
     root.innerHTML = shelves.length ? shelves.join('') : '<div class="empty">No entries match that search.</div>';
   };
 
+  const renderSnapshot = () => {
+    const values = {
+      'snapshot-checked': `Checked ${catalog.updated_at}`,
+      'snapshot-active': catalog.audit.active_skills,
+      'snapshot-removed': catalog.audit.unused_skills_removed,
+      'snapshot-public': catalog.audit.public_starter_skills,
+      'snapshot-affiliate': catalog.audit.affiliate_links,
+    };
+    Object.entries(values).forEach(([id, value]) => {
+      document.getElementById(id).textContent = String(value);
+    });
+  };
+
   filters.forEach(button => button.addEventListener('click', () => {
     active = button.dataset.filter;
     const url = new URL(location.href);
@@ -68,6 +81,7 @@
     .then(data => {
       catalog = data;
       if (!catalog.collections.some(collection => collection.id === active)) active = 'all';
+      renderSnapshot();
       render();
     })
     .catch(() => {
