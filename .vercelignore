@@ -2,7 +2,7 @@
 router/
 desktop/
 desktop-app/
-*.md
+/*.md
 *.py
 *.toml
 *.yaml

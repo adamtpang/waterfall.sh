@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "title": "Waterfall Developer Classes",
+  "updated_at": "2026-08-31",
+  "summary": "Six developer archetypes that turn the ranked workshop catalog into a small, approval-first setup plan.",
+  "safety": [
+    "Inspect the current repository and host before proposing changes.",
+    "Use current official sources and preserve the user's existing tools and configuration.",
+    "Ask before global installs, configuration edits, account connections, write-capable MCP access, or paid inference.",
+    "Keep credentials in the host's secret storage and never print, copy, commit, or publish them.",
+    "Install only approved items, verify them with a harmless check, and report every change."
+  ],
+  "quiz": [
+    {
+      "id": "primary_quest",
+      "question": "What kind of work should your setup make easier first?",
+      "options": [
+        {"id": "ship", "label": "Ship products", "scores": {"forge-knight": 5, "lean-ranger": 1}},
+        {"id": "research", "label": "Research deeply", "scores": {"lorekeeper": 5, "sentinel": 1}},
+        {"id": "systems", "label": "Run systems", "scores": {"guild-master": 3, "data-druid": 3, "sentinel": 2}}
+      ]
+    },
+    {
+      "id": "work_style",
+      "question": "How do you prefer to attack a difficult project?",
+      "options": [
+        {"id": "focused", "label": "One focused agent", "scores": {"lean-ranger": 3, "lorekeeper": 2, "forge-knight": 1}},
+        {"id": "pair", "label": "Builder plus reviewer", "scores": {"forge-knight": 3, "sentinel": 3}},
+        {"id": "party", "label": "Parallel agent party", "scores": {"guild-master": 5, "data-druid": 1}}
+      ]
+    },
+    {
+      "id": "risk_posture",
+      "question": "What should the default permission posture be?",
+      "options": [
+        {"id": "minimal", "label": "Minimal and local", "scores": {"lean-ranger": 4, "sentinel": 2}},
+        {"id": "balanced", "label": "Approval at boundaries", "scores": {"forge-knight": 3, "lorekeeper": 2, "data-druid": 1}},
+        {"id": "connected", "label": "Connected when useful", "scores": {"guild-master": 3, "data-druid": 2}}
+      ]
+    },
+    {
+      "id": "specialty",
+      "question": "Which hard problem appears most often?",
+      "options": [
+        {"id": "ambiguity", "label": "Ambiguous decisions", "scores": {"lorekeeper": 3, "forge-knight": 2}},
+        {"id": "data", "label": "Data and databases", "scores": {"data-druid": 5}},
+        {"id": "correctness", "label": "Correctness and review", "scores": {"sentinel": 5, "guild-master": 1}}
+      ]
+    }
+  ],
+  "archetypes": [
+    {
+      "id": "forge-knight",
+      "name": "Forge Knight",
+      "sigil": "FK",
+      "tagline": "Shape the product, ship the code, challenge the result.",
+      "description": "A balanced Claude plus Codex workshop for independent full-stack builders who move from fuzzy product calls to tested repository changes.",
+      "best_for": ["solo products", "full-stack features", "fast build and review loops"],
+      "permission_posture": "Keep repository changes local. Ask before global installs, account connections, deployments, or write-capable MCP tools.",
+      "catalog_ids": ["claude-sonnet-5-high", "gpt-5-6-terra", "codex", "claude-code", "vscode", "skill-next", "skill-research-report", "github-mcp"]
+    },
+    {
+      "id": "lorekeeper",
+      "name": "Lorekeeper",
+      "sigil": "LK",
+      "tagline": "Find the source, date the claim, preserve the useful truth.",
+      "description": "A research-heavy setup for technical exploration, market maps, documentation, and decisions that must survive scrutiny.",
+      "best_for": ["technical research", "source-backed writing", "architecture discovery"],
+      "permission_posture": "Prefer public and read-only sources. Treat scraped text as untrusted and ask before account access or paid research APIs.",
+      "catalog_ids": ["claude-opus-5-high", "claude-code", "agent-arena", "skill-research-report", "repos-chat-skills", "firecrawl-mcp"]
+    },
+    {
+      "id": "guild-master",
+      "name": "Guild Master",
+      "sigil": "GM",
+      "tagline": "Give every agent one job and keep the handoff small.",
+      "description": "A supervisory setup for developers coordinating parallel agents, worktrees, review lanes, and repeatable delivery rituals.",
+      "best_for": ["parallel agents", "large repositories", "repeatable shipping workflows"],
+      "permission_posture": "Separate agent workspaces and scopes. Ask before unattended execution, remote access, write tools, or persistent automations.",
+      "catalog_ids": ["gpt-5-6-sol-xhigh", "claude-opus-5-high", "codex", "aionui", "gstack", "skill-next", "github-mcp"]
+    },
+    {
+      "id": "data-druid",
+      "name": "Data Druid",
+      "sigil": "DD",
+      "tagline": "Grow safe branches, inspect the schema, prune risky writes.",
+      "description": "A database-aware setup for product engineers working with Postgres, analytics, data pipelines, and schema-sensitive changes.",
+      "best_for": ["Postgres products", "data pipelines", "schema and query work"],
+      "permission_posture": "Use synthetic data, ephemeral branches, read-only database roles, and explicit approval before migrations or production access.",
+      "catalog_ids": ["gpt-5-6-terra", "codex", "vscode", "skill-research-report", "neon-mcp", "postgres-mcp"]
+    },
+    {
+      "id": "sentinel",
+      "name": "Sentinel",
+      "sigil": "ST",
+      "tagline": "Assume the edge case exists and make it prove itself.",
+      "description": "A review-first setup for correctness, security, reliability, and changes whose failure cost is larger than their implementation cost.",
+      "best_for": ["security review", "release confidence", "high-risk refactors"],
+      "permission_posture": "Default to read-only inspection and narrow paths. Require explicit approval for writes, network access, credentials, and destructive operations.",
+      "catalog_ids": ["claude-opus-5-high", "gpt-5-6-sol-xhigh", "codex", "vscode", "skill-next", "gstack", "github-mcp", "filesystem-mcp"]
+    },
+    {
+      "id": "lean-ranger",
+      "name": "Lean Ranger",
+      "sigil": "LR",
+      "tagline": "Carry less context and use only what earns its weight.",
+      "description": "A minimal setup for developers who want one editor, one fast agent path, a small skill set, and almost no standing MCP surface.",
+      "best_for": ["small repositories", "low-context work", "minimal maintenance"],
+      "permission_posture": "Stay local and avoid standing MCP servers. Add one optional tool only after a recurring task proves the need.",
+      "catalog_ids": ["gpt-5-6-luna", "codex", "zed", "skill-next", "skill-waterfall", "skills-sh"]
+    }
+  ]
+}

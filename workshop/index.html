@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waterfall Workshop | Models, IDEs, Skills, and MCPs</title>
+<meta name="description" content="A dated, evidence-backed developer workshop for choosing models, coding IDEs, agent skills, and MCP servers.">
+<meta property="og:title" content="Waterfall Workshop">
+<meta property="og:description" content="The tools that survived a real Claude and Codex workflow audit.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://waterfall.sh/workshop/">
+<link rel="canonical" href="https://waterfall.sh/workshop/">
+<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/workshop/workshop.css">
+</head>
+<body>
+  <header class="wrap nav">
+    <a class="brand" href="/">
+      <img src="/brand/favicon.svg" alt="">
+      <span>waterfall<span class="tld">.sh</span></span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="#rhythm">workflow</a>
+      <a href="#catalog" class="keep">catalog</a>
+      <a href="/workshop/starter-packs" class="keep">starter packs</a>
+      <a href="/workshop/README.md">readme</a>
+      <a href="https://github.com/adamtpang/waterfall.sh" class="keep">github</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="wrap hero">
+      <div>
+        <div class="eyebrow">free developer workshop</div>
+        <h1>Dated rankings, built for real work.</h1>
+        <p class="lede">Models, coding surfaces, agent skills, and MCP servers ranked for <strong>Waterfall fit</strong>, not universal supremacy. Every pick says what it is for, why it earned a place, and when to leave it off.</p>
+      </div>
+      <aside class="snapshot" aria-label="Catalog snapshot">
+        <div class="stamp" id="snapshot-checked">Catalog metadata loads with the index</div>
+          <h2>Evidence, not a link dump.</h2>
+          <p>Ranks are scoped to independent developers using Claude and Codex. Each entry carries its own checked date and refresh cadence.</p>
+        <dl>
+          <dt>Active skills after audit</dt><dd id="snapshot-active">catalog</dd>
+          <dt>Unused skill names removed</dt><dd id="snapshot-removed">catalog</dd>
+          <dt>Public starter skills</dt><dd id="snapshot-public">catalog</dd>
+          <dt>Affiliate links</dt><dd id="snapshot-affiliate">catalog</dd>
+        </dl>
+      </aside>
+    </section>
+
+    <section class="wrap section" id="rhythm">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Claude plus Codex</div>
+          <h2>Use both every week.</h2>
+        </div>
+        <p class="section-note">Do not burn one plan to zero and then drag a cold project into the other. Give each agent a distinct job and preserve a compact shared handoff.</p>
+      </div>
+      <div class="rhythm">
+        <article>
+          <div class="step">01 · shape</div>
+          <h3>Claude for ambiguity</h3>
+          <p>Product calls, architecture, confusing requirements, and the hardest review pass.</p>
+        </article>
+        <article>
+          <div class="step">02 · build</div>
+          <h3>Codex for implementation</h3>
+          <p>Repository work, parallel agents, worktrees, tests, and autonomous execution.</p>
+        </article>
+        <article>
+          <div class="step">03 · challenge</div>
+          <h3>Cross-review the result</h3>
+          <p>One agent owns the change. The other gets a narrow review brief and no incentive to defend it.</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="controls" id="catalog">
+      <div class="wrap control-row">
+        <div class="filters" role="group" aria-label="Filter catalog">
+          <button class="filter" type="button" data-filter="all" aria-pressed="true">all</button>
+          <button class="filter" type="button" data-filter="models" aria-pressed="false">models</button>
+          <button class="filter" type="button" data-filter="ides" aria-pressed="false">ides</button>
+          <button class="filter" type="button" data-filter="skills" aria-pressed="false">skills</button>
+          <button class="filter" type="button" data-filter="mcps" aria-pressed="false">mcps</button>
+        </div>
+        <label>
+          <span class="sr-only">Search catalog</span>
+          <input class="search" id="search" type="search" placeholder="Search use, source, or tag" autocomplete="off">
+        </label>
+      </div>
+    </div>
+
+    <section class="wrap catalog" aria-live="polite">
+      <div id="catalog-root"><div class="empty">Loading the workshop catalog...</div></div>
+      <noscript><div class="empty">JavaScript is off. Read the complete catalog in <a href="/workshop/README.md">README.md</a> or <a href="/workshop/catalog.json">catalog.json</a>.</div></noscript>
+    </section>
+
+    <section class="wrap section">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">How picks earn a place</div>
+          <h2>Four ranking gates.</h2>
+        </div>
+        <p class="section-note">A popular tool can still lose if it creates more context, permission, billing, or maintenance cost than useful work. skills.sh installs and mcp.directory discovery are signals, not quality or security verdicts.</p>
+      </div>
+      <div class="method">
+        <div><b>01 · task fit</b><p>A named recurring job, not a generic promise to make agents better.</p></div>
+        <div><b>02 · evidence</b><p>Official sources, dated benchmarks, or observed local use.</p></div>
+        <div><b>03 · negative case</b><p>An honest reason to keep it off or choose something else.</p></div>
+        <div><b>04 · safe source</b><p>No copied secrets, machine config, or unlicensed third-party code.</p></div>
+      </div>
+    </section>
+
+    <section class="wrap section">
+      <div class="resource-bar">
+        <div>
+          <h2>Choose a developer class.</h2>
+          <p>Take the short quiz or pick an archetype directly, then copy one approval-first setup prompt into Codex or Claude.</p>
+        </div>
+        <div class="resource-links">
+          <a class="button primary" href="/workshop/starter-packs">build a starter pack</a>
+          <a class="button primary" href="/workshop/catalog.json">catalog.json</a>
+          <a class="button" href="/workshop/AUDIT.md">audit</a>
+          <a class="button" href="/workshop/README.md">workshop notes</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <span>waterfall.sh · dev workshop · no affiliate links</span>
+    <span><a href="/">product</a> · <a href="https://github.com/adamtpang/waterfall.sh">source</a></span>
+  </footer>
+
+<script src="/workshop/workshop.js" defer></script>
+</body>
+</html>
