@@ -11,6 +11,8 @@ The public site is product documentation and a download surface. It does not exp
 - Home and product status: https://waterfall.sh/
 - Free developer workshop: https://waterfall.sh/workshop/
 - Machine-readable workshop catalog: https://waterfall.sh/workshop/catalog.json
+- Developer starter-pack builder: https://waterfall.sh/workshop/starter-packs
+- Machine-readable developer classes: https://waterfall.sh/workshop/packs.json
 - About the project: https://waterfall.sh/about
 - Contact paths: https://waterfall.sh/contact
 - Privacy notice: https://waterfall.sh/privacy
@@ -21,10 +23,14 @@ The public site is product documentation and a download surface. It does not exp
 
 - Curation and workflow guide: https://waterfall.sh/workshop/README.md
 - Public-safe skill and MCP audit: https://waterfall.sh/workshop/AUDIT.md
+- Developer class quiz and setup prompt: https://waterfall.sh/workshop/starter-packs
+- Starter-pack data: https://waterfall.sh/workshop/packs.json
 - Next-step skill: https://waterfall.sh/workshop/skills/next/SKILL.md
 - Research-report skill: https://waterfall.sh/workshop/skills/research-report/SKILL.md
 - Waterfall routing skill: https://waterfall.sh/workshop/skills/waterfall/SKILL.md
 - Model ranks, pricing, and plan access are dated snapshots.
+- Numbered ranks mean Waterfall fit for independent Claude plus Codex workflows, not universal quality.
+- skills.sh install counts and mcp.directory listings are discovery signals, not quality or security endorsements.
 - Registry presence is not a security endorsement.
 - Free means no Waterfall paywall. Upstream licenses, terms, and inference costs still apply.
 - Raw credentials, private paths, account identifiers, and personal workflow data are excluded.

@@ -13,6 +13,7 @@ class WorkshopCatalogTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.catalog = json.loads((WORKSHOP / "catalog.json").read_text(encoding="utf-8"))
+        cls.packs = json.loads((WORKSHOP / "packs.json").read_text(encoding="utf-8"))
 
     def test_catalog_has_expected_collections(self):
         collections = {collection["id"]: collection for collection in self.catalog["collections"]}
@@ -21,7 +22,7 @@ class WorkshopCatalogTests(unittest.TestCase):
             self.assertGreaterEqual(len(collection["items"]), 6)
 
     def test_catalog_metadata_and_collection_schema(self):
-        self.assertEqual(1, self.catalog["schema_version"])
+        self.assertEqual(2, self.catalog["schema_version"])
         self.assertEqual("Waterfall Workshop", self.catalog["title"])
         dt.date.fromisoformat(self.catalog["updated_at"])
         self.assertTrue(self.catalog["summary"].strip())
@@ -43,6 +44,8 @@ class WorkshopCatalogTests(unittest.TestCase):
     def test_catalog_items_have_sources_negative_cases_and_dates(self):
         required = {
             "id",
+            "ranking_eligible",
+            "rank",
             "name",
             "publisher",
             "url",
@@ -72,10 +75,61 @@ class WorkshopCatalogTests(unittest.TestCase):
                 self.assertIn(item["default_state"], allowed_states)
                 self.assertIn(item["volatility"], allowed_volatility)
                 self.assertIn(item["refresh_cadence"], allowed_refresh)
+                self.assertIsInstance(item["ranking_eligible"], bool)
+                if item["ranking_eligible"]:
+                    self.assertIsInstance(item["rank"], int)
+                    self.assertGreater(item["rank"], 0)
+                else:
+                    self.assertIsNone(item["rank"])
                 dt.date.fromisoformat(item["checked_at"])
                 dt.date.fromisoformat(item["source_date"])
                 ids.append(item["id"])
         self.assertEqual(len(ids), len(set(ids)), "catalog IDs must be unique")
+
+    def test_rankings_are_dated_scoped_and_contiguous(self):
+        ranking = self.catalog["ranking"]
+        dt.date.fromisoformat(ranking["as_of"])
+        self.assertIn("Waterfall fit", ranking["scope"])
+        self.assertEqual("weekly", ranking["refresh_cadence"])
+        self.assertGreaterEqual(len(ranking["methodology"]), 4)
+        signals = {signal["name"]: signal for signal in ranking["signals"]}
+        self.assertEqual({"Agent Arena", "skills.sh", "MCP Registry", "mcp.directory"}, set(signals))
+        self.assertIn("not task performance", signals["skills.sh"]["limit"])
+        self.assertIn("No public ranking methodology", signals["mcp.directory"]["limit"])
+
+        for collection in self.catalog["collections"]:
+            ranks = sorted(item["rank"] for item in collection["items"] if item["ranking_eligible"])
+            self.assertEqual(list(range(1, len(ranks) + 1)), ranks, collection["id"])
+
+    def test_starter_pack_schema_and_catalog_references(self):
+        self.assertEqual(1, self.packs["schema_version"])
+        dt.date.fromisoformat(self.packs["updated_at"])
+        self.assertEqual(6, len(self.packs["archetypes"]))
+        self.assertEqual(4, len(self.packs["quiz"]))
+        self.assertGreaterEqual(len(self.packs["safety"]), 5)
+        catalog_ids = {
+            item["id"]
+            for collection in self.catalog["collections"]
+            for item in collection["items"]
+        }
+        archetype_ids = []
+        for archetype in self.packs["archetypes"]:
+            self.assertTrue({
+                "id", "name", "sigil", "tagline", "description", "best_for",
+                "permission_posture", "catalog_ids",
+            } <= set(archetype))
+            self.assertTrue(archetype["catalog_ids"])
+            self.assertFalse(set(archetype["catalog_ids"]) - catalog_ids, archetype["id"])
+            self.assertEqual(len(archetype["catalog_ids"]), len(set(archetype["catalog_ids"])))
+            archetype_ids.append(archetype["id"])
+        self.assertEqual(len(archetype_ids), len(set(archetype_ids)))
+
+        for question in self.packs["quiz"]:
+            self.assertEqual(3, len(question["options"]))
+            for option in question["options"]:
+                self.assertTrue(option["scores"])
+                self.assertFalse(set(option["scores"]) - set(archetype_ids))
+                self.assertTrue(all(isinstance(points, int) and points > 0 for points in option["scores"].values()))
 
     def test_public_workshop_has_no_private_machine_markers(self):
         forbidden = (
@@ -86,7 +140,7 @@ class WorkshopCatalogTests(unittest.TestCase):
             r"OPENROUTER_API_KEY",
             r"ANTHROPIC_API_KEY",
             r"BROWSER_USE_API_KEY",
-            r"sk-[A-Za-z0-9]",
+            r"(?<![A-Za-z0-9])sk-[A-Za-z0-9]{8,}",
         )
         public_files = [path for path in WORKSHOP.rglob("*") if path.is_file()]
         for path in public_files:
@@ -121,16 +175,25 @@ class WorkshopCatalogTests(unittest.TestCase):
     def test_static_site_links_to_workshop_assets(self):
         workshop_html = (WORKSHOP / "index.html").read_text(encoding="utf-8")
         workshop_js = (WORKSHOP / "workshop.js").read_text(encoding="utf-8")
+        packs_html = (WORKSHOP / "starter-packs.html").read_text(encoding="utf-8")
+        packs_js = (WORKSHOP / "starter-packs.js").read_text(encoding="utf-8")
         root_html = (ROOT / "index.html").read_text(encoding="utf-8")
         sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
         llms = (ROOT / "llms.txt").read_text(encoding="utf-8")
         self.assertIn('src="/workshop/workshop.js"', workshop_html)
         self.assertIn('href="/workshop/workshop.css"', workshop_html)
         self.assertIn("fetch('/workshop/catalog.json')", workshop_js)
+        self.assertIn('src="/workshop/starter-packs.js"', packs_html)
+        self.assertIn('href="/workshop/starter-packs.css"', packs_html)
+        self.assertIn("fetch('/workshop/packs.json')", packs_js)
+        self.assertIn("fetch('/workshop/catalog.json')", packs_js)
         self.assertIn('data-filter="models"', workshop_html)
         self.assertIn('href="/workshop/"', root_html)
         self.assertIn("https://waterfall.sh/workshop/", sitemap)
+        self.assertIn("https://waterfall.sh/workshop/starter-packs", sitemap)
         self.assertIn("workshop/catalog.json", llms)
+        self.assertIn("workshop/packs.json", llms)
+        self.assertIn('href="/workshop/starter-packs"', root_html)
 
     def test_visible_snapshot_uses_catalog_metadata(self):
         workshop_html = (WORKSHOP / "index.html").read_text(encoding="utf-8")
@@ -161,6 +224,7 @@ class WorkshopCatalogTests(unittest.TestCase):
 
     def test_workshop_assets_match_the_deployment_contract(self):
         workshop_html = (WORKSHOP / "index.html").read_text(encoding="utf-8")
+        starter_html = (WORKSHOP / "starter-packs.html").read_text(encoding="utf-8")
         vercel = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
         csp = next(
             header["value"]
@@ -170,9 +234,10 @@ class WorkshopCatalogTests(unittest.TestCase):
         )
         self.assertIn("script-src 'self'", csp)
         self.assertIn("style-src 'self'", csp)
-        self.assertNotIn("<style", workshop_html)
-        self.assertIsNone(re.search(r"<script(?![^>]+\bsrc=)", workshop_html))
-        self.assertIsNone(re.search(r"\sstyle=", workshop_html))
+        for page in (workshop_html, starter_html):
+            self.assertNotIn("<style", page)
+            self.assertIsNone(re.search(r"<script(?![^>]+\bsrc=)", page))
+            self.assertIsNone(re.search(r"\sstyle=", page))
 
         ignore_rules = {
             line.strip()
@@ -181,7 +246,7 @@ class WorkshopCatalogTests(unittest.TestCase):
         }
         self.assertNotIn("*.md", ignore_rules, "recursive Markdown ignore hides workshop resources")
         self.assertIn("/*.md", ignore_rules, "root handoff Markdown should remain excluded")
-        for resource in ("README.md", "AUDIT.md"):
+        for resource in ("README.md", "AUDIT.md", "catalog.json", "packs.json"):
             self.assertTrue((WORKSHOP / resource).is_file())
 
 

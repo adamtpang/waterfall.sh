@@ -27,9 +27,10 @@ CLAUDE.md                                           Full project handoff / statu
 
 ## Free developer workshop
 
-[`workshop/`](workshop/) is the public, dated catalog of models, coding
+[`workshop/`](workshop/) is the public, dated ranking of models, coding
 surfaces, skills, and MCP servers that survived a real usage audit. It includes
-three sanitized starter skills and a machine-readable `catalog.json`.
+three sanitized starter skills, six quiz-driven developer classes, and
+machine-readable `catalog.json` and `packs.json` sources.
 
 The curation rule is simple: every pick names a job, evidence, a reason not to
 use it, an official source, and a checked date. Third-party work is linked
@@ -67,11 +68,11 @@ Or install it as a command (`pip install -e .` from the repo root, then
 ## Testing
 
 Run both suites from the repository root. The Python suite covers the router and
-deployment contract; the Node 18+ suite executes the workshop catalog interactions.
+deployment contract; the Node 18+ suites execute the catalog and starter-pack interactions.
 
 ```bash
 python3 -m unittest discover -s router/tests -p "test_*.py"
-node --test router/tests/workshop.test.mjs
+node --test router/tests/workshop.test.mjs router/tests/starter-packs.test.mjs
 ```
 
 ### Desktop GUI (`watertop`)

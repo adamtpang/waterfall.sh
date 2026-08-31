@@ -4,8 +4,10 @@ Waterfall is a working developer workshop: a dated, evidence-backed collection o
 models, coding surfaces, agent skills, and MCP servers that have earned a place in
 a real Claude and Codex workflow.
 
-The public catalog is available at [`/workshop/`](./index.html). Its machine-readable
-source is [`catalog.json`](./catalog.json).
+The public rankings are available at [`/workshop/`](./index.html). The
+[`developer class builder`](./starter-packs.html) turns those rankings into a
+small starter stack and approval-first setup prompt. The machine-readable sources
+are [`catalog.json`](./catalog.json) and [`packs.json`](./packs.json).
 
 ## Start here
 
@@ -34,7 +36,10 @@ sources in the catalog before treating any model name or rank as current.
 
 ## What “best” means here
 
-There is no single best model, IDE, skill, or MCP server. Every catalog entry has:
+There is no single best model, IDE, skill, or MCP server. Numbered entries are
+Waterfall-fit ranks for independent developers using Claude and Codex, checked on
+the date shown in the catalog. Reference signals and directories remain unranked.
+Every catalog entry has:
 
 - a task it is best for;
 - evidence for why it is included;
@@ -43,7 +48,24 @@ There is no single best model, IDE, skill, or MCP server. Every catalog entry ha
 - a source and a checked date.
 
 Arena rank is one signal. Local usage is another. Price, first-pass success, tool
-reliability, privacy, and setup cost all matter.
+reliability, privacy, and setup cost all matter. skills.sh install telemetry is a
+popularity signal, not a task-quality score. mcp.directory is useful for discovery,
+but no public ranking methodology was verified during the 2026-08-31 review.
+
+## Developer classes
+
+Choose a class directly or answer four local browser questions:
+
+- **Forge Knight** for balanced product building.
+- **Lorekeeper** for source-backed research and architecture discovery.
+- **Guild Master** for parallel agents and repeatable delivery.
+- **Data Druid** for Postgres, pipelines, and schema-sensitive work.
+- **Sentinel** for correctness, security, and high-risk review.
+- **Lean Ranger** for a small local setup with little standing tool surface.
+
+The generated prompt inspects first, proposes exact changes, and asks before global
+installs, account connections, paid inference, configuration edits, or write-capable
+MCP access. Quiz answers stay in the browser.
 
 ## Public starter skills
 

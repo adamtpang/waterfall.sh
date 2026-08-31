@@ -8,15 +8,22 @@
   const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, (char) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
   })[char]);
+  const safeHref = (value) => {
+    const href = String(value);
+    return href.startsWith('https://') || href.startsWith('/workshop/') ? href : '#';
+  };
 
   const card = (item) => {
     const text = [item.name, item.publisher, item.role, item.evidence, item.avoid, ...(item.tags || [])].join(' ').toLowerCase();
     const query = search.value.trim().toLowerCase();
     if (query && !text.includes(query)) return '';
     const tags = (item.tags || []).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('');
+    const rank = item.ranking_eligible && Number.isInteger(item.rank)
+      ? `<span class="rank" title="Waterfall fit rank" aria-label="Waterfall fit rank ${escapeHtml(item.rank)}">#${escapeHtml(item.rank)}</span>`
+      : '';
     return `<article class="card">
       <div class="card-top">
-        <span class="state ${escapeHtml(item.default_state)}">${escapeHtml(item.default_state)}</span>
+        <div class="card-labels">${rank}<span class="state ${escapeHtml(item.default_state)}">${escapeHtml(item.default_state)}</span></div>
         <span class="publisher">${escapeHtml(item.publisher)}</span>
       </div>
       <h3>${escapeHtml(item.name)}</h3>
@@ -25,7 +32,7 @@
       <p class="avoid"><b>leave off</b>${escapeHtml(item.avoid)}</p>
       <div class="card-foot">
         <div class="tags">${tags}</div>
-        <a class="source-link" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">
+        <a class="source-link" href="${escapeHtml(safeHref(item.url))}" target="_blank" rel="noreferrer">
           <span>open link</span><span class="checked">checked ${escapeHtml(item.checked_at)}</span>
         </a>
       </div>
@@ -38,7 +45,12 @@
     const shelves = catalog.collections
       .filter(collection => active === 'all' || collection.id === active)
       .map(collection => {
-        const cards = collection.items.map(card).filter(Boolean);
+        const orderedItems = [...collection.items].sort((a, b) => {
+          if (a.ranking_eligible !== b.ranking_eligible) return a.ranking_eligible ? -1 : 1;
+          if (a.ranking_eligible) return a.rank - b.rank;
+          return a.name.localeCompare(b.name);
+        });
+        const cards = orderedItems.map(card).filter(Boolean);
         if (!cards.length) return '';
         return `<section class="shelf" data-shelf="${escapeHtml(collection.id)}">
           <div class="shelf-head">
