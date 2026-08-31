@@ -20,6 +20,19 @@ class WorkshopCatalogTests(unittest.TestCase):
         for collection in collections.values():
             self.assertGreaterEqual(len(collection["items"]), 6)
 
+    def test_catalog_metadata_and_collection_schema(self):
+        self.assertEqual(1, self.catalog["schema_version"])
+        self.assertEqual("Waterfall Workshop", self.catalog["title"])
+        dt.date.fromisoformat(self.catalog["updated_at"])
+        self.assertTrue(self.catalog["summary"].strip())
+        self.assertGreaterEqual(len(self.catalog["principles"]), 4)
+
+        required = {"id", "title", "summary", "items"}
+        for collection in self.catalog["collections"]:
+            self.assertFalse(required - set(collection), collection.get("id"))
+            self.assertTrue(collection["title"].strip())
+            self.assertTrue(collection["summary"].strip())
+
     def test_catalog_items_have_sources_negative_cases_and_dates(self):
         required = {
             "id",
@@ -38,12 +51,18 @@ class WorkshopCatalogTests(unittest.TestCase):
             "refresh_cadence",
         }
         ids = []
+        allowed_states = {"hard-work", "daily", "routine", "optional", "pilot", "reference"}
+        allowed_volatility = {"live", "daily", "high", "medium", "low"}
+        allowed_refresh = {"live", "weekly", "monthly", "quarterly"}
         for collection in self.catalog["collections"]:
             for item in collection["items"]:
                 self.assertFalse(required - set(item), f"{item.get('id')} is missing fields")
-                self.assertTrue(item["url"].startswith(("https://", "./")))
+                self.assertTrue(item["url"].startswith(("https://", "/workshop/")))
                 self.assertTrue(item["avoid"].strip())
                 self.assertTrue(item["tags"])
+                self.assertIn(item["default_state"], allowed_states)
+                self.assertIn(item["volatility"], allowed_volatility)
+                self.assertIn(item["refresh_cadence"], allowed_refresh)
                 dt.date.fromisoformat(item["checked_at"])
                 dt.date.fromisoformat(item["source_date"])
                 ids.append(item["id"])
@@ -82,16 +101,60 @@ class WorkshopCatalogTests(unittest.TestCase):
             actual.add(match.group(1).strip())
         self.assertEqual(expected, actual)
 
+    def test_local_catalog_urls_resolve_to_public_files(self):
+        for collection in self.catalog["collections"]:
+            for item in collection["items"]:
+                url = item["url"]
+                if url.startswith("/workshop/"):
+                    target = ROOT / url.removeprefix("/")
+                    self.assertTrue(target.is_file(), f"{item['id']} points to missing {target}")
+
     def test_static_site_links_to_workshop_assets(self):
         workshop_html = (WORKSHOP / "index.html").read_text(encoding="utf-8")
+        workshop_js = (WORKSHOP / "workshop.js").read_text(encoding="utf-8")
         root_html = (ROOT / "index.html").read_text(encoding="utf-8")
         sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
         llms = (ROOT / "llms.txt").read_text(encoding="utf-8")
-        self.assertIn("fetch('./catalog.json')", workshop_html)
+        self.assertIn('src="/workshop/workshop.js"', workshop_html)
+        self.assertIn('href="/workshop/workshop.css"', workshop_html)
+        self.assertIn("fetch('/workshop/catalog.json')", workshop_js)
         self.assertIn('data-filter="models"', workshop_html)
         self.assertIn('href="/workshop/"', root_html)
         self.assertIn("https://waterfall.sh/workshop/", sitemap)
         self.assertIn("workshop/catalog.json", llms)
+
+    def test_static_site_has_no_javascript_and_load_failure_fallbacks(self):
+        workshop_html = (WORKSHOP / "index.html").read_text(encoding="utf-8")
+        workshop_js = (WORKSHOP / "workshop.js").read_text(encoding="utf-8")
+        self.assertIn("<noscript>", workshop_html)
+        self.assertIn('href="/workshop/catalog.json"', workshop_html)
+        self.assertIn('href="/workshop/README.md"', workshop_html)
+        self.assertIn("interactive catalog could not load", workshop_js)
+
+    def test_workshop_assets_match_the_deployment_contract(self):
+        workshop_html = (WORKSHOP / "index.html").read_text(encoding="utf-8")
+        vercel = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
+        csp = next(
+            header["value"]
+            for rule in vercel["headers"]
+            for header in rule["headers"]
+            if header["key"] == "Content-Security-Policy"
+        )
+        self.assertIn("script-src 'self'", csp)
+        self.assertIn("style-src 'self'", csp)
+        self.assertNotIn("<style", workshop_html)
+        self.assertIsNone(re.search(r"<script(?![^>]+\bsrc=)", workshop_html))
+        self.assertIsNone(re.search(r"\sstyle=", workshop_html))
+
+        ignore_rules = {
+            line.strip()
+            for line in (ROOT / ".vercelignore").read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.startswith("#")
+        }
+        self.assertNotIn("*.md", ignore_rules, "recursive Markdown ignore hides workshop resources")
+        self.assertIn("/*.md", ignore_rules, "root handoff Markdown should remain excluded")
+        for resource in ("README.md", "AUDIT.md"):
+            self.assertTrue((WORKSHOP / resource).is_file())
 
 
 if __name__ == "__main__":

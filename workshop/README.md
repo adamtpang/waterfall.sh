@@ -39,7 +39,7 @@ There is no single best model, IDE, skill, or MCP server. Every catalog entry ha
 - a task it is best for;
 - evidence for why it is included;
 - a reason not to enable it;
-- a default state: daily, optional, or reference;
+- a default state: hard-work, daily, routine, optional, pilot, or reference;
 - a source and a checked date.
 
 Arena rank is one signal. Local usage is another. Price, first-pass success, tool
