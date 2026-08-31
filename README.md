@@ -64,6 +64,16 @@ python3 cli.py desktop                         # local GUI (browser on 127.0.0.1
 Or install it as a command (`pip install -e .` from the repo root, then
 `waterfall classify/route/stats/models/desktop ...`).
 
+## Testing
+
+Run both suites from the repository root. The Python suite covers the router and
+deployment contract; the Node 18+ suite executes the workshop catalog interactions.
+
+```bash
+python3 -m unittest discover -s router/tests -p "test_*.py"
+node --test router/tests/workshop.test.mjs
+```
+
 ### Desktop GUI (`watertop`)
 
 After install, one word (works in **Git Bash**, PowerShell, and cmd):

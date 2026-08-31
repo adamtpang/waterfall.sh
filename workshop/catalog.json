@@ -3,6 +3,12 @@
   "title": "Waterfall Workshop",
   "updated_at": "2026-08-31",
   "summary": "A dated, evidence-backed catalog of models, coding surfaces, agent skills, and MCP servers for a Claude plus Codex workflow.",
+  "audit": {
+    "active_skills": 130,
+    "unused_skills_removed": 84,
+    "public_starter_skills": 3,
+    "affiliate_links": 0
+  },
   "principles": [
     "Choose for the task, not the logo.",
     "Treat rankings, pricing, and plan access as dated snapshots.",
