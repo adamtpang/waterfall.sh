@@ -432,6 +432,20 @@ project once the naming/branding direction was clear.
   anything on Windows): `pip install -e .` produced a real
   `waterfall.exe`, and running it bare rendered the full real dashboard.
 
+## Testing
+
+Run both suites from the repository root:
+
+```bash
+python3 -m unittest discover -s router/tests -p "test_*.py"
+node --test router/tests/workshop.test.mjs
+```
+
+The Python suite covers the router and static deployment contract. The Node 18+
+suite executes the workshop catalog's filtering, search, URL, recovery, and escaping
+paths. Run both before committing changes to `workshop/`, `.vercelignore`, or
+`vercel.json`.
+
 ## Design principles (from the 2026-08-04 token-saving pass)
 
 Distilled from a Nate B. Jones transcript on why LLM token usage compounds

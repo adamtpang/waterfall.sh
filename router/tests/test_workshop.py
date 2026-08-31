@@ -26,6 +26,15 @@ class WorkshopCatalogTests(unittest.TestCase):
         dt.date.fromisoformat(self.catalog["updated_at"])
         self.assertTrue(self.catalog["summary"].strip())
         self.assertGreaterEqual(len(self.catalog["principles"]), 4)
+        self.assertEqual(
+            {
+                "active_skills": 130,
+                "unused_skills_removed": 84,
+                "public_starter_skills": 3,
+                "affiliate_links": 0,
+            },
+            self.catalog["audit"],
+        )
 
         required = {"id", "title", "summary", "items"}
         for collection in self.catalog["collections"]:
@@ -122,6 +131,19 @@ class WorkshopCatalogTests(unittest.TestCase):
         self.assertIn('href="/workshop/"', root_html)
         self.assertIn("https://waterfall.sh/workshop/", sitemap)
         self.assertIn("workshop/catalog.json", llms)
+
+    def test_visible_snapshot_matches_catalog_metadata(self):
+        workshop_html = (WORKSHOP / "index.html").read_text(encoding="utf-8")
+        audit = self.catalog["audit"]
+        self.assertIn(f"Checked {self.catalog['updated_at']}", workshop_html)
+        for value in audit.values():
+            self.assertRegex(workshop_html, rf">{value}<")
+        public_skills = sum(
+            item["publisher"] == "Waterfall Workshop"
+            for collection in self.catalog["collections"]
+            for item in collection["items"]
+        )
+        self.assertEqual(audit["public_starter_skills"], public_skills)
 
     def test_static_site_has_no_javascript_and_load_failure_fallbacks(self):
         workshop_html = (WORKSHOP / "index.html").read_text(encoding="utf-8")

@@ -4,9 +4,9 @@ import test from 'node:test';
 import vm from 'node:vm';
 
 
-const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
-const catalog = JSON.parse(readFileSync(new URL('./catalog.json', import.meta.url), 'utf8'));
-const workshopScript = readFileSync(new URL('./workshop.js', import.meta.url), 'utf8');
+const html = readFileSync(new URL('../../workshop/index.html', import.meta.url), 'utf8');
+const catalog = JSON.parse(readFileSync(new URL('../../workshop/catalog.json', import.meta.url), 'utf8'));
+const workshopScript = readFileSync(new URL('../../workshop/workshop.js', import.meta.url), 'utf8');
 
 assert.match(html, /<script src="\/workshop\/workshop\.js" defer><\/script>/);
 
@@ -116,7 +116,8 @@ test('valid shelf deep link renders only the requested collection', async () => 
 
   assert.match(harness.root.innerHTML, /data-shelf="skills"/);
   assert.doesNotMatch(harness.root.innerHTML, /data-shelf="models"/);
-  assert.equal((harness.root.innerHTML.match(/<article class="card">/g) || []).length, 10);
+  const expected = catalog.collections.find(collection => collection.id === 'skills').items.length;
+  assert.equal((harness.root.innerHTML.match(/<article class="card">/g) || []).length, expected);
   assert.equal(pressed(harness, 'skills'), 'true');
   assert.equal(pressed(harness, 'all'), 'false');
 });
@@ -142,12 +143,14 @@ test('filter clicks update rendered cards, pressed state, and URL', async () => 
   assert.equal(pressed(harness, 'mcps'), 'true');
   assert.equal(new URL(harness.location.href).searchParams.get('shelf'), 'mcps');
   assert.equal(new URL(harness.location.href).searchParams.get('ref'), 'audit');
+  assert.equal(harness.historyCalls.length, 1);
 
   all.listeners.click();
   assert.match(harness.root.innerHTML, /data-shelf="skills"/);
   assert.equal(pressed(harness, 'all'), 'true');
   assert.equal(new URL(harness.location.href).searchParams.has('shelf'), false);
   assert.equal(new URL(harness.location.href).searchParams.get('ref'), 'audit');
+  assert.equal(harness.historyCalls.length, 2);
 });
 
 
@@ -270,3 +273,5 @@ test('missing optional tags and an empty collection render safely', async () => 
   });
   assert.equal(emptyHarness.root.innerHTML, '<div class="empty">No entries match that search.</div>');
 });
+
+
