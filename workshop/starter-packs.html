@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Developer Starter Packs | Waterfall Workshop</title>
+<meta name="description" content="Choose a developer archetype or take a short quiz, then generate an approval-first setup prompt for Codex or Claude.">
+<meta property="og:title" content="Waterfall Developer Starter Packs">
+<meta property="og:description" content="A developer class quiz that turns dated model, IDE, skill, and MCP rankings into one safe setup prompt.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://waterfall.sh/workshop/starter-packs">
+<link rel="canonical" href="https://waterfall.sh/workshop/starter-packs">
+<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/workshop/workshop.css">
+<link rel="stylesheet" href="/workshop/starter-packs.css">
+</head>
+<body>
+  <header class="wrap nav">
+    <a class="brand" href="/">
+      <img src="/brand/favicon.svg" alt="">
+      <span>waterfall<span class="tld">.sh</span></span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/workshop/">rankings</a>
+      <a href="#choose" class="keep">classes</a>
+      <a href="/workshop/README.md">readme</a>
+      <a href="https://github.com/adamtpang/waterfall.sh" class="keep">github</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="wrap packs-hero">
+      <div class="eyebrow">developer starter packs</div>
+      <h1>Choose your dev class.</h1>
+      <p class="lede">Pick an archetype directly or answer four questions. Waterfall turns the result into a small, dated stack and one setup prompt that asks before global installs, account access, paid inference, or write-capable MCP tools.</p>
+      <div class="pack-legend" aria-label="How the builder works">
+        <span><b>1</b> choose</span>
+        <span><b>2</b> inspect</span>
+        <span><b>3</b> approve</span>
+        <span><b>4</b> verify</span>
+      </div>
+    </section>
+
+    <section class="wrap pack-section" id="choose" aria-labelledby="choose-title">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">direct selection</div>
+          <h2 id="choose-title">Pick a class.</h2>
+        </div>
+        <p class="section-note">The class is a starting posture, not an identity test. You can edit the generated prompt before using it.</p>
+      </div>
+      <div class="class-grid" id="class-grid"><div class="empty">Loading developer classes...</div></div>
+    </section>
+
+    <section class="wrap pack-section builder-grid" aria-label="Starter pack builder">
+      <section class="panel quiz-panel" aria-labelledby="quiz-title">
+        <div class="panel-heading">
+          <div>
+            <div class="section-kicker">four-question quiz</div>
+            <h2 id="quiz-title">Let the workshop choose.</h2>
+          </div>
+          <span class="progress" id="quiz-progress">0 / 4</span>
+        </div>
+        <div id="quiz-root" aria-live="polite"><div class="empty">Loading the quiz...</div></div>
+      </section>
+
+      <section class="panel result-panel" aria-labelledby="result-title">
+        <div class="panel-heading">
+          <div>
+            <div class="section-kicker">your setup brief</div>
+            <h2 id="result-title">Choose a class to begin.</h2>
+          </div>
+          <span class="result-sigil" id="result-sigil" aria-hidden="true">?</span>
+        </div>
+        <div id="result-root" class="result-root">
+          <p>Your recommended tools, permission posture, and copy-ready setup prompt will appear here.</p>
+        </div>
+        <label class="prompt-label" for="setup-prompt">One-prompt setup brief</label>
+        <textarea id="setup-prompt" class="setup-prompt" rows="18" readonly placeholder="Choose a class or finish the quiz first."></textarea>
+        <div class="result-actions">
+          <button class="button primary" id="copy-prompt" type="button" disabled>copy setup prompt</button>
+          <button class="button" id="start-over" type="button" disabled>start over</button>
+        </div>
+        <p class="pack-status" id="pack-status" aria-live="polite">The builder is loading.</p>
+      </section>
+    </section>
+
+    <section class="wrap pack-section">
+      <div class="resource-bar">
+        <div>
+          <h2>Want the raw ingredients?</h2>
+          <p>Both the archetypes and the ranked catalog are plain JSON. No quiz answer leaves your browser.</p>
+        </div>
+        <div class="resource-links">
+          <a class="button primary" href="/workshop/packs.json">packs.json</a>
+          <a class="button" href="/workshop/catalog.json">catalog.json</a>
+          <a class="button" href="/workshop/">rankings</a>
+        </div>
+      </div>
+    </section>
+
+    <noscript><div class="wrap empty">JavaScript is off. Read <a href="/workshop/packs.json">packs.json</a> and <a href="/workshop/catalog.json">catalog.json</a> directly.</div></noscript>
+  </main>
+
+  <footer class="wrap">
+    <span>waterfall.sh · developer classes · no affiliate links</span>
+    <span><a href="/workshop/">rankings</a> · <a href="https://github.com/adamtpang/waterfall.sh">source</a></span>
+  </footer>
+
+<script src="/workshop/starter-packs.js" defer></script>
+</body>
+</html>

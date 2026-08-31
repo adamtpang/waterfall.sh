@@ -14,6 +14,7 @@ DESIGN.md, brand/                                   Design system + logo (SVG/PN
 index.html, site.css, vercel.json                  Landing page (static, zero build)
 about.html, contact.html, privacy.html, llms.txt   Public trust + agent guidance pages
 robots.txt, sitemap.xml                            Crawler policy + route index
+workshop/                                          Free model, IDE, skill, and MCP catalog
 router/                                             The actual routing logic (Python)
   openrouter_api_client.py                          Direct OpenRouter API client
   smart_router.py                                   Classify -> split -> route -> stitch
@@ -23,6 +24,22 @@ desktop/                                            Local desktop GUI (dashboard
 DESKTOP_GUI_LANDSCAPE.md                            OSS research for coding-agent desktop UIs
 CLAUDE.md                                           Full project handoff / status -- read this first
 ```
+
+## Free developer workshop
+
+[`workshop/`](workshop/) is the public, dated ranking of models, coding
+surfaces, skills, and MCP servers that survived a real usage audit. It includes
+three sanitized starter skills, six quiz-driven developer classes, and
+machine-readable `catalog.json` and `packs.json` sources.
+
+The curation rule is simple: every pick names a job, evidence, a reason not to
+use it, an official source, and a checked date. Third-party work is linked
+upstream instead of copied when licensing is unclear. Private paths,
+credentials, account data, and personal automations are never published.
+
+For a Claude plus Codex setup, use both during the week: one owns the change,
+the other plans or reviews. Do not wait for one plan to hit zero before moving a
+cold project into the other.
 
 ## Quick start (landing page)
 
@@ -47,6 +64,16 @@ python3 cli.py desktop                         # local GUI (browser on 127.0.0.1
 
 Or install it as a command (`pip install -e .` from the repo root, then
 `waterfall classify/route/stats/models/desktop ...`).
+
+## Testing
+
+Run both suites from the repository root. The Python suite covers the router and
+deployment contract; the Node 18+ suites execute the catalog and starter-pack interactions.
+
+```bash
+python3 -m unittest discover -s router/tests -p "test_*.py"
+node --test router/tests/workshop.test.mjs router/tests/starter-packs.test.mjs
+```
 
 ### Desktop GUI (`watertop`)
 
