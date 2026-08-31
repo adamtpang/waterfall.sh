@@ -17,18 +17,22 @@ Run classification before writing any substantial subtask in these categories:
 3. Extracting, transforming, or summarizing self-contained supplied text.
 4. Mechanical one-off work with no architecture or product decision.
 
+Write the subtask to a temporary UTF-8 file using the host's file-write API. Never
+interpolate prompt text into a shell command. Then classify the controlled file:
+
 ```bash
-waterfall classify "<self-contained subtask>"
+waterfall classify --file "<controlled-temp-path>"
 ```
 
 - `claude`: keep the task with the primary agent.
 - `free` or `split`: route the eligible part.
 
 ```bash
-waterfall route "<self-contained subtask>"
+waterfall route --file "<controlled-temp-path>"
 ```
 
-Review the routed result. Use it when correct. Fix or discard it when it is not.
+Review the routed result. Use it when correct. Fix or discard it when it is not, then
+remove the temporary file with the host's file API.
 
 ## Existing-file safety rule
 
