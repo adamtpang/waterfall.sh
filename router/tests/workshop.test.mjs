@@ -117,8 +117,16 @@ test('successful load renders every catalog shelf and item', async () => {
     assert.match(harness.root.innerHTML, new RegExp(`data-shelf="${collection.id}"`));
   }
   assert.equal(pressed(harness, 'all'), 'true');
-  assert.equal(harness.snapshot['snapshot-checked'].textContent, `Checked ${catalog.updated_at}`);
-  assert.equal(harness.snapshot['snapshot-active'].textContent, String(catalog.audit.active_skills));
+  const expectedSnapshot = {
+    'snapshot-checked': `Checked ${catalog.updated_at}`,
+    'snapshot-active': catalog.audit.active_skills,
+    'snapshot-removed': catalog.audit.unused_skills_removed,
+    'snapshot-public': catalog.audit.public_starter_skills,
+    'snapshot-affiliate': catalog.audit.affiliate_links,
+  };
+  for (const [id, value] of Object.entries(expectedSnapshot)) {
+    assert.equal(harness.snapshot[id].textContent, String(value));
+  }
 });
 
 
