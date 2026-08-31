@@ -130,6 +130,22 @@ test('successful load renders every catalog shelf and item', async () => {
 });
 
 
+test('ranked entries show numbered Waterfall-fit badges and references stay unranked', async () => {
+  const harness = await makeHarness();
+  const rankedCount = catalog.collections.reduce(
+    (count, collection) => count + collection.items.filter(item => item.ranking_eligible).length,
+    0,
+  );
+
+  assert.equal((harness.root.innerHTML.match(/class="rank"/g) || []).length, rankedCount);
+  assert.match(harness.root.innerHTML, /class="rank" title="Waterfall fit rank" aria-label="Waterfall fit rank 1">#1<\/span>/);
+  assert.doesNotMatch(
+    harness.root.innerHTML,
+    /class="rank"[^>]*>#[^<]+<\/span>[\s\S]{0,180}<h3>Agent Arena<\/h3>/,
+  );
+});
+
+
 test('valid shelf deep link renders only the requested collection', async () => {
   const harness = await makeHarness({ href: 'https://waterfall.sh/workshop/?shelf=skills' });
 
@@ -280,6 +296,16 @@ test('catalog values and tags are escaped before insertion into HTML', async () 
   assert.match(harness.root.innerHTML, /&quot;publisher&quot;/);
   assert.match(harness.root.innerHTML, /owner&#39;s role/);
   assert.doesNotMatch(harness.root.innerHTML, /onclick="alert/);
+});
+
+
+test('unsafe catalog source URLs are not rendered as executable links', async () => {
+  const unsafeUrlCatalog = structuredClone(catalog);
+  unsafeUrlCatalog.collections[0].items[0].url = 'javascript:alert(1)';
+  const harness = await makeHarness({ response: Promise.resolve(responseFor(unsafeUrlCatalog)) });
+
+  assert.doesNotMatch(harness.root.innerHTML, /href="javascript:/);
+  assert.match(harness.root.innerHTML, /href="#"/);
 });
 
 

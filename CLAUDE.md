@@ -44,8 +44,10 @@ project once the naming/branding direction was clear.
   root rewrite to `/index`: prebuilt Vercel deployments otherwise expose
   the clean `/index` asset but return 404 for `/`.
 - **Developer workshop**: `workshop/` is the public, no-paywall resource hub
-  for dated model, IDE, agent-skill, and MCP picks. `catalog.json` is the
+  for dated model, IDE, agent-skill, and MCP rankings. `catalog.json` is the
   machine-readable source; `index.html` renders it without a build step;
+  `starter-packs.html` plus `packs.json` provide six quiz-driven developer
+  classes and generate an approval-first setup prompt entirely in the browser;
   `AUDIT.md` records the public-safe 214-skill audit; and three sanitized
   Waterfall-authored starter skills live under `workshop/skills/`. Third-party
   material is linked upstream by default. Never publish raw configs,
@@ -438,12 +440,12 @@ Run both suites from the repository root:
 
 ```bash
 python3 -m unittest discover -s router/tests -p "test_*.py"
-node --test router/tests/workshop.test.mjs
+node --test router/tests/workshop.test.mjs router/tests/starter-packs.test.mjs
 ```
 
 The Python suite covers the router and static deployment contract. The Node 18+
-suite executes the workshop catalog's filtering, search, URL, recovery, and escaping
-paths. Run both before committing changes to `workshop/`, `.vercelignore`, or
+suites execute the catalog and starter-pack filtering, quiz, prompt, URL, copy,
+recovery, and escaping paths. Run both before committing changes to `workshop/`, `.vercelignore`, or
 `vercel.json`.
 
 ## Design principles (from the 2026-08-04 token-saving pass)
