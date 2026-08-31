@@ -36,6 +36,14 @@ project once the naming/branding direction was clear.
   (same dark chalkboard-style theme, mono/hand font pairing) for
   consistency across Adam's project portfolio. Swap the accent color /
   copy freely, the structure is just a starting point.
+- **Developer workshop**: `workshop/` is the public, no-paywall resource hub
+  for dated model, IDE, agent-skill, and MCP picks. `catalog.json` is the
+  machine-readable source; `index.html` renders it without a build step;
+  `AUDIT.md` records the public-safe 214-skill audit; and three sanitized
+  Waterfall-authored starter skills live under `workshop/skills/`. Third-party
+  material is linked upstream by default. Never publish raw configs,
+  credentials, account identifiers, absolute paths, private project names, or
+  personal-only skills. The root `llms.txt` makes the workshop agent-readable.
 - **Router core**: `router/`: this is real, tested, working Python, not a
   stub:
   - `router/openrouter_api_client.py`: direct HTTP client for OpenRouter's
