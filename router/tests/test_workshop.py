@@ -95,7 +95,7 @@ class WorkshopCatalogTests(unittest.TestCase):
         signals = {signal["name"]: signal for signal in ranking["signals"]}
         self.assertEqual({"Agent Arena", "skills.sh", "MCP Registry", "mcp.directory"}, set(signals))
         self.assertIn("not task performance", signals["skills.sh"]["limit"])
-        self.assertIn("No public ranking methodology", signals["mcp.directory"]["limit"])
+        self.assertIn("GitHub stars", signals["mcp.directory"]["limit"])
 
         for collection in self.catalog["collections"]:
             ranks = sorted(item["rank"] for item in collection["items"] if item["ranking_eligible"])
@@ -130,6 +130,17 @@ class WorkshopCatalogTests(unittest.TestCase):
                 self.assertTrue(option["scores"])
                 self.assertFalse(set(option["scores"]) - set(archetype_ids))
                 self.assertTrue(all(isinstance(points, int) and points > 0 for points in option["scores"].values()))
+
+    def test_current_audit_recommendations_are_cataloged(self):
+        items = {
+            item["id"]: item
+            for collection in self.catalog["collections"]
+            for item in collection["items"]
+        }
+        self.assertEqual("pilot", items["mcp-security-audit-skill"]["default_state"])
+        self.assertEqual("pilot", items["context7-mcp"]["default_state"])
+        self.assertIn("two focused tools", items["context7-mcp"]["evidence"])
+        self.assertIn("inconsistent server totals", items["mcp-directory"]["avoid"])
 
     def test_public_workshop_has_no_private_machine_markers(self):
         forbidden = (

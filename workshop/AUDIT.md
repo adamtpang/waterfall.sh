@@ -1,12 +1,28 @@
 # Public skill and MCP audit
 
-Snapshot: 2026-08-30
+Snapshot: 2026-09-03
 
-This is the public-safe result of a local audit across Claude, Codex, and Grok skill
-roots plus configured MCP servers. Raw histories, configuration files, credentials,
-private paths, and quarantine manifests are not part of this repository.
+This is the public-safe result of a local audit across shared agent, Claude, Codex,
+and Codex plugin skill surfaces plus configured MCP servers. Raw histories,
+configuration files, credentials, private paths, and quarantine manifests are not
+part of this repository.
 
-## Skill result
+## Current inventory result
+
+- 565 active-surface skill files were found across four agent surfaces.
+- Those files declared 352 unique skill names.
+- 183 names had multiple copies across surfaces.
+- 61 duplicated names had different contents, so behavior can vary by host.
+- 30 MCP configuration entries resolved to 17 unique names across the inspected
+  hosts.
+- 21 Codex remote plugin packages were installed.
+
+The full names-only report stays local. It deliberately excludes commands,
+arguments, URLs, headers, environment values, credentials, and project paths.
+The strongest finding is consolidation, not expansion: duplicated skills and
+drifted copies create more immediate risk than a missing general-purpose skill.
+
+## Earlier cleanup baseline
 
 - 214 standalone skill names were reviewed.
 - 84 names with no observed invocation or read were removed from active roots.
@@ -30,6 +46,26 @@ but rare, or heavily invoked because a hook keeps rediscovering it.
 | `research-report` | recurring | publish sanitized | General research discipline, safe after removing personal references |
 | `waterfall` | project skill | publish sanitized | Core routine-work routing behavior for this repository |
 
+## Three-skill bundle review
+
+A supplied bundle containing `direct-response-copy`, `seo-content`, and
+`content-atomizer` was extracted into a local quarantine but not installed or
+copied into this repository.
+
+- The bundle contains no redistribution license.
+- Its `CLAUDE.md` files contain local activity-memory material that must not be
+  published.
+- The skills and reference files are large enough to impose substantial context
+  cost.
+- `content-atomizer` asks the agent to inspect `.env` for social scheduling keys
+  and can connect to publishing workflows. That violates a least-secret-access,
+  draft-only posture.
+- Several instructions assume private memory files that are not included.
+
+The safe path is to measure whether these workflows recur, then write smaller
+project-scoped skills with explicit inputs. Any content workflow should produce
+drafts only and leave external publishing to the user.
+
 ## MCP result
 
 The audit found one clear daily default: a local JavaScript scratchpad used for
@@ -41,6 +77,12 @@ small computations and data shaping. Everything else earned an optional state.
 | Firecrawl | 56 calls | optional | link official source and docs |
 | Neon | 10 calls | optional | link official source and require scoped credentials |
 | browser, messaging, music, and project-specific servers | mixed | off | omit private configuration and publish only safe upstream links |
+
+The 2026-09-03 directory pass produced one practical MCP pilot: Context7 for
+version-specific public library documentation. It also produced one narrowly
+useful skill candidate: GitHub's MCP security audit. Neither was installed during
+the audit. Existing GitHub, Firecrawl, filesystem, database, notes, and browser
+capabilities should be consolidated before adding equivalents from a directory.
 
 ## What was not published
 

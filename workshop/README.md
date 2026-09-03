@@ -49,8 +49,9 @@ Every catalog entry has:
 
 Arena rank is one signal. Local usage is another. Price, first-pass success, tool
 reliability, privacy, and setup cost all matter. skills.sh install telemetry is a
-popularity signal, not a task-quality score. mcp.directory is useful for discovery,
-but no public ranking methodology was verified during the 2026-08-31 review.
+popularity signal, not a task-quality score. mcp.directory exposes leaderboards by
+GitHub stars, installs, and views. Its default star ranking is still not a task-fit,
+maintenance, or security score.
 
 ## Developer classes
 
@@ -95,6 +96,21 @@ the maintainer's machine. The public result is deliberately smaller.
   permission, and maintenance cost they add.
 
 See [`AUDIT.md`](./AUDIT.md) for the public-safe audit record.
+
+To generate a private names-only report from a local checkout:
+
+```bash
+python -m router.tool_inventory --output local-skill-mcp-inventory.md
+```
+
+The report suppresses commands, arguments, URLs, headers, environment values,
+credentials, and project paths. Keep it private because even tool names can reveal
+personal workflows.
+
+The 2026-09-03 pass found two candidates worth a controlled pilot, not a bulk
+install: GitHub's MCP security-audit skill and Upstash's Context7 MCP. Context7
+should be enabled only while current library documentation is needed. Existing
+capabilities should be consolidated before adding equivalent servers or skills.
 
 ## Refresh cadence
 
