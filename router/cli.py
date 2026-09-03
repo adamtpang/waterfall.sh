@@ -5,6 +5,10 @@ it's down or rate-limited), and log what that kept off Claude's plate.
     python3 -m router.cli classify "explain this traceback: ..."
     python3 -m router.cli route "..." --dry-run
     python3 -m router.cli route "..."
+    python3 -m router.cli run "fix the flaky auth test"
+    python3 -m router.cli why
+    python3 -m router.cli leaderboard --publish
+    python3 -m router.cli bench --suite coding-smoketest --models grok-4.6,glm-5.3
     python3 -m router.cli stats
     python3 -m router.cli claude-usage --by-day
     python3 -m router.cli hook-log --verbose
@@ -29,6 +33,7 @@ actually got kept off Claude.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import subprocess
 import sys
@@ -89,17 +94,161 @@ def _add_prompt_args(sp: argparse.ArgumentParser) -> None:
     sp.add_argument("--file", help="read the prompt from a file instead of the argument")
 
 
+def _add_coding_signal_args(sp: argparse.ArgumentParser) -> None:
+    sp.add_argument("--repo-file-count", type=int, default=0,
+                    help="files touched in the previous session, when known")
+    sp.add_argument("--language", action="append", default=[],
+                    help="repository language signal; repeat for multiple languages")
+    sp.add_argument("--test-runner", action="store_true",
+                    help="signal that the repository has an executable test runner")
+    sp.add_argument("--previous-harden-failed", action="store_true",
+                    help="the same task already failed the harden tier")
+
+
 def cmd_classify(args: argparse.Namespace) -> int:
+    from waterfall_policy import RepoSignals, RoutingPolicy
+
     prompt = _read_prompt(args)
-    router = SmartRouter()
-    cls = router.classify(prompt)
-    print(f"routing:      {cls.routing}")
-    print(f"complexity:   {cls.complexity_score}")
-    print(f"confidence:   {cls.confidence}")
-    print(f"est free pct: {cls.estimated_free_pct:.0%}")
-    print(f"task types:   {', '.join(cls.task_types) or '(none)'}")
-    print(f"domains:      {', '.join(cls.domains) or '(none)'}")
-    print(f"reasoning:    {cls.reasoning}")
+    signals = RepoSignals(
+        file_count=args.repo_file_count,
+        languages=tuple(args.language or []),
+        test_runner_present=args.test_runner,
+        previous_harden_failed=args.previous_harden_failed,
+    )
+    decision = RoutingPolicy().classify(
+        prompt, signals, tier=args.tier, effort=args.effort
+    )
+    print(json.dumps(decision.to_dict(), indent=2))
+    return 0
+
+
+def _repo_signals_from_args(args: argparse.Namespace, prompt: str = ""):
+    from waterfall_policy import RepoSignals, same_task_failed_harden
+
+    return RepoSignals(
+        file_count=args.repo_file_count,
+        languages=tuple(args.language or []),
+        test_runner_present=args.test_runner,
+        previous_harden_failed=(
+            args.previous_harden_failed or bool(prompt and same_task_failed_harden(prompt))
+        ),
+    )
+
+
+def cmd_run(args: argparse.Namespace) -> int:
+    from waterfall_policy import RoutingPolicy, RunTrace, format_why, save_trace
+
+    prompt = _read_prompt(args)
+    policy = RoutingPolicy()
+    signals = _repo_signals_from_args(args, prompt)
+    decision = policy.classify(prompt, signals, tier=args.tier, effort=args.effort)
+
+    if args.dry_run:
+        from waterfall_policy import task_hash
+        trace = RunTrace(
+            task_preview=prompt[:200], classified=decision.to_dict(), task_hash=task_hash(prompt)
+        )
+        if not (set(decision.suggested_models) & policy.fable_models()):
+            trace.skipped.append("claude-fable-5.1")
+        save_trace(trace)
+        print(json.dumps(decision.to_dict(), indent=2))
+        print("\ndry run: no model contacted")
+        return 0
+
+    try:
+        from waterfall_run import execute_waterfall
+        result = execute_waterfall(
+            prompt,
+            policy=policy,
+            signals=signals,
+            tier=args.tier,
+            effort=args.effort,
+            no_cap=args.no_cap,
+        )
+    except Exception as exc:
+        print(f"waterfall run failed: {exc}", file=sys.stderr)
+        return 1
+
+    save_trace(result.trace)
+    print(format_why(result.trace))
+    if result.output:
+        print("\n--- author output ---")
+        print(result.output)
+    return 0 if result.passed else 2
+
+
+def cmd_why(_args: argparse.Namespace) -> int:
+    from waterfall_policy import format_why, load_trace
+
+    try:
+        trace = load_trace()
+    except (FileNotFoundError, ValueError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+    print(format_why(trace))
+    return 0
+
+
+def cmd_leaderboard(args: argparse.Namespace) -> int:
+    import leaderboard
+
+    board = leaderboard.build_leaderboard()
+    if args.publish:
+        json_path, csv_path = leaderboard.publish_leaderboard(board)
+        print(f"published: {json_path}")
+        print(f"published: {csv_path}")
+    print(leaderboard.format_table(board))
+    return 0
+
+
+def cmd_bench(args: argparse.Namespace) -> int:
+    import bench
+
+    models = [model.strip() for model in args.models.split(",") if model.strip()]
+    if not models:
+        print("--models needs at least one comma-separated model alias", file=sys.stderr)
+        return 2
+    try:
+        suite = bench.load_suite(args.suite)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"could not load benchmark suite: {exc}", file=sys.stderr)
+        return 2
+
+    tasks = suite["tasks"][:args.limit] if args.limit else suite["tasks"]
+    if args.dry_run:
+        print(f"suite: {suite['id']} ({len(tasks)} of {len(suite['tasks'])} tasks)")
+        print("models: " + ", ".join(models))
+        for task in tasks:
+            print(f"  {task['id']:<30} {task['category']}")
+        print("dry run: no model contacted and no JSONL written")
+        return 0
+
+    output_path = Path(args.output) if args.output else None
+
+    def progress(attempt) -> None:
+        result = "pass" if attempt.passed else "fail"
+        print(
+            f"{attempt.model:<22} {attempt.task_id:<30} {result:<4} "
+            f"${attempt.cost_usd:.4f} {attempt.wall_time:.1f}s"
+        )
+
+    try:
+        attempts = bench.run_suite(
+            suite,
+            models,
+            effort=args.effort,
+            output_path=output_path,
+            limit=args.limit,
+            progress=progress,
+        )
+    except Exception as exc:
+        print(f"benchmark stopped: {exc}", file=sys.stderr)
+        return 1
+    passed = sum(attempt.passed for attempt in attempts)
+    spent = sum(attempt.cost_usd for attempt in attempts)
+    print(f"\n{passed}/{len(attempts)} passed · ${spent:.4f} total")
+    print(f"records: {output_path or bench.DEFAULT_RUNS_DIR / (datetime.now(timezone.utc).date().isoformat() + '.jsonl')}")
+    print("rebuild feeds: waterfall leaderboard --publish")
     return 0
 
 
@@ -623,9 +772,40 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sub = p.add_subparsers(dest="command", required=False)
 
-    sp = sub.add_parser("classify", help="classify a prompt -- no network calls")
+    sp = sub.add_parser("classify", help="classify a coding task to the cheapest likely tier")
     _add_prompt_args(sp)
+    _add_coding_signal_args(sp)
+    sp.add_argument("--tier", choices=["draft", "implement", "harden", "escalate", "ceiling"])
+    sp.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"])
     sp.set_defaults(func=cmd_classify)
+
+    sp = sub.add_parser("run", help="author, independently review, and promote only on blocking failure")
+    _add_prompt_args(sp)
+    _add_coding_signal_args(sp)
+    sp.add_argument("--tier", choices=["draft", "implement", "harden", "escalate", "ceiling"],
+                    help="pin the starting coding tier")
+    sp.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"],
+                    help="pin effort within the starting tier's allowed range")
+    sp.add_argument("--no-cap", action="store_true", help="allow more than two promotions")
+    sp.add_argument("--dry-run", action="store_true", help="classify and save the trace without model calls")
+    sp.set_defaults(func=cmd_run)
+
+    sp = sub.add_parser("why", help="explain the last run's route, attempts, cost, and promotions")
+    sp.set_defaults(func=cmd_why)
+
+    sp = sub.add_parser("leaderboard", help="print the bang-for-buck leaderboard")
+    sp.add_argument("--publish", action="store_true", help="rebuild the public JSON and CSV feeds")
+    sp.set_defaults(func=cmd_leaderboard)
+
+    sp = sub.add_parser("bench", help="run the small coding harness and append task-level JSONL")
+    sp.add_argument("--suite", default="coding-smoketest", help="suite id under data/suites")
+    sp.add_argument("--models", required=True, help="comma-separated routing model aliases")
+    sp.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"],
+                    help="override effort when the selected model's tier allows it")
+    sp.add_argument("--output", help="append JSONL to this path instead of data/runs/YYYY-MM-DD.jsonl")
+    sp.add_argument("--limit", type=int, help="run only the first N tasks per model")
+    sp.add_argument("--dry-run", action="store_true", help="show the matrix without model calls or writes")
+    sp.set_defaults(func=cmd_bench)
 
     sp = sub.add_parser("route", help="classify, split, and route via OpenRouter")
     _add_prompt_args(sp)

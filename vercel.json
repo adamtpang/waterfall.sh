@@ -6,6 +6,18 @@
     {
       "source": "/",
       "destination": "/index"
+    },
+    {
+      "source": "/badge/value.svg",
+      "destination": "/api/badge"
+    },
+    {
+      "source": "/api/leaderboard.json",
+      "destination": "/api/leaderboard-feed?format=json"
+    },
+    {
+      "source": "/api/leaderboard.csv",
+      "destination": "/api/leaderboard-feed?format=csv"
     }
   ],
   "headers": [

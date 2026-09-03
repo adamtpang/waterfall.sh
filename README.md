@@ -12,6 +12,10 @@ plan's quota last the full day instead of the first hour.
 ```
 DESIGN.md, brand/                                   Design system + logo (SVG/PNG/ICO)
 index.html, site.css, vercel.json                  Landing page (static, zero build)
+leaderboard.html, leaderboard.css/js               Public bang-for-buck table
+api/leaderboard.json, api/leaderboard.csv           Generated read-only feeds
+config/routing.yaml                                 Versioned coding tiers, models, and promotion rules
+data/                                               Dated snapshot, smoke suite, and local run records
 about.html, contact.html, privacy.html, llms.txt   Public trust + agent guidance pages
 robots.txt, sitemap.xml                            Crawler policy + route index
 workshop/                                          Free model, IDE, skill, and MCP catalog
@@ -60,18 +64,48 @@ npx vercel --prod        # deploys production and updates https://waterfall.sh
 
 ```bash
 cd router
-pip install -r requirements.txt   # just `requests`
+pip install -r requirements.txt   # requests + PyYAML
 export OPENROUTER_API_KEY=sk-or-...   # get one at https://openrouter.ai/keys
 python3 -m unittest discover -s tests -p "test_*.py"
 
-python3 cli.py classify "your prompt here"     # free, no network
+python3 cli.py classify "your prompt here"     # JSON tier decision, no network
+python3 cli.py run "fix the flaky auth test"   # author, review, promote on blocking failure
+python3 cli.py why                              # inspect the last run and every promotion
+python3 cli.py leaderboard                      # print value per solved-task dollar
 python3 cli.py route "your prompt here"        # routes + logs to the savings ledger
 python3 cli.py stats                           # what's been kept off Claude so far
 python3 cli.py desktop                         # local GUI (browser on 127.0.0.1:8765)
 ```
 
 Or install it as a command (`pip install -e .` from the repo root, then
-`waterfall classify/route/stats/models/desktop ...`).
+`waterfall classify/run/why/leaderboard/bench/route/stats/models/desktop ...`).
+
+Run the complete 15-task harness when you intend to spend provider credits:
+
+```bash
+waterfall bench --suite coding-smoketest --models grok-4.6,glm-5.3,opus-5,fable-5.1
+waterfall leaderboard --publish
+```
+
+Use `--dry-run` to inspect the benchmark matrix without contacting a model or writing JSONL.
+
+## Routing policy
+
+1. Peak coding quality is not the same thing as the best dollars per solved task.
+2. The versioned policy lives in [`config/routing.yaml`](config/routing.yaml), not scattered conditionals.
+3. A Flash-class candidate classifies hardness, language, repository span, and tool need.
+4. Draft work starts on DeepSeek V4 Flash, MiniMax M3, or GLM-5.3-Flash.
+5. Normal implementation starts on Grok 4.6 or GLM-5.3, with Kimi K3 preferred for frontend work.
+6. Repository-spanning work starts at the harden tier on Opus 5 or a GPT-5.6 peer.
+7. Fable 5.1 is the quality ceiling, never the ordinary starting model.
+8. Fable may start only for an explicit escalation, a can't-be-wrong request, or qualifying high-risk history.
+9. The author never reviews its own patch with the same model and tier.
+10. Tests, concrete blocking rejects, stuck authors, empty diffs, repo reverts, or user escalation can promote.
+11. Style, verbosity, missing comments, elegance, and requests for a smarter model cannot promote.
+12. A task gets at most two promotions unless the user passes `--no-cap`.
+13. Fable uses adaptive thinking steered by effort; Waterfall never sends `thinking.disabled`.
+14. `waterfall why` keeps the route, attempts, costs, skips, and promotion reasons inspectable.
+15. [`/leaderboard`](https://waterfall.sh/leaderboard) ranks the dated snapshot and harness rows by quality per solved-task dollar.
 
 ## Testing
 
@@ -80,7 +114,7 @@ deployment contract; the Node 18+ suites execute the catalog and starter-pack in
 
 ```bash
 python3 -m unittest discover -s router/tests -p "test_*.py"
-node --test router/tests/workshop.test.mjs router/tests/starter-packs.test.mjs
+node --test router/tests/workshop.test.mjs router/tests/starter-packs.test.mjs router/tests/leaderboard.test.mjs
 ```
 
 ### Desktop GUI (`watertop`)

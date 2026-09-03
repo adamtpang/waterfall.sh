@@ -3,7 +3,7 @@ name = "waterfall-router"
 version = "0.1.0"
 description = "Cascade to the best model, automatically -- classify a prompt, route the routine part to the cheapest capable OpenRouter model, keep a ledger of what it saved."
 requires-python = ">=3.9"
-dependencies = ["requests>=2.31.0"]
+dependencies = ["requests>=2.31.0", "PyYAML>=6.0,<7"]
 
 [project.scripts]
 waterfall = "router.cli:main"

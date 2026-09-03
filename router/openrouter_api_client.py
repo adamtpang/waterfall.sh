@@ -105,6 +105,7 @@ class GenerateResult:
     output_tokens: int = 0
     cost_usd: float = 0.0
     elapsed_sec: float = 0.0
+    cache_read_tokens: int = 0
     queue: List[str] = field(default_factory=list)
     attempts: List[Dict[str, Any]] = field(default_factory=list)
 
@@ -297,12 +298,13 @@ class OpenRouterClient:
         temperature: float = 0.7,
         max_tokens: int = 4096,
         system: Optional[str] = None,
+        output_effort: Optional[str] = None,
     ) -> str:
         """Simple string-in, string-out generation. Matches ProviderChain's
         `client.generate(prompt, temperature=...)` call site exactly."""
         return self.generate_with_usage(
             prompt, model=model, temperature=temperature,
-            max_tokens=max_tokens, system=system,
+            max_tokens=max_tokens, system=system, output_effort=output_effort,
         ).text
 
     def generate_with_usage(
@@ -313,6 +315,7 @@ class OpenRouterClient:
         temperature: float = 0.7,
         max_tokens: int = 4096,
         system: Optional[str] = None,
+        output_effort: Optional[str] = None,
         retries: int = 1,
         fallback_models: int = 3,
     ) -> GenerateResult:
@@ -361,6 +364,13 @@ class OpenRouterClient:
                 "temperature": temperature,
                 "max_tokens": max_tokens,
             }
+            if output_effort:
+                if "fable" in candidate_model.lower():
+                    # Fable thinking is adaptive and always on. Effort is the
+                    # steering control; never send a thinking.disabled flag.
+                    payload["output_config"] = {"effort": output_effort}
+                else:
+                    payload["reasoning"] = {"effort": output_effort}
 
             for attempt in range(retries + 1):
                 start = time.time()
@@ -432,6 +442,9 @@ class OpenRouterClient:
                 usage = data.get("usage", {}) or {}
                 input_tokens = usage.get("prompt_tokens", 0)
                 output_tokens = usage.get("completion_tokens", 0)
+                cache_read_tokens = usage.get("cache_read_tokens", 0) or (
+                    usage.get("prompt_tokens_details", {}) or {}
+                ).get("cached_tokens", 0)
                 cost = usage.get("cost")
                 if cost is None:
                     cost = self._estimate_cost(candidate_model, input_tokens, output_tokens)
@@ -449,6 +462,7 @@ class OpenRouterClient:
                     output_tokens=output_tokens,
                     cost_usd=cost,
                     elapsed_sec=round(elapsed, 2),
+                    cache_read_tokens=int(cache_read_tokens or 0),
                     queue=list(candidates),
                     attempts=attempts,
                 )

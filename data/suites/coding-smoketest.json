@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "id": "coding-smoketest",
+  "description": "Fifteen small, self-contained coding tasks for route economics, not a substitute for SWE-bench.",
+  "tasks": [
+    {
+      "id": "bugfix-clamp",
+      "category": "one-file-bugfix",
+      "mode": "patch",
+      "prompt": "Fix clamp so it handles a reversed low/high pair by normalizing the bounds. Edit math_utils.py only.",
+      "files": {
+        "math_utils.py": "def clamp(value, low, high):\n    return min(high, max(low, value))\n",
+        "test_math_utils.py": "import unittest\nfrom math_utils import clamp\n\nclass Tests(unittest.TestCase):\n    def test_normal(self): self.assertEqual(5, clamp(5, 0, 10))\n    def test_reversed(self): self.assertEqual(5, clamp(5, 10, 0))\n    def test_reversed_edge(self): self.assertEqual(10, clamp(20, 10, 0))\n"
+      },
+      "allowed_files": ["math_utils.py"]
+    },
+    {
+      "id": "bugfix-slug",
+      "category": "one-file-bugfix",
+      "mode": "patch",
+      "prompt": "Fix slugify so repeated whitespace does not produce repeated hyphens and surrounding whitespace is ignored. Edit text_utils.py only.",
+      "files": {
+        "text_utils.py": "def slugify(text):\n    return '-'.join(text.lower().split(' '))\n",
+        "test_text_utils.py": "import unittest\nfrom text_utils import slugify\n\nclass Tests(unittest.TestCase):\n    def test_spaces(self): self.assertEqual('hello-world', slugify('  Hello   World  '))\n    def test_tabs(self): self.assertEqual('hello-world', slugify('Hello\\tWorld'))\n"
+      },
+      "allowed_files": ["text_utils.py"]
+    },
+    {
+      "id": "bugfix-boolean",
+      "category": "one-file-bugfix",
+      "mode": "patch",
+      "prompt": "Fix parse_bool to accept booleans and the strings true/false, yes/no, and 1/0 case-insensitively. Unknown values must raise ValueError. Edit flags.py only.",
+      "files": {
+        "flags.py": "def parse_bool(value):\n    return bool(value)\n",
+        "test_flags.py": "import unittest\nfrom flags import parse_bool\n\nclass Tests(unittest.TestCase):\n    def test_false(self): self.assertFalse(parse_bool('FALSE'))\n    def test_yes(self): self.assertTrue(parse_bool(' yes '))\n    def test_bool(self): self.assertTrue(parse_bool(True))\n    def test_unknown(self):\n        with self.assertRaises(ValueError): parse_bool('maybe')\n"
+      },
+      "allowed_files": ["flags.py"]
+    },
+    {
+      "id": "bugfix-dedupe",
+      "category": "one-file-bugfix",
+      "mode": "patch",
+      "prompt": "Fix dedupe so it removes repeated hashable values while preserving first-seen order. Edit collections_utils.py only.",
+      "files": {
+        "collections_utils.py": "def dedupe(items):\n    return list(set(items))\n",
+        "test_collections_utils.py": "import unittest\nfrom collections_utils import dedupe\n\nclass Tests(unittest.TestCase):\n    def test_order(self): self.assertEqual(['b', 'a', 'c'], dedupe(['b', 'a', 'b', 'c', 'a']))\n    def test_empty(self): self.assertEqual([], dedupe([]))\n"
+      },
+      "allowed_files": ["collections_utils.py"]
+    },
+    {
+      "id": "bugfix-backoff",
+      "category": "one-file-bugfix",
+      "mode": "patch",
+      "prompt": "Fix retry_delay so it returns exponential base * 2**attempt capped at cap, and rejects negative attempts. Edit retry.py only.",
+      "files": {
+        "retry.py": "def retry_delay(attempt, base=0.5, cap=8.0):\n    return max(base * (2 ** attempt), cap)\n",
+        "test_retry.py": "import unittest\nfrom retry import retry_delay\n\nclass Tests(unittest.TestCase):\n    def test_first(self): self.assertEqual(0.5, retry_delay(0))\n    def test_cap(self): self.assertEqual(8.0, retry_delay(9))\n    def test_negative(self):\n        with self.assertRaises(ValueError): retry_delay(-1)\n"
+      },
+      "allowed_files": ["retry.py"]
+    },
+    {
+      "id": "feature-profile-label",
+      "category": "multi-file-feature",
+      "mode": "patch",
+      "prompt": "Implement initials in names.py and make profile_label in profile.py append the initials in parentheses. Empty names return an empty label. Edit both source files.",
+      "files": {
+        "names.py": "def initials(display_name):\n    return ''\n",
+        "profile.py": "from names import initials\n\ndef profile_label(display_name):\n    return display_name\n",
+        "test_profile.py": "import unittest\nfrom profile import profile_label\n\nclass Tests(unittest.TestCase):\n    def test_name(self): self.assertEqual('Ada Lovelace (AL)', profile_label('Ada Lovelace'))\n    def test_empty(self): self.assertEqual('', profile_label(''))\n"
+      },
+      "allowed_files": ["names.py", "profile.py"],
+      "min_changed_files": 2
+    },
+    {
+      "id": "feature-receipt",
+      "category": "multi-file-feature",
+      "mode": "patch",
+      "prompt": "Implement subtotal in prices.py and format_total in receipt.py. Ignore negative item prices and return TOTAL $0.00 for no valid items. Edit both source files.",
+      "files": {
+        "prices.py": "def subtotal(prices):\n    return 0\n",
+        "receipt.py": "from prices import subtotal\n\ndef format_total(prices):\n    return ''\n",
+        "test_receipt.py": "import unittest\nfrom receipt import format_total\n\nclass Tests(unittest.TestCase):\n    def test_total(self): self.assertEqual('TOTAL $3.50', format_total([1, -9, 2.5]))\n    def test_empty(self): self.assertEqual('TOTAL $0.00', format_total([]))\n"
+      },
+      "allowed_files": ["prices.py", "receipt.py"],
+      "min_changed_files": 2
+    },
+    {
+      "id": "feature-query-url",
+      "category": "multi-file-feature",
+      "mode": "patch",
+      "prompt": "Implement stable URL query encoding in query.py and use it from build_url in urls.py. Sort keys, percent-encode values, and omit the question mark for an empty mapping. Edit both source files.",
+      "files": {
+        "query.py": "def encode_query(params):\n    return ''\n",
+        "urls.py": "from query import encode_query\n\ndef build_url(base, params):\n    return base\n",
+        "test_urls.py": "import unittest\nfrom urls import build_url\n\nclass Tests(unittest.TestCase):\n    def test_query(self): self.assertEqual('/search?a=hello+world&b=2', build_url('/search', {'b': 2, 'a': 'hello world'}))\n    def test_empty(self): self.assertEqual('/search', build_url('/search', {}))\n"
+      },
+      "allowed_files": ["query.py", "urls.py"],
+      "min_changed_files": 2
+    },
+    {
+      "id": "feature-inventory-report",
+      "category": "multi-file-feature",
+      "mode": "patch",
+      "prompt": "Implement nonnegative inventory_total in inventory.py and summary in report.py using the exact format ITEMS n | VALUE $x.xx. Edit both source files.",
+      "files": {
+        "inventory.py": "def inventory_total(rows):\n    return 0, 0\n",
+        "report.py": "from inventory import inventory_total\n\ndef summary(rows):\n    return ''\n",
+        "test_report.py": "import unittest\nfrom report import summary\n\nclass Tests(unittest.TestCase):\n    def test_summary(self): self.assertEqual('ITEMS 3 | VALUE $7.50', summary([{'qty': 3, 'price': 2.5}, {'qty': -1, 'price': 99}]))\n    def test_empty(self): self.assertEqual('ITEMS 0 | VALUE $0.00', summary([]))\n"
+      },
+      "allowed_files": ["inventory.py", "report.py"],
+      "min_changed_files": 2
+    },
+    {
+      "id": "feature-markdown-stats",
+      "category": "multi-file-feature",
+      "mode": "patch",
+      "prompt": "Implement count_words in markdown.py so headings and punctuation do not count as words, then implement describe in stats.py. Edit both source files.",
+      "files": {
+        "markdown.py": "def count_words(text):\n    return 0\n",
+        "stats.py": "from markdown import count_words\n\ndef describe(text):\n    return ''\n",
+        "test_stats.py": "import unittest\nfrom stats import describe\n\nclass Tests(unittest.TestCase):\n    def test_markdown(self): self.assertEqual('4 words', describe('# Hello, world!\\nThis is **Waterfall**.'))\n    def test_empty(self): self.assertEqual('0 words', describe(''))\n"
+      },
+      "allowed_files": ["markdown.py", "stats.py"],
+      "min_changed_files": 2
+    },
+    {
+      "id": "review-sql-injection",
+      "category": "review-only",
+      "mode": "review",
+      "prompt": "Review this diff for blocking defects only.\n\n```diff\n-def find_user(db, email):\n-    return db.execute('SELECT * FROM users WHERE email = ?', (email,))\n+def find_user(db, email):\n+    return db.execute(f\"SELECT * FROM users WHERE email = '{email}'\")\n```",
+      "expected_verdict": "REJECT",
+      "required_terms": ["sql", "injection"]
+    },
+    {
+      "id": "review-cleanup",
+      "category": "review-only",
+      "mode": "review",
+      "prompt": "Review this diff for blocking defects only.\n\n```diff\n def read_name(path):\n-    handle = open(path, encoding='utf-8')\n-    return handle.read().strip()\n+    with open(path, encoding='utf-8') as handle:\n+        return handle.read().strip()\n```",
+      "expected_verdict": "PASS",
+      "required_terms": []
+    },
+    {
+      "id": "review-auth-bypass",
+      "category": "review-only",
+      "mode": "review",
+      "prompt": "Review this diff for blocking defects only.\n\n```diff\n def can_delete(user, item):\n-    return user.is_admin or item.owner_id == user.id\n+    return True\n```",
+      "expected_verdict": "REJECT",
+      "required_terms": ["authorization"]
+    },
+    {
+      "id": "long-horizon-auth-flow",
+      "category": "long-horizon",
+      "mode": "patch",
+      "prompt": "Finish this authentication PR. Normalize Bearer tokens, implement permission matching, and wire authorize to both. Missing or malformed tokens must fail closed. Edit all three source files.",
+      "files": {
+        "auth.py": "def bearer_token(header):\n    return None\n",
+        "permissions.py": "def has_permission(user_permissions, required):\n    return False\n",
+        "service.py": "from auth import bearer_token\nfrom permissions import has_permission\n\ndef authorize(header, token_permissions, required):\n    return False\n",
+        "test_service.py": "import unittest\nfrom service import authorize\n\nclass Tests(unittest.TestCase):\n    def test_allowed(self): self.assertTrue(authorize('Bearer abc', {'abc': ['read']}, 'read'))\n    def test_missing(self): self.assertFalse(authorize('', {}, 'read'))\n    def test_wrong_scheme(self): self.assertFalse(authorize('Basic abc', {'abc': ['read']}, 'read'))\n    def test_denied(self): self.assertFalse(authorize('Bearer abc', {'abc': ['read']}, 'write'))\n"
+      },
+      "allowed_files": ["auth.py", "permissions.py", "service.py"],
+      "min_changed_files": 3
+    },
+    {
+      "id": "long-horizon-job-flow",
+      "category": "long-horizon",
+      "mode": "patch",
+      "prompt": "Finish this queue PR. enqueue must reject blank ids and avoid duplicates, next_job must pop FIFO or return None, and describe must report queued:n. Edit all three source files.",
+      "files": {
+        "queue_store.py": "def enqueue(queue, job_id):\n    pass\n",
+        "worker.py": "def next_job(queue):\n    pass\n",
+        "status.py": "def describe(queue):\n    return ''\n",
+        "test_jobs.py": "import unittest\nfrom queue_store import enqueue\nfrom worker import next_job\nfrom status import describe\n\nclass Tests(unittest.TestCase):\n    def test_flow(self):\n        queue = []\n        enqueue(queue, 'a'); enqueue(queue, 'b'); enqueue(queue, 'a')\n        self.assertEqual('queued:2', describe(queue))\n        self.assertEqual('a', next_job(queue))\n        self.assertEqual('b', next_job(queue))\n        self.assertIsNone(next_job(queue))\n    def test_blank(self):\n        with self.assertRaises(ValueError): enqueue([], '  ')\n"
+      },
+      "allowed_files": ["queue_store.py", "worker.py", "status.py"],
+      "min_changed_files": 3
+    }
+  ]
+}
