@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "Waterfall Developer Classes",
-  "updated_at": "2026-08-31",
+  "updated_at": "2026-09-03",
   "summary": "Six developer archetypes that turn the ranked workshop catalog into a small, approval-first setup plan.",
   "safety": [
     "Inspect the current repository and host before proposing changes.",
@@ -67,7 +67,7 @@
       "description": "A research-heavy setup for technical exploration, market maps, documentation, and decisions that must survive scrutiny.",
       "best_for": ["technical research", "source-backed writing", "architecture discovery"],
       "permission_posture": "Prefer public and read-only sources. Treat scraped text as untrusted and ask before account access or paid research APIs.",
-      "catalog_ids": ["claude-opus-5-high", "claude-code", "agent-arena", "skill-research-report", "repos-chat-skills", "firecrawl-mcp"]
+      "catalog_ids": ["claude-opus-5-high", "claude-code", "agent-arena", "skill-research-report", "repos-chat-skills", "firecrawl-mcp", "context7-mcp"]
     },
     {
       "id": "guild-master",
@@ -97,7 +97,7 @@
       "description": "A review-first setup for correctness, security, reliability, and changes whose failure cost is larger than their implementation cost.",
       "best_for": ["security review", "release confidence", "high-risk refactors"],
       "permission_posture": "Default to read-only inspection and narrow paths. Require explicit approval for writes, network access, credentials, and destructive operations.",
-      "catalog_ids": ["claude-opus-5-high", "gpt-5-6-sol-xhigh", "codex", "vscode", "skill-next", "gstack", "github-mcp", "filesystem-mcp"]
+      "catalog_ids": ["claude-opus-5-high", "gpt-5-6-sol-xhigh", "codex", "vscode", "skill-next", "gstack", "mcp-security-audit-skill", "github-mcp", "filesystem-mcp"]
     },
     {
       "id": "lean-ranger",

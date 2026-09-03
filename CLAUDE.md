@@ -48,11 +48,21 @@ project once the naming/branding direction was clear.
   machine-readable source; `index.html` renders it without a build step;
   `starter-packs.html` plus `packs.json` provide six quiz-driven developer
   classes and generate an approval-first setup prompt entirely in the browser;
-  `AUDIT.md` records the public-safe 214-skill audit; and three sanitized
-  Waterfall-authored starter skills live under `workshop/skills/`. Third-party
-  material is linked upstream by default. Never publish raw configs,
+  `AUDIT.md` records the public-safe audit; and three sanitized Waterfall-authored
+  starter skills live under `workshop/skills/`. A 2026-09-03 rescan found 565
+  active-surface skill files, 352 unique names, 183 duplicated names, 61 drifted
+  duplicate names, 30 MCP configuration entries, 17 unique MCP names, and 21
+  installed Codex remote plugins. The full names-only report stays private.
+  `router/tool_inventory.py` can regenerate it while suppressing commands,
+  arguments, URLs, headers, environment values, credentials, and project paths.
+  Third-party material is linked upstream by default. Never publish raw configs,
   credentials, account identifiers, absolute paths, private project names, or
   personal-only skills. The root `llms.txt` makes the workshop agent-readable.
+  The same review added GitHub's `mcp-security-audit` skill and Upstash Context7
+  as pilot candidates, not automatic installs. A supplied three-skill content
+  bundle was extracted locally but not installed or republished because it lacked
+  a redistribution license, included private activity-memory files, imposed high
+  context cost, and included secret-scanning or publishing behavior.
 - **Router core**: `router/`: this is real, tested, working Python, not a
   stub:
   - `router/openrouter_api_client.py`: direct HTTP client for OpenRouter's
@@ -331,6 +341,14 @@ project once the naming/branding direction was clear.
     (correctly surfaced a 401), and again on 2026-08-04 with Adam's real
     `OPENROUTER_API_KEY` -- `route "Write a one-line docstring..."` actually
     called OpenRouter, got real usage/cost back, and logged a ledger entry.
+  - `router/tool_inventory.py`: a private, names-only cross-host inventory of
+    active skill surfaces, configured MCP names, enabled state, duplicate skill
+    copies, content drift, and installed Codex remote plugin package names. It
+    deliberately excludes commands, arguments, URLs, headers, environment values,
+    credentials, and project paths. `router/tests/test_tool_inventory.py` covers
+    backup exclusion, nested-repository exclusion, secret suppression, duplicate
+    drift, and plugin listing. The completed 2026-09-03 pass left the full Python
+    suite green at 269 tests and both workshop Node suites green at 23 tests.
 - **`install.py`**: one-line installer (`curl -sSL .../install.py |
   python3`) for a beta tester's machine: clones/updates into
   `~/.waterfall`, installs the one dependency, and merges (never
