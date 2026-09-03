@@ -91,7 +91,6 @@ file is written for these unless a real need is named later.
 - `interneta.world`
 - `iron.credit`
 - `lightmark.app`
-- `maans.love`
 - `megawatt.fun`
 - `moneymeta.fun`
 - `ness.city`
