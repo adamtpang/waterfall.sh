@@ -105,7 +105,14 @@
       tr.append(cell(number(row.quality_borrowed), 'borrowed'));
       tr.append(cell(sourceName(row.quality_source)));
       const price = row.free ? 'free' : `${money(row.price_in)} / ${money(row.price_out)}`;
-      tr.append(cell(price, row.free ? 'free-tag' : ''));
+      const priceCell = cell(price, row.free ? 'free-tag' : '');
+      (row.variants || []).forEach(v => {
+        const line = document.createElement('small');
+        line.className = 'variant-price';
+        line.textContent = `${v.suffix}: ${v.free ? 'free' : `${money(v.price_in)} / ${money(v.price_out)}`}`;
+        priceCell.append(line);
+      });
+      tr.append(priceCell);
       tr.append(cell(ctx(row.context)));
       tr.append(cell((row.efforts && row.efforts.length) ? row.efforts.join(', ') : ''));
       coverageBody.append(tr);

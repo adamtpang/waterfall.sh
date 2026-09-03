@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "as_of": "2026-09-03",
-  "generated_at": "2026-09-03T13:45:56.754301+00:00",
+  "generated_at": "2026-09-03T13:52:46.881992+00:00",
   "disclaimer": "Priors from public benches + list prices. Replace with waterfall.sh harness runs.",
   "formula": "value = 100 * (quality / max(cost_per_solved, 0.01)) / max(value_raw on board)",
   "methodology": {
@@ -199,32 +199,13 @@
   "coverage": {
     "note": "Borrowed scores for models the harness has not measured. quality_borrowed is Artificial Analysis coding_index where available, else intelligence_index, else Design Arena Elo rescaled to 0-100; quality_source says which. No cost_per_solved and no value: those exist only for measured rows above. Prices are OpenRouter list prices per 1M tokens.",
     "catalog_models_seen": 424,
-    "count": 220,
+    "count": 171,
+    "variants_folded": 49,
     "by_source": {
-      "aa:coding_index": 164,
-      "design_arena:elo_rescaled": 56
+      "aa:coding_index": 126,
+      "design_arena:elo_rescaled": 45
     },
     "rows": [
-      {
-        "model": "anthropic/claude-fable-5:batch",
-        "display": "Anthropic: Claude Fable 5 (batch)",
-        "quality_borrowed": 76.5,
-        "quality_source": "aa:coding_index",
-        "price_in": 5.0,
-        "price_out": 25.0,
-        "price_blended": 10.0,
-        "free": false,
-        "context": 1000000,
-        "efforts": [
-          "max",
-          "xhigh",
-          "high",
-          "medium",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
-      },
       {
         "model": "anthropic/claude-fable-5",
         "display": "Anthropic: Claude Fable 5",
@@ -243,25 +224,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "google/gemini-3.8-flash:batch",
-        "display": "Google: Gemini 3.8 Flash (batch)",
-        "quality_borrowed": 76.3,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.375,
-        "price_out": 1.875,
-        "price_blended": 0.75,
-        "free": false,
-        "context": 1048576,
-        "efforts": [
-          "high",
-          "medium",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "anthropic/claude-fable-5:batch",
+            "price_in": 5.0,
+            "price_out": 25.0,
+            "price_blended": 10.0,
+            "free": false
+          }
+        ]
       },
       {
         "model": "google/gemini-3.8-flash",
@@ -279,25 +252,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "google/gemini-3.7-flash:batch",
-        "display": "Google: Gemini 3.7 Flash (batch)",
-        "quality_borrowed": 76.1,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.375,
-        "price_out": 1.875,
-        "price_blended": 0.75,
-        "free": false,
-        "context": 1048576,
-        "efforts": [
-          "high",
-          "medium",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "google/gemini-3.8-flash:batch",
+            "price_in": 0.375,
+            "price_out": 1.875,
+            "price_blended": 0.75,
+            "free": false
+          }
+        ]
       },
       {
         "model": "google/gemini-3.7-flash",
@@ -315,27 +280,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-5.5:batch",
-        "display": "OpenAI: GPT-5.5 (batch)",
-        "quality_borrowed": 74.9,
-        "quality_source": "aa:coding_index",
-        "price_in": 2.5,
-        "price_out": 15.0,
-        "price_blended": 5.625,
-        "free": false,
-        "context": 1050000,
-        "efforts": [
-          "xhigh",
-          "high",
-          "medium",
-          "low",
-          "none"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "google/gemini-3.7-flash:batch",
+            "price_in": 0.375,
+            "price_out": 1.875,
+            "price_blended": 0.75,
+            "free": false
+          }
+        ]
       },
       {
         "model": "openai/gpt-5.5",
@@ -355,27 +310,17 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "anthropic/claude-opus-4.8:batch",
-        "display": "Anthropic: Claude Opus 4.8 (batch)",
-        "quality_borrowed": 74.3,
-        "quality_source": "aa:coding_index",
-        "price_in": 2.5,
-        "price_out": 12.5,
-        "price_blended": 5.0,
-        "free": false,
-        "context": 1000000,
-        "efforts": [
-          "max",
-          "xhigh",
-          "high",
-          "medium",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-5.5:batch",
+            "price_in": 2.5,
+            "price_out": 15.0,
+            "price_blended": 5.625,
+            "free": false
+          }
+        ]
       },
       {
         "model": "anthropic/claude-opus-4.8",
@@ -395,27 +340,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "anthropic/claude-opus-4.7:batch",
-        "display": "Anthropic: Claude Opus 4.7 (batch)",
-        "quality_borrowed": 73.6,
-        "quality_source": "aa:coding_index",
-        "price_in": 2.5,
-        "price_out": 12.5,
-        "price_blended": 5.0,
-        "free": false,
-        "context": 1000000,
-        "efforts": [
-          "max",
-          "xhigh",
-          "high",
-          "medium",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "anthropic/claude-opus-4.8:batch",
+            "price_in": 2.5,
+            "price_out": 12.5,
+            "price_blended": 5.0,
+            "free": false
+          }
+        ]
       },
       {
         "model": "anthropic/claude-opus-4.7",
@@ -435,7 +370,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "anthropic/claude-opus-4.7:batch",
+            "price_in": 2.5,
+            "price_out": 12.5,
+            "price_blended": 5.0,
+            "free": false
+          }
+        ]
       },
       {
         "model": "x-ai/grok-4.5",
@@ -453,7 +398,8 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "meta/muse-spark-1.2",
@@ -473,7 +419,8 @@
           "minimal"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3.8-2.4t-a95b",
@@ -491,25 +438,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "qwen/qwen3.8-2.4t-a95b:batch",
-        "display": "Qwen: Qwen3.8 2.4T A95B (batch)",
-        "quality_borrowed": 71.9,
-        "quality_source": "aa:coding_index",
-        "price_in": 2.0,
-        "price_out": 6.0,
-        "price_blended": 3.0,
-        "free": false,
-        "context": 1010000,
-        "efforts": [
-          "xhigh",
-          "medium",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "qwen/qwen3.8-2.4t-a95b:batch",
+            "price_in": 2.0,
+            "price_out": 6.0,
+            "price_blended": 3.0,
+            "free": false
+          }
+        ]
       },
       {
         "model": "qwen/qwen3.8-max",
@@ -529,7 +468,8 @@
           "minimal"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "z-ai/glm-5.3-flash",
@@ -547,45 +487,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "z-ai/glm-5.3-flash:batch",
-        "display": "Z.ai: GLM 5.3 Flash (batch)",
-        "quality_borrowed": 71.5,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.15,
-        "price_out": 0.5,
-        "price_blended": 0.2375,
-        "free": false,
-        "context": 1048575,
-        "efforts": [
-          "max",
-          "high",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "anthropic/claude-sonnet-5:batch",
-        "display": "Anthropic: Claude Sonnet 5 (batch)",
-        "quality_borrowed": 71.5,
-        "quality_source": "aa:coding_index",
-        "price_in": 1.0,
-        "price_out": 5.0,
-        "price_blended": 2.0,
-        "free": false,
-        "context": 1000000,
-        "efforts": [
-          "max",
-          "xhigh",
-          "high",
-          "medium",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "z-ai/glm-5.3-flash:batch",
+            "price_in": 0.15,
+            "price_out": 0.5,
+            "price_blended": 0.2375,
+            "free": false
+          }
+        ]
       },
       {
         "model": "anthropic/claude-sonnet-5",
@@ -605,28 +517,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-5.6-luna:batch",
-        "display": "OpenAI: GPT-5.6 Luna (batch)",
-        "quality_borrowed": 71.4,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.1,
-        "price_out": 0.6,
-        "price_blended": 0.225,
-        "free": false,
-        "context": 1050000,
-        "efforts": [
-          "max",
-          "xhigh",
-          "high",
-          "medium",
-          "low",
-          "none"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "anthropic/claude-sonnet-5:batch",
+            "price_in": 1.0,
+            "price_out": 5.0,
+            "price_blended": 2.0,
+            "free": false
+          }
+        ]
       },
       {
         "model": "openai/gpt-5.6-luna",
@@ -647,7 +548,17 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-5.6-luna:batch",
+            "price_in": 0.1,
+            "price_out": 0.6,
+            "price_blended": 0.225,
+            "free": false
+          }
+        ]
       },
       {
         "model": "meta/muse-spark-1.1",
@@ -667,27 +578,8 @@
           "minimal"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-5.4:batch",
-        "display": "OpenAI: GPT-5.4 (batch)",
-        "quality_borrowed": 71.1,
-        "quality_source": "aa:coding_index",
-        "price_in": 1.25,
-        "price_out": 7.5,
-        "price_blended": 2.8125,
-        "free": false,
-        "context": 1050000,
-        "efforts": [
-          "xhigh",
-          "high",
-          "medium",
-          "low",
-          "none"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-5.4",
@@ -707,26 +599,17 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "google/gemini-3.5-flash:batch",
-        "display": "Google: Gemini 3.5 Flash (batch)",
-        "quality_borrowed": 70.1,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.75,
-        "price_out": 4.5,
-        "price_blended": 1.6875,
-        "free": false,
-        "context": 1048576,
-        "efforts": [
-          "high",
-          "medium",
-          "low",
-          "minimal"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-5.4:batch",
+            "price_in": 1.25,
+            "price_out": 7.5,
+            "price_blended": 2.8125,
+            "free": false
+          }
+        ]
       },
       {
         "model": "google/gemini-3.5-flash",
@@ -745,26 +628,17 @@
           "minimal"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "anthropic/claude-opus-4.6:batch",
-        "display": "Anthropic: Claude Opus 4.6 (batch)",
-        "quality_borrowed": 69.7,
-        "quality_source": "design_arena:elo_rescaled",
-        "price_in": 2.5,
-        "price_out": 12.5,
-        "price_blended": 5.0,
-        "free": false,
-        "context": 1000000,
-        "efforts": [
-          "max",
-          "high",
-          "medium",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "google/gemini-3.5-flash:batch",
+            "price_in": 0.75,
+            "price_out": 4.5,
+            "price_blended": 1.6875,
+            "free": false
+          }
+        ]
       },
       {
         "model": "anthropic/claude-opus-4.6",
@@ -783,26 +657,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "google/gemini-3.6-flash:batch",
-        "display": "Google: Gemini 3.6 Flash (batch)",
-        "quality_borrowed": 69.2,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.375,
-        "price_out": 1.875,
-        "price_blended": 0.75,
-        "free": false,
-        "context": 1048576,
-        "efforts": [
-          "high",
-          "medium",
-          "low",
-          "minimal"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "anthropic/claude-opus-4.6:batch",
+            "price_in": 2.5,
+            "price_out": 12.5,
+            "price_blended": 5.0,
+            "free": false
+          }
+        ]
       },
       {
         "model": "google/gemini-3.6-flash",
@@ -821,7 +686,17 @@
           "minimal"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "google/gemini-3.6-flash:batch",
+            "price_in": 0.375,
+            "price_out": 1.875,
+            "price_blended": 0.75,
+            "free": false
+          }
+        ]
       },
       {
         "model": "deepseek/deepseek-v4-flash-0731",
@@ -839,25 +714,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "deepseek/deepseek-v4-flash-0731:batch",
-        "display": "DeepSeek: DeepSeek V4 Flash 0731 (batch)",
-        "quality_borrowed": 69.1,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.14,
-        "price_out": 0.28,
-        "price_blended": 0.175,
-        "free": false,
-        "context": 1048576,
-        "efforts": [
-          "max",
-          "high",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "deepseek/deepseek-v4-flash-0731:batch",
+            "price_in": 0.14,
+            "price_out": 0.28,
+            "price_blended": 0.175,
+            "free": false
+          }
+        ]
       },
       {
         "model": "z-ai/glm-5.2:free",
@@ -874,7 +741,8 @@
           "high"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "z-ai/glm-5.2",
@@ -891,7 +759,8 @@
           "high"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "deepseek/deepseek-v4-pro-0813",
@@ -909,43 +778,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "deepseek/deepseek-v4-pro-0813:batch",
-        "display": "DeepSeek: DeepSeek V4 Pro 0813 (batch)",
-        "quality_borrowed": 68.8,
-        "quality_source": "aa:coding_index",
-        "price_in": 1.32,
-        "price_out": 3.96,
-        "price_blended": 1.98,
-        "free": false,
-        "context": 1048576,
-        "efforts": [
-          "max",
-          "high",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "google/gemini-3.1-pro-preview:batch",
-        "display": "Google: Gemini 3.1 Pro Preview (batch)",
-        "quality_borrowed": 68.8,
-        "quality_source": "aa:coding_index",
-        "price_in": 1.0,
-        "price_out": 6.0,
-        "price_blended": 2.25,
-        "free": false,
-        "context": 1048576,
-        "efforts": [
-          "high",
-          "medium",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "deepseek/deepseek-v4-pro-0813:batch",
+            "price_in": 1.32,
+            "price_out": 3.96,
+            "price_blended": 1.98,
+            "free": false
+          }
+        ]
       },
       {
         "model": "google/gemini-3.1-pro-preview",
@@ -963,7 +806,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "google/gemini-3.1-pro-preview:batch",
+            "price_in": 1.0,
+            "price_out": 6.0,
+            "price_blended": 2.25,
+            "free": false
+          }
+        ]
       },
       {
         "model": "qwen/qwen3.8-27b",
@@ -981,7 +834,8 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "z-ai/glm-5-turbo",
@@ -995,7 +849,8 @@
         "context": 202752,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3.7-max",
@@ -1009,21 +864,8 @@
         "context": 1000000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "anthropic/claude-opus-4.5:batch",
-        "display": "Anthropic: Claude Opus 4.5 (batch)",
-        "quality_borrowed": 63.4,
-        "quality_source": "design_arena:elo_rescaled",
-        "price_in": 2.5,
-        "price_out": 12.5,
-        "price_blended": 5.0,
-        "free": false,
-        "context": 200000,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "anthropic/claude-opus-4.5",
@@ -1037,26 +879,17 @@
         "context": 200000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "anthropic/claude-sonnet-4.6:batch",
-        "display": "Anthropic: Claude Sonnet 4.6 (batch)",
-        "quality_borrowed": 63.0,
-        "quality_source": "aa:coding_index",
-        "price_in": 1.5,
-        "price_out": 7.5,
-        "price_blended": 3.0,
-        "free": false,
-        "context": 1000000,
-        "efforts": [
-          "max",
-          "high",
-          "medium",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "anthropic/claude-opus-4.5:batch",
+            "price_in": 2.5,
+            "price_out": 12.5,
+            "price_blended": 5.0,
+            "free": false
+          }
+        ]
       },
       {
         "model": "anthropic/claude-sonnet-4.6",
@@ -1075,7 +908,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "anthropic/claude-sonnet-4.6:batch",
+            "price_in": 1.5,
+            "price_out": 7.5,
+            "price_blended": 3.0,
+            "free": false
+          }
+        ]
       },
       {
         "model": "moonshotai/kimi-k2.6",
@@ -1089,7 +932,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "moonshotai/kimi-k2.7-code",
@@ -1103,7 +947,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "z-ai/glm-5",
@@ -1117,7 +962,8 @@
         "context": 204800,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "xiaomi/mimo-v2.5-pro",
@@ -1131,7 +977,8 @@
         "context": 1050000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "minimax/minimax-m2.5",
@@ -1145,7 +992,8 @@
         "context": 204800,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "minimax/minimax-m2.1",
@@ -1159,7 +1007,8 @@
         "context": 204800,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "kwaipilot/kat-coder-pro-v2",
@@ -1173,7 +1022,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "deepseek/deepseek-v4-pro",
@@ -1190,7 +1040,8 @@
           "high"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "nex-agi/nex-n2-pro",
@@ -1204,7 +1055,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "tencent/hy3-preview",
@@ -1222,21 +1074,8 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "anthropic/claude-opus-4.1:batch",
-        "display": "Anthropic: Claude Opus 4.1 (batch)",
-        "quality_borrowed": 57.8,
-        "quality_source": "design_arena:elo_rescaled",
-        "price_in": 7.5,
-        "price_out": 37.5,
-        "price_blended": 15.0,
-        "free": false,
-        "context": 200000,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "anthropic/claude-opus-4.1",
@@ -1250,7 +1089,17 @@
         "context": 200000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "anthropic/claude-opus-4.1:batch",
+            "price_in": 7.5,
+            "price_out": 37.5,
+            "price_blended": 15.0,
+            "free": false
+          }
+        ]
       },
       {
         "model": "tencent/hy3",
@@ -1268,7 +1117,8 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "xiaomi/mimo-v2.5",
@@ -1282,7 +1132,8 @@
         "context": 1050000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "x-ai/grok-4.20",
@@ -1296,27 +1147,8 @@
         "context": 2000000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-5.4-nano:batch",
-        "display": "OpenAI: GPT-5.4 Nano (batch)",
-        "quality_borrowed": 56.1,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.1,
-        "price_out": 0.625,
-        "price_blended": 0.2313,
-        "free": false,
-        "context": 400000,
-        "efforts": [
-          "xhigh",
-          "high",
-          "medium",
-          "low",
-          "none"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-5.4-nano",
@@ -1336,27 +1168,17 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-5.4-mini:batch",
-        "display": "OpenAI: GPT-5.4 Mini (batch)",
-        "quality_borrowed": 56.1,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.375,
-        "price_out": 2.25,
-        "price_blended": 0.8438,
-        "free": false,
-        "context": 400000,
-        "efforts": [
-          "xhigh",
-          "high",
-          "medium",
-          "low",
-          "none"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-5.4-nano:batch",
+            "price_in": 0.1,
+            "price_out": 0.625,
+            "price_blended": 0.2313,
+            "free": false
+          }
+        ]
       },
       {
         "model": "openai/gpt-5.4-mini",
@@ -1376,7 +1198,17 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-5.4-mini:batch",
+            "price_in": 0.375,
+            "price_out": 2.25,
+            "price_blended": 0.8438,
+            "free": false
+          }
+        ]
       },
       {
         "model": "anthropic/claude-opus-4",
@@ -1390,7 +1222,8 @@
         "context": 200000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3.7-plus",
@@ -1404,7 +1237,8 @@
         "context": 1000000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "z-ai/glm-5v-turbo",
@@ -1418,7 +1252,8 @@
         "context": 202752,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "z-ai/glm-4.5",
@@ -1432,7 +1267,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "z-ai/glm-5.1",
@@ -1446,7 +1282,8 @@
         "context": 204800,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "z-ai/glm-4.7-flash",
@@ -1460,7 +1297,8 @@
         "context": 202752,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "deepseek/deepseek-v3.2-exp",
@@ -1474,7 +1312,8 @@
         "context": 163840,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3.6-plus",
@@ -1488,7 +1327,8 @@
         "context": 1000000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-5.1-codex",
@@ -1506,7 +1346,8 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3.5-plus-02-15",
@@ -1520,7 +1361,8 @@
         "context": 1000000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3.6-27b",
@@ -1534,27 +1376,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-5.2:batch",
-        "display": "OpenAI: GPT-5.2 (batch)",
-        "quality_borrowed": 53.5,
-        "quality_source": "design_arena:elo_rescaled",
-        "price_in": 0.875,
-        "price_out": 7.0,
-        "price_blended": 2.4062,
-        "free": false,
-        "context": 400000,
-        "efforts": [
-          "xhigh",
-          "high",
-          "medium",
-          "low",
-          "none"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-5.2",
@@ -1574,7 +1397,17 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-5.2:batch",
+            "price_in": 0.875,
+            "price_out": 7.0,
+            "price_blended": 2.4062,
+            "free": false
+          }
+        ]
       },
       {
         "model": "thinkingmachines/inkling-small:free",
@@ -1595,7 +1428,8 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "thinkingmachines/inkling-small",
@@ -1616,28 +1450,17 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "thinkingmachines/inkling-small:batch",
-        "display": "Thinking Machines: Inkling Small (batch)",
-        "quality_borrowed": 52.9,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.5,
-        "price_out": 1.2,
-        "price_blended": 0.675,
-        "free": false,
-        "context": 524288,
-        "efforts": [
-          "max",
-          "high",
-          "medium",
-          "low",
-          "minimal",
-          "none"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "thinkingmachines/inkling-small:batch",
+            "price_in": 0.5,
+            "price_out": 1.2,
+            "price_blended": 0.675,
+            "free": false
+          }
+        ]
       },
       {
         "model": "upstage/solar-pro4",
@@ -1651,7 +1474,8 @@
         "context": 524288,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "minimax/minimax-m2.7:free",
@@ -1665,7 +1489,8 @@
         "context": 196608,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "minimax/minimax-m2.7",
@@ -1679,7 +1504,8 @@
         "context": 204800,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "z-ai/glm-4.5-air",
@@ -1693,7 +1519,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "minimax/minimax-m2",
@@ -1707,7 +1534,8 @@
         "context": 204800,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "thinkingmachines/inkling:free",
@@ -1728,7 +1556,8 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "thinkingmachines/inkling",
@@ -1749,42 +1578,17 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "thinkingmachines/inkling:batch",
-        "display": "Thinking Machines: Inkling (batch)",
-        "quality_borrowed": 52.1,
-        "quality_source": "aa:coding_index",
-        "price_in": 1.0,
-        "price_out": 4.05,
-        "price_blended": 1.7625,
-        "free": false,
-        "context": 524288,
-        "efforts": [
-          "max",
-          "high",
-          "medium",
-          "low",
-          "minimal",
-          "none"
-        ],
-        "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "anthropic/claude-sonnet-4.5:batch",
-        "display": "Anthropic: Claude Sonnet 4.5 (batch)",
-        "quality_borrowed": 52.1,
-        "quality_source": "aa:coding_index",
-        "price_in": 1.5,
-        "price_out": 7.5,
-        "price_blended": 3.0,
-        "free": false,
-        "context": 1000000,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "thinkingmachines/inkling:batch",
+            "price_in": 1.0,
+            "price_out": 4.05,
+            "price_blended": 1.7625,
+            "free": false
+          }
+        ]
       },
       {
         "model": "anthropic/claude-sonnet-4.5",
@@ -1798,7 +1602,17 @@
         "context": 1000000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "anthropic/claude-sonnet-4.5:batch",
+            "price_in": 1.5,
+            "price_out": 7.5,
+            "price_blended": 3.0,
+            "free": false
+          }
+        ]
       },
       {
         "model": "x-ai/grok-build-0.1",
@@ -1812,7 +1626,8 @@
         "context": 256000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "deepseek/deepseek-r1-0528",
@@ -1826,7 +1641,8 @@
         "context": 163840,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3-coder",
@@ -1840,7 +1656,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "inclusionai/ling-3.0-flash",
@@ -1854,26 +1671,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "google/gemini-3-flash-preview:batch",
-        "display": "Google: Gemini 3 Flash Preview (batch)",
-        "quality_borrowed": 50.2,
-        "quality_source": "design_arena:elo_rescaled",
-        "price_in": 0.25,
-        "price_out": 1.5,
-        "price_blended": 0.5625,
-        "free": false,
-        "context": 1048576,
-        "efforts": [
-          "high",
-          "medium",
-          "low",
-          "minimal"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "google/gemini-3-flash-preview",
@@ -1892,26 +1691,17 @@
           "minimal"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-5.1:batch",
-        "display": "OpenAI: GPT-5.1 (batch)",
-        "quality_borrowed": 49.4,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.625,
-        "price_out": 5.0,
-        "price_blended": 1.7188,
-        "free": false,
-        "context": 400000,
-        "efforts": [
-          "high",
-          "medium",
-          "low",
-          "none"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "google/gemini-3-flash-preview:batch",
+            "price_in": 0.25,
+            "price_out": 1.5,
+            "price_blended": 0.5625,
+            "free": false
+          }
+        ]
       },
       {
         "model": "openai/gpt-5.1",
@@ -1930,7 +1720,17 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-5.1:batch",
+            "price_in": 0.625,
+            "price_out": 5.0,
+            "price_blended": 1.7188,
+            "free": false
+          }
+        ]
       },
       {
         "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
@@ -1947,26 +1747,8 @@
           "medium"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "google/gemini-3.5-flash-lite:batch",
-        "display": "Google: Gemini 3.5 Flash Lite (batch)",
-        "quality_borrowed": 49.3,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.15,
-        "price_out": 1.25,
-        "price_blended": 0.425,
-        "free": false,
-        "context": 1048576,
-        "efforts": [
-          "high",
-          "medium",
-          "low",
-          "minimal"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "google/gemini-3.5-flash-lite",
@@ -1985,7 +1767,17 @@
           "minimal"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "google/gemini-3.5-flash-lite:batch",
+            "price_in": 0.15,
+            "price_out": 1.25,
+            "price_blended": 0.425,
+            "free": false
+          }
+        ]
       },
       {
         "model": "nvidia/nemotron-3-ultra-550b-a55b",
@@ -2002,7 +1794,8 @@
           "medium"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-5.3-codex",
@@ -2022,7 +1815,8 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3.5-397b-a17b",
@@ -2036,7 +1830,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "moonshotai/kimi-k2-0905",
@@ -2050,7 +1845,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3-max",
@@ -2064,21 +1860,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "google/gemini-2.5-flash:batch",
-        "display": "Google: Gemini 2.5 Flash (batch)",
-        "quality_borrowed": 47.1,
-        "quality_source": "design_arena:elo_rescaled",
-        "price_in": 0.15,
-        "price_out": 1.25,
-        "price_blended": 0.425,
-        "free": false,
-        "context": 1048576,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "google/gemini-2.5-flash",
@@ -2092,24 +1875,17 @@
         "context": 1048576,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "mistralai/mistral-medium-3-5:batch",
-        "display": "Mistral: Mistral Medium 3.5 (batch)",
-        "quality_borrowed": 46.9,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.75,
-        "price_out": 3.75,
-        "price_blended": 1.5,
-        "free": false,
-        "context": 262144,
-        "efforts": [
-          "high",
-          "none"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "google/gemini-2.5-flash:batch",
+            "price_in": 0.15,
+            "price_out": 1.25,
+            "price_blended": 0.425,
+            "free": false
+          }
+        ]
       },
       {
         "model": "mistralai/mistral-medium-3-5",
@@ -2126,7 +1902,17 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "mistralai/mistral-medium-3-5:batch",
+            "price_in": 0.75,
+            "price_out": 3.75,
+            "price_blended": 1.5,
+            "free": false
+          }
+        ]
       },
       {
         "model": "moonshotai/kimi-k2.5",
@@ -2140,7 +1926,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-5.2-codex",
@@ -2159,7 +1946,8 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "deepseek/deepseek-chat-v3.1",
@@ -2173,7 +1961,8 @@
         "context": 163840,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "z-ai/glm-4.6",
@@ -2187,7 +1976,8 @@
         "context": 204800,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3.5-122b-a10b",
@@ -2201,7 +1991,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "deepseek/deepseek-chat",
@@ -2215,7 +2006,8 @@
         "context": 163840,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "meituan/longcat-2.0",
@@ -2229,7 +2021,8 @@
         "context": 1048756,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "z-ai/glm-4.7",
@@ -2243,7 +2036,8 @@
         "context": 204800,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-5.1-codex-mini",
@@ -2261,7 +2055,8 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "deepseek/deepseek-v3.2",
@@ -2275,7 +2070,8 @@
         "context": 163840,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3-coder-30b-a3b-instruct",
@@ -2289,21 +2085,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "anthropic/claude-haiku-4.5:batch",
-        "display": "Anthropic: Claude Haiku 4.5 (batch)",
-        "quality_borrowed": 43.9,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.5,
-        "price_out": 2.5,
-        "price_blended": 1.0,
-        "free": false,
-        "context": 200000,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "anthropic/claude-haiku-4.5",
@@ -2317,7 +2100,17 @@
         "context": 200000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "anthropic/claude-haiku-4.5:batch",
+            "price_in": 0.5,
+            "price_out": 2.5,
+            "price_blended": 1.0,
+            "free": false
+          }
+        ]
       },
       {
         "model": "deepseek/deepseek-v3.1-terminus",
@@ -2331,7 +2124,8 @@
         "context": 163840,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "google/gemma-4-31b-it:free",
@@ -2345,7 +2139,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "google/gemma-4-31b-it",
@@ -2359,35 +2154,17 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "google/gemma-4-31b-it:batch",
-        "display": "Google: Gemma 4 31B (batch)",
-        "quality_borrowed": 43.4,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.39,
-        "price_out": 0.97,
-        "price_blended": 0.535,
-        "free": false,
-        "context": 262144,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/o3:batch",
-        "display": "OpenAI: o3 (batch)",
-        "quality_borrowed": 42.6,
-        "quality_source": "design_arena:elo_rescaled",
-        "price_in": 1.0,
-        "price_out": 4.0,
-        "price_blended": 1.75,
-        "free": false,
-        "context": 200000,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "google/gemma-4-31b-it:batch",
+            "price_in": 0.39,
+            "price_out": 0.97,
+            "price_blended": 0.535,
+            "free": false
+          }
+        ]
       },
       {
         "model": "openai/o3",
@@ -2401,26 +2178,17 @@
         "context": 200000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-5-nano:batch",
-        "display": "OpenAI: GPT-5 Nano (batch)",
-        "quality_borrowed": 42.4,
-        "quality_source": "design_arena:elo_rescaled",
-        "price_in": 0.025,
-        "price_out": 0.2,
-        "price_blended": 0.0688,
-        "free": false,
-        "context": 400000,
-        "efforts": [
-          "high",
-          "medium",
-          "low",
-          "minimal"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/o3:batch",
+            "price_in": 1.0,
+            "price_out": 4.0,
+            "price_blended": 1.75,
+            "free": false
+          }
+        ]
       },
       {
         "model": "openai/gpt-5-nano",
@@ -2439,7 +2207,17 @@
           "minimal"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-5-nano:batch",
+            "price_in": 0.025,
+            "price_out": 0.2,
+            "price_blended": 0.0688,
+            "free": false
+          }
+        ]
       },
       {
         "model": "x-ai/grok-4.3",
@@ -2458,7 +2236,8 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "mistralai/mistral-medium-3",
@@ -2472,7 +2251,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3.6-35b-a3b",
@@ -2486,7 +2266,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/o1",
@@ -2500,7 +2281,8 @@
         "context": 200000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "stepfun/step-3.7-flash",
@@ -2518,7 +2300,8 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "google/gemma-4-26b-a4b-it:free",
@@ -2532,7 +2315,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "google/gemma-4-26b-a4b-it",
@@ -2546,26 +2330,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-5:batch",
-        "display": "OpenAI: GPT-5 (batch)",
-        "quality_borrowed": 37.8,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.625,
-        "price_out": 5.0,
-        "price_blended": 1.7188,
-        "free": false,
-        "context": 400000,
-        "efforts": [
-          "high",
-          "medium",
-          "low",
-          "minimal"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-5",
@@ -2584,7 +2350,17 @@
           "minimal"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-5:batch",
+            "price_in": 0.625,
+            "price_out": 5.0,
+            "price_blended": 1.7188,
+            "free": false
+          }
+        ]
       },
       {
         "model": "nvidia/nemotron-3-super-120b-a12b:free",
@@ -2601,7 +2377,8 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "nvidia/nemotron-3-super-120b-a12b",
@@ -2618,7 +2395,8 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "moonshotai/kimi-k2",
@@ -2632,7 +2410,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "anthropic/claude-sonnet-4",
@@ -2646,21 +2425,8 @@
         "context": 1000000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-4.1:batch",
-        "display": "OpenAI: GPT-4.1 (batch)",
-        "quality_borrowed": 37.4,
-        "quality_source": "design_arena:elo_rescaled",
-        "price_in": 1.0,
-        "price_out": 4.0,
-        "price_blended": 1.75,
-        "free": false,
-        "context": 1047576,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-4.1",
@@ -2674,7 +2440,17 @@
         "context": 1047576,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-4.1:batch",
+            "price_in": 1.0,
+            "price_out": 4.0,
+            "price_blended": 1.75,
+            "free": false
+          }
+        ]
       },
       {
         "model": "qwen/qwen3.5-35b-a3b",
@@ -2688,7 +2464,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3-235b-a22b-2507",
@@ -2702,7 +2479,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "cohere/north-mini-code:free",
@@ -2716,7 +2494,8 @@
         "context": 256000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3-coder-next",
@@ -2730,7 +2509,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "mistralai/codestral-2508",
@@ -2744,7 +2524,8 @@
         "context": 256000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "google/gemini-3.1-flash-lite-preview",
@@ -2763,21 +2544,8 @@
           "minimal"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "google/gemini-2.5-pro:batch",
-        "display": "Google: Gemini 2.5 Pro (batch)",
-        "quality_borrowed": 33.3,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.625,
-        "price_out": 5.0,
-        "price_blended": 1.7188,
-        "free": false,
-        "context": 1048576,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "google/gemini-2.5-pro",
@@ -2791,7 +2559,17 @@
         "context": 1048576,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "google/gemini-2.5-pro:batch",
+            "price_in": 0.625,
+            "price_out": 5.0,
+            "price_blended": 1.7188,
+            "free": false
+          }
+        ]
       },
       {
         "model": "mistralai/devstral-2512",
@@ -2805,7 +2583,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "inception/mercury-2",
@@ -2824,21 +2603,8 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/o4-mini:batch",
-        "display": "OpenAI: o4 Mini (batch)",
-        "quality_borrowed": 30.5,
-        "quality_source": "design_arena:elo_rescaled",
-        "price_in": 0.55,
-        "price_out": 2.2,
-        "price_blended": 0.9625,
-        "free": false,
-        "context": 200000,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/o4-mini",
@@ -2852,7 +2618,17 @@
         "context": 200000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/o4-mini:batch",
+            "price_in": 0.55,
+            "price_out": 2.2,
+            "price_blended": 0.9625,
+            "free": false
+          }
+        ]
       },
       {
         "model": "openai/gpt-oss-120b",
@@ -2870,25 +2646,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-oss-120b:batch",
-        "display": "OpenAI: gpt-oss-120b (batch)",
-        "quality_borrowed": 30.4,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.15,
-        "price_out": 0.6,
-        "price_blended": 0.2625,
-        "free": false,
-        "context": 131072,
-        "efforts": [
-          "high",
-          "medium",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-oss-120b:batch",
+            "price_in": 0.15,
+            "price_out": 0.6,
+            "price_blended": 0.2625,
+            "free": false
+          }
+        ]
       },
       {
         "model": "qwen/qwen3-235b-a22b",
@@ -2902,7 +2670,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3.5-9b",
@@ -2916,21 +2685,17 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "qwen/qwen3.5-9b:batch",
-        "display": "Qwen: Qwen3.5-9B (batch)",
-        "quality_borrowed": 28.7,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.17,
-        "price_out": 0.25,
-        "price_blended": 0.19,
-        "free": false,
-        "context": 262144,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "qwen/qwen3.5-9b:batch",
+            "price_in": 0.17,
+            "price_out": 0.25,
+            "price_blended": 0.19,
+            "free": false
+          }
+        ]
       },
       {
         "model": "cohere/command-a",
@@ -2944,7 +2709,8 @@
         "context": 256000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3-30b-a3b",
@@ -2958,7 +2724,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "nvidia/nemotron-3.5-lightning:free",
@@ -2972,7 +2739,8 @@
         "context": 1000000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "nvidia/nemotron-3.5-lightning",
@@ -2986,7 +2754,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "mistralai/mistral-small-2603",
@@ -3003,7 +2772,8 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "arcee-ai/trinity-large-thinking",
@@ -3017,7 +2787,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "deepseek/deepseek-r1",
@@ -3031,7 +2802,8 @@
         "context": 64000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-4o-2024-05-13",
@@ -3045,7 +2817,8 @@
         "context": 128000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "amazon/nova-2-lite-v1",
@@ -3059,7 +2832,8 @@
         "context": 1000000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "ibm-granite/granite-4.2-8b",
@@ -3077,7 +2851,8 @@
           "none"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3-235b-a22b-thinking-2507",
@@ -3091,7 +2866,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "mistralai/mistral-small-3.2-24b-instruct",
@@ -3105,21 +2881,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-4-turbo:batch",
-        "display": "OpenAI: GPT-4 Turbo (batch)",
-        "quality_borrowed": 21.5,
-        "quality_source": "aa:coding_index",
-        "price_in": 5.0,
-        "price_out": 15.0,
-        "price_blended": 7.5,
-        "free": false,
-        "context": 128000,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-4-turbo",
@@ -3133,7 +2896,17 @@
         "context": 128000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-4-turbo:batch",
+            "price_in": 5.0,
+            "price_out": 15.0,
+            "price_blended": 7.5,
+            "free": false
+          }
+        ]
       },
       {
         "model": "deepseek/deepseek-chat-v3-0324",
@@ -3147,7 +2920,8 @@
         "context": 163840,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "moonshotai/kimi-k2-thinking",
@@ -3161,7 +2935,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-oss-20b",
@@ -3179,25 +2954,17 @@
           "low"
         ],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-oss-20b:batch",
-        "display": "OpenAI: gpt-oss-20b (batch)",
-        "quality_borrowed": 20.7,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.05,
-        "price_out": 0.2,
-        "price_blended": 0.0875,
-        "free": false,
-        "context": 131072,
-        "efforts": [
-          "high",
-          "medium",
-          "low"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-oss-20b:batch",
+            "price_in": 0.05,
+            "price_out": 0.2,
+            "price_blended": 0.0875,
+            "free": false
+          }
+        ]
       },
       {
         "model": "mistralai/mistral-medium-3.1",
@@ -3211,21 +2978,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-4.1-mini:batch",
-        "display": "OpenAI: GPT-4.1 Mini (batch)",
-        "quality_borrowed": 20.2,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.2,
-        "price_out": 0.8,
-        "price_blended": 0.35,
-        "free": false,
-        "context": 1047576,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-4.1-mini",
@@ -3239,7 +2993,17 @@
         "context": 1047576,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-4.1-mini:batch",
+            "price_in": 0.2,
+            "price_out": 0.8,
+            "price_blended": 0.35,
+            "free": false
+          }
+        ]
       },
       {
         "model": "mistralai/mistral-large-2512",
@@ -3253,7 +3017,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3-next-80b-a3b-thinking",
@@ -3267,21 +3032,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-4o:batch",
-        "display": "OpenAI: GPT-4o (batch)",
-        "quality_borrowed": 17.3,
-        "quality_source": "design_arena:elo_rescaled",
-        "price_in": 1.25,
-        "price_out": 5.0,
-        "price_blended": 2.1875,
-        "free": false,
-        "context": 128000,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-4o",
@@ -3295,7 +3047,17 @@
         "context": 128000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-4o:batch",
+            "price_in": 1.25,
+            "price_out": 5.0,
+            "price_blended": 2.1875,
+            "free": false
+          }
+        ]
       },
       {
         "model": "meta-llama/llama-4-maverick",
@@ -3309,7 +3071,8 @@
         "context": 1048576,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/o3-mini-high",
@@ -3325,7 +3088,8 @@
           "high"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "upstage/solar-pro-3",
@@ -3339,26 +3103,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-5-mini:batch",
-        "display": "OpenAI: GPT-5 Mini (batch)",
-        "quality_borrowed": 15.6,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.125,
-        "price_out": 1.0,
-        "price_blended": 0.3438,
-        "free": false,
-        "context": 400000,
-        "efforts": [
-          "high",
-          "medium",
-          "low",
-          "minimal"
-        ],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-5-mini",
@@ -3377,7 +3123,17 @@
           "minimal"
         ],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-5-mini:batch",
+            "price_in": 0.125,
+            "price_out": 1.0,
+            "price_blended": 0.3438,
+            "free": false
+          }
+        ]
       },
       {
         "model": "qwen/qwen3-32b",
@@ -3391,7 +3147,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "nvidia/nemotron-3-nano-30b-a3b",
@@ -3405,7 +3162,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "mistralai/ministral-14b-2512",
@@ -3419,7 +3177,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
@@ -3433,7 +3192,8 @@
         "context": 256000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3-14b",
@@ -3447,7 +3207,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-4",
@@ -3461,7 +3222,8 @@
         "context": 8191,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3-30b-a3b-thinking-2507",
@@ -3475,7 +3237,8 @@
         "context": 81920,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "meta-llama/llama-3.3-70b-instruct",
@@ -3489,7 +3252,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "amazon/nova-premier-v1",
@@ -3503,21 +3267,8 @@
         "context": 1000000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-4o-mini:batch",
-        "display": "OpenAI: GPT-4o-mini (batch)",
-        "quality_borrowed": 11.4,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.075,
-        "price_out": 0.3,
-        "price_blended": 0.1312,
-        "free": false,
-        "context": 128000,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "openai/gpt-4o-mini",
@@ -3531,21 +3282,17 @@
         "context": 128000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-4.1-nano:batch",
-        "display": "OpenAI: GPT-4.1 Nano (batch)",
-        "quality_borrowed": 11.1,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.05,
-        "price_out": 0.2,
-        "price_blended": 0.0875,
-        "free": false,
-        "context": 1047576,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-4o-mini:batch",
+            "price_in": 0.075,
+            "price_out": 0.3,
+            "price_blended": 0.1312,
+            "free": false
+          }
+        ]
       },
       {
         "model": "openai/gpt-4.1-nano",
@@ -3559,21 +3306,17 @@
         "context": 1047576,
         "efforts": [],
         "source": "catalog",
-        "measured": false
-      },
-      {
-        "model": "openai/gpt-3.5-turbo:batch",
-        "display": "OpenAI: GPT-3.5 Turbo (batch)",
-        "quality_borrowed": 10.7,
-        "quality_source": "aa:coding_index",
-        "price_in": 0.25,
-        "price_out": 0.75,
-        "price_blended": 0.375,
-        "free": false,
-        "context": 16385,
-        "efforts": [],
-        "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-4.1-nano:batch",
+            "price_in": 0.05,
+            "price_out": 0.2,
+            "price_blended": 0.0875,
+            "free": false
+          }
+        ]
       },
       {
         "model": "openai/gpt-3.5-turbo",
@@ -3587,7 +3330,17 @@
         "context": 16385,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": [
+          {
+            "suffix": "batch",
+            "model": "openai/gpt-3.5-turbo:batch",
+            "price_in": 0.25,
+            "price_out": 0.75,
+            "price_blended": 0.375,
+            "free": false
+          }
+        ]
       },
       {
         "model": "google/gemma-3-27b-it",
@@ -3601,7 +3354,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "mistralai/ministral-8b-2512",
@@ -3615,7 +3369,8 @@
         "context": 262144,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "ibm-granite/granite-4.1-8b",
@@ -3629,7 +3384,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "qwen/qwen3-8b",
@@ -3643,7 +3399,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "meta-llama/llama-4-scout",
@@ -3657,7 +3414,8 @@
         "context": 1310720,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "amazon/nova-pro-v1",
@@ -3671,7 +3429,8 @@
         "context": 300000,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "google/gemma-3-12b-it",
@@ -3685,7 +3444,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "meta-llama/llama-3.1-8b-instruct",
@@ -3699,7 +3459,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "mistralai/ministral-3b-2512",
@@ -3713,7 +3474,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       },
       {
         "model": "google/gemma-3-4b-it",
@@ -3727,7 +3489,8 @@
         "context": 131072,
         "efforts": [],
         "source": "catalog",
-        "measured": false
+        "measured": false,
+        "variants": []
       }
     ]
   }

@@ -178,8 +178,49 @@ def coverage_rows(
             "measured": False,
         })
 
+    rows = collapse_variants(rows)
     rows.sort(key=lambda r: (-r["quality_borrowed"], r["price_blended"], r["model"]))
     return rows
+
+
+# Variant suffixes that are the same weights at a different price and belong
+# folded into the base model's row. ":free" is deliberately NOT here: a free
+# tier is a materially different offer (rate limits, data policy) and it is
+# the thing this board exists to surface, so it keeps its own row.
+COLLAPSE_SUFFIXES = frozenset({"batch"})
+
+
+def collapse_variants(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Fold `model:batch` into the `model` row as a `variants` entry.
+
+    The suffix-free row is canonical: its price stays the headline and its
+    borrowed quality is the row's quality (same weights, so they agree). A
+    :batch row with no base row in the set stays as its own row, suffix and
+    all, since there is nothing to fold it into. Every row gets a `variants`
+    list, empty when there is nothing to say."""
+    by_id = {r["model"]: r for r in rows}
+    folded: set[str] = set()
+    for r in rows:
+        base, sep, suffix = r["model"].partition(":")
+        if not sep or suffix not in COLLAPSE_SUFFIXES or base not in by_id:
+            continue
+        by_id[base].setdefault("variants", []).append({
+            "suffix": suffix,
+            "model": r["model"],
+            "price_in": r["price_in"],
+            "price_out": r["price_out"],
+            "price_blended": r["price_blended"],
+            "free": r["free"],
+        })
+        folded.add(r["model"])
+    out = []
+    for r in rows:
+        if r["model"] in folded:
+            continue
+        r.setdefault("variants", [])
+        r["variants"].sort(key=lambda v: v["price_blended"])
+        out.append(r)
+    return out
 
 
 def load_catalog_models(cache_path: Path = DEFAULT_CATALOG_CACHE) -> list[dict[str, Any]]:
@@ -220,6 +261,7 @@ def build_coverage(
         ),
         "catalog_models_seen": len(models),
         "count": len(rows),
+        "variants_folded": sum(len(r.get("variants") or []) for r in rows),
         "by_source": by_source,
         "rows": rows,
     }
