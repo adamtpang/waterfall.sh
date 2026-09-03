@@ -77,6 +77,11 @@ is stale, the mirror faithfully propagates the staleness. This is exactly how
 the 2026-08-24 gap happened: a week of work went into `DESIGN.md` and commit
 messages, `CLAUDE.md` was not updated, so `AGENTS.md` inherited the hole.
 
+**Step zero, before anything: `git fetch` and look at `HEAD..origin/main`.**
+Another agent may have shipped while you were away. On 2026-09-03 a session
+resumed after ten days, skipped this, and rebuilt a leaderboard Codex had
+already merged. Fetch first, then:
+
 **So the real sync ritual is two steps, in this order:**
 
 1. Update `CLAUDE.md` with what was decided and why. This is the load-bearing

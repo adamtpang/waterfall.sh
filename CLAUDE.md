@@ -712,6 +712,24 @@ which is what actually drives the 65–96% reused-input share.
   agent-usable sources are shadcn blocks/themes/registries, tweakcn, Godly,
   SaaS Landing Page.
 
+- **Leaderboard coverage idea, 2026-09-03 (Claude, logged not built).** While
+  building a duplicate of the leaderboard Codex had already shipped (caught
+  before push; the duplicate is parked on branch
+  `backup/claude-leaderboard-2026-09-03` and should not be merged), one
+  finding surfaced that the shipped board does not use: OpenRouter's
+  `/models` catalog natively carries `benchmarks.artificial_analysis` (the AA
+  Intelligence Index, 169 models), `benchmarks.design_arena` (per-category
+  Elo, 230 models), and `reasoning.supported_efforts` per model. The shipped
+  board is the right design, measured dollars-per-solved-task on a real
+  smoketest, and it covers roughly ten models. The catalog fields are a
+  cheap way to show a borrowed score for the other ~230, clearly labeled as
+  "not measured here, from AA / Arena" so they never get confused with the
+  smoketest numbers. `perf_source` per row. Worth doing only if coverage
+  becomes a real complaint; the measured ten are the product.
+  Lesson recorded plainly: this session resumed after ten days and never ran
+  `git fetch` before building. BACKUP_PLAN.md's sync ritual is now amended
+  to start with a fetch.
+
 ## Not done yet
 
 - **A/B/C/D quota-safety plan shipped, 2026-08-18**, in response to Adam
