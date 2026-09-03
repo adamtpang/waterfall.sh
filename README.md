@@ -18,6 +18,7 @@ workshop/                                          Free model, IDE, skill, and M
 router/                                             The actual routing logic (Python)
   openrouter_api_client.py                          Direct OpenRouter API client
   smart_router.py                                   Classify -> split -> route -> stitch
+  tool_inventory.py                                 Private names-only skill and MCP audit
   classifier/                                        Local, zero-API prompt classifier
   tests/                                              Unit tests (no network required)
 desktop/                                            Local desktop GUI (dashboard + cascade + agent launcher)
@@ -40,6 +41,13 @@ credentials, account data, and personal automations are never published.
 For a Claude plus Codex setup, use both during the week: one owns the change,
 the other plans or reviews. Do not wait for one plan to hit zero before moving a
 cold project into the other.
+
+Generate a private local inventory without exposing commands, credentials, URLs,
+or project paths:
+
+```bash
+python -m router.tool_inventory --output local-skill-mcp-inventory.md
+```
 
 ## Quick start (landing page)
 

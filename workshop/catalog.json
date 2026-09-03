@@ -1,10 +1,10 @@
 {
   "schema_version": 2,
   "title": "Waterfall Workshop",
-  "updated_at": "2026-08-31",
+  "updated_at": "2026-09-03",
   "summary": "A dated, evidence-backed catalog of models, coding surfaces, agent skills, and MCP servers for a Claude plus Codex workflow.",
   "ranking": {
-    "as_of": "2026-08-31",
+    "as_of": "2026-09-03",
     "scope": "Waterfall fit for independent developers using Claude and Codex",
     "refresh_cadence": "weekly",
     "methodology": [
@@ -34,14 +34,14 @@
       },
       {
         "name": "mcp.directory",
-        "url": "https://mcp.directory/",
-        "use": "Broad MCP discovery and popularity browsing",
-        "limit": "No public ranking methodology was verified during this review, so directory position is not used as a quality score"
+        "url": "https://mcp.directory/servers/leaderboard",
+        "use": "Broad MCP discovery plus star, install, and view leaderboards",
+        "limit": "Its default leaderboard ranks GitHub stars, not task fit, maintenance quality, or security"
       }
     ]
   },
   "audit": {
-    "active_skills": 130,
+    "active_skills": 352,
     "unused_skills_removed": 84,
     "public_starter_skills": 3,
     "affiliate_links": 0
@@ -489,9 +489,27 @@
           "refresh_cadence": "quarterly"
         },
         {
-          "id": "vercel-agent-skills",
+          "id": "mcp-security-audit-skill",
           "ranking_eligible": true,
           "rank": 6,
+          "name": "MCP security audit",
+          "publisher": "GitHub",
+          "url": "https://github.com/github/awesome-copilot/blob/main/skills/mcp-security-audit/SKILL.md",
+          "role": "Review MCP configurations for exposed secrets, command injection, unpinned packages, and unapproved servers.",
+          "default_state": "pilot",
+          "evidence": "The exact skill is maintained in GitHub's MIT-licensed awesome-copilot repository. The skills.sh CLI reported about 1,000 installs when checked on 2026-09-03, which is popularity evidence only.",
+          "avoid": "It overlaps broad security-review skills and cannot certify an MCP server as safe. Run it when MCP configuration changes, then verify findings against source and policy.",
+          "access": "Free and MIT-licensed",
+          "tags": ["mcp", "security", "github", "pilot"],
+          "checked_at": "2026-09-03",
+          "source_date": "2026-09-03",
+          "volatility": "medium",
+          "refresh_cadence": "quarterly"
+        },
+        {
+          "id": "vercel-agent-skills",
+          "ranking_eligible": true,
+          "rank": 7,
           "name": "Vercel agent-skills",
           "publisher": "Vercel",
           "url": "https://github.com/vercel-labs/agent-skills",
@@ -509,7 +527,7 @@
         {
           "id": "awesome-copilot",
           "ranking_eligible": true,
-          "rank": 7,
+          "rank": 8,
           "name": "awesome-copilot",
           "publisher": "GitHub",
           "url": "https://github.com/github/awesome-copilot",
@@ -527,7 +545,7 @@
         {
           "id": "anthropic-skills",
           "ranking_eligible": true,
-          "rank": 8,
+          "rank": 9,
           "name": "Anthropic skills",
           "publisher": "Anthropic",
           "url": "https://github.com/anthropics/skills",
@@ -594,12 +612,12 @@
           "url": "https://mcp.directory/about",
           "role": "Browse a broad community directory before verifying candidates against official source and registry metadata.",
           "default_state": "reference",
-          "evidence": "The public directory indexed 2,303 MCP servers and 9,291 skills when checked on 2026-08-31, with searchable server pages and setup guides.",
-          "avoid": "No public ranking methodology was verified during this review. Popularity or directory position is not a security, maintenance, or task-fit verdict.",
+          "evidence": "Its exact statistics page reported 2,303 MCP servers and 9,291 skills on 2026-09-03, while the homepage advertised more than 3,000 servers. Its server leaderboard exposes GitHub-star, install, and view tabs.",
+          "avoid": "The site currently reports inconsistent server totals. Its default leaderboard ranks GitHub stars, not security, maintenance quality, or fit for your task.",
           "access": "Free public directory",
           "tags": ["directory", "discovery", "community"],
-          "checked_at": "2026-08-31",
-          "source_date": "2026-08-31",
+          "checked_at": "2026-09-03",
+          "source_date": "2026-09-03",
           "volatility": "high",
           "refresh_cadence": "weekly"
         },
@@ -624,7 +642,7 @@
         {
           "id": "filesystem-mcp",
           "ranking_eligible": true,
-          "rank": 4,
+          "rank": 5,
           "name": "Filesystem reference server",
           "publisher": "Model Context Protocol",
           "url": "https://github.com/modelcontextprotocol/servers/blob/main/src/filesystem/README.md",
@@ -676,9 +694,27 @@
           "refresh_cadence": "quarterly"
         },
         {
+          "id": "context7-mcp",
+          "ranking_eligible": true,
+          "rank": 4,
+          "name": "Context7 MCP",
+          "publisher": "Upstash",
+          "url": "https://github.com/upstash/context7",
+          "role": "Fetch version-specific public library documentation during API and configuration work.",
+          "default_state": "pilot",
+          "evidence": "The official MIT-licensed server exposes two focused tools for resolving a library and querying its documentation. Its published server metadata supports a hosted HTTP endpoint with an optional API key.",
+          "avoid": "Remote documentation is still untrusted context and may be incomplete. Enable it only for current library work, and prefer local source or official docs when already available.",
+          "access": "Hosted remote server or self-hosted MIT source; optional account limits apply",
+          "tags": ["documentation", "libraries", "remote", "pilot"],
+          "checked_at": "2026-09-03",
+          "source_date": "2026-09-03",
+          "volatility": "high",
+          "refresh_cadence": "monthly"
+        },
+        {
           "id": "postgres-mcp",
           "ranking_eligible": true,
-          "rank": 5,
+          "rank": 6,
           "name": "Microsoft Postgres MCP",
           "publisher": "Microsoft",
           "url": "https://github.com/microsoft/postgres-mcp",
@@ -696,7 +732,7 @@
         {
           "id": "obsidian-rest-mcp",
           "ranking_eligible": true,
-          "rank": 6,
+          "rank": 7,
           "name": "Obsidian Local REST API MCP",
           "publisher": "Community",
           "url": "https://github.com/coddingtonbear/obsidian-local-rest-api",
@@ -714,7 +750,7 @@
         {
           "id": "obsidian-mcp-fallback",
           "ranking_eligible": true,
-          "rank": 7,
+          "rank": 8,
           "name": "Obsidian MCP Server",
           "publisher": "cyanheads",
           "url": "https://github.com/cyanheads/obsidian-mcp-server",
