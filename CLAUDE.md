@@ -714,7 +714,9 @@ which is what actually drives the 65–96% reused-input share.
 
 - **Leaderboard coverage, BUILT 2026-09-03** (`router/leaderboard_coverage.py`,
   a `coverage` key in `api/leaderboard.json`, its own table on `/leaderboard`).
-  220 borrowed rows from 424 catalog models: AA `coding_index` first, then
+  171 borrowed rows from 424 catalog models (49 `:batch` twins folded into
+  their base row as `variants`; `:free` deliberately stays its own row since a
+  free tier is a different offer): AA `coding_index` first, then
   `intelligence_index`, then rescaled Design Arena Elo; `quality_source` per row.
   Never `quality`, never `value`, never `cost_per_solved`, and the measured ten
   plus their `:batch`/`:free` variants are excluded by base provider id.

@@ -77,6 +77,34 @@ class CoverageRowTests(unittest.TestCase):
         ])
         self.assertEqual(["keep/me", "keep/multimodal-in"], [r["model"] for r in rows])
 
+    def test_batch_variant_collapses_into_base_row(self) -> None:
+        rows = cov.coverage_rows([
+            _model("google/gemini-x", prompt="0.00000075", completion="0.00000375", aa={"coding_index": 76}),
+            _model("google/gemini-x:batch", prompt="0.000000375", completion="0.000001875", aa={"coding_index": 76}),
+            _model("other/solo", aa={"coding_index": 10}),
+        ])
+        self.assertEqual(["google/gemini-x", "other/solo"], [r["model"] for r in rows])
+        gem = rows[0]
+        self.assertEqual((0.75, 3.75), (gem["price_in"], gem["price_out"]), "base price stays the headline")
+        self.assertEqual(1, len(gem["variants"]))
+        self.assertEqual("batch", gem["variants"][0]["suffix"])
+        self.assertEqual((0.375, 1.875), (gem["variants"][0]["price_in"], gem["variants"][0]["price_out"]))
+        self.assertEqual([], rows[1]["variants"], "every row carries a variants list")
+
+    def test_batch_without_a_base_row_stands_alone(self) -> None:
+        rows = cov.coverage_rows([_model("lonely/model:batch", aa={"coding_index": 50})])
+        self.assertEqual(["lonely/model:batch"], [r["model"] for r in rows])
+        self.assertEqual([], rows[0]["variants"])
+
+    def test_free_variant_is_not_collapsed(self) -> None:
+        # a free tier is a different offer, and it is what the board is for
+        rows = cov.coverage_rows([
+            _model("z-ai/glm-x", aa={"coding_index": 68}),
+            _model("z-ai/glm-x:free", prompt="0", completion="0", aa={"coding_index": 68}),
+        ])
+        self.assertEqual({"z-ai/glm-x", "z-ai/glm-x:free"}, {r["model"] for r in rows})
+        self.assertTrue(next(r for r in rows if r["model"].endswith(":free"))["free"])
+
     def test_excludes_pricing_variants_of_measured_models(self) -> None:
         # :batch and :free are the same weights at a different price. The board
         # measured the base model, so its variants are not "unmeasured".
