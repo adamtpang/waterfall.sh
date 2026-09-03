@@ -108,7 +108,7 @@
       const priceCell = cell(price, row.free ? 'free-tag' : '');
       (row.variants || []).forEach(v => {
         const line = document.createElement('small');
-        line.className = 'variant-price';
+        line.className = 'variant-price' + (v.free ? ' variant-free' : '');
         line.textContent = `${v.suffix}: ${v.free ? 'free' : `${money(v.price_in)} / ${money(v.price_out)}`}`;
         priceCell.append(line);
       });

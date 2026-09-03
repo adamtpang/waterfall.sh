@@ -96,14 +96,40 @@ class CoverageRowTests(unittest.TestCase):
         self.assertEqual(["lonely/model:batch"], [r["model"] for r in rows])
         self.assertEqual([], rows[0]["variants"])
 
-    def test_free_variant_is_not_collapsed(self) -> None:
-        # a free tier is a different offer, and it is what the board is for
+    def test_free_variant_collapses_and_flags_the_base_row(self) -> None:
+        # folded like :batch, but the free signal must survive on the base row
         rows = cov.coverage_rows([
             _model("z-ai/glm-x", aa={"coding_index": 68}),
             _model("z-ai/glm-x:free", prompt="0", completion="0", aa={"coding_index": 68}),
+            _model("paid/only", aa={"coding_index": 20}),
         ])
-        self.assertEqual({"z-ai/glm-x", "z-ai/glm-x:free"}, {r["model"] for r in rows})
-        self.assertTrue(next(r for r in rows if r["model"].endswith(":free"))["free"])
+        self.assertEqual(["z-ai/glm-x", "paid/only"], [r["model"] for r in rows])
+        glm, paid = rows
+        self.assertFalse(glm["free"], "headline price stays the paid base price")
+        self.assertTrue(glm["has_free_variant"])
+        self.assertEqual([("free", True)], [(v["suffix"], v["free"]) for v in glm["variants"]])
+        self.assertFalse(paid["has_free_variant"])
+
+    def test_free_only_model_with_no_paid_base_stands_alone_and_is_free(self) -> None:
+        rows = cov.coverage_rows([_model("lab/model:free", prompt="0", completion="0", aa={"coding_index": 40})])
+        self.assertEqual(["lab/model:free"], [r["model"] for r in rows])
+        self.assertTrue(rows[0]["free"])
+        self.assertTrue(rows[0]["has_free_variant"])
+
+    def test_free_tier_count_in_metadata(self) -> None:
+        board = leaderboard.build_leaderboard(
+            runs_dir=Path("this-directory-does-not-exist"),
+            catalog_models=[
+                _model("a/x", aa={"coding_index": 50}),
+                _model("a/x:free", prompt="0", completion="0", aa={"coding_index": 50}),
+                _model("b/y:free", prompt="0", completion="0", aa={"coding_index": 30}),
+                _model("c/z", aa={"coding_index": 10}),
+            ],
+        )
+        cov_meta = board["coverage"]
+        self.assertEqual(3, cov_meta["count"])
+        self.assertEqual(1, cov_meta["variants_folded"])
+        self.assertEqual(2, cov_meta["free_tier_count"])
 
     def test_excludes_pricing_variants_of_measured_models(self) -> None:
         # :batch and :free are the same weights at a different price. The board
