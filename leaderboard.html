@@ -105,6 +105,37 @@
       <noscript><p class="noscript-note">Sorting needs JavaScript. The value-sorted snapshot is visible above, and the <a href="/api/leaderboard.json">JSON feed</a> is always available.</p></noscript>
     </section>
 
+    <section class="table-section coverage-section" aria-labelledby="coverage-table">
+      <div class="section-heading">
+        <div>
+          <h2 class="sec" id="coverage-table">Coverage: borrowed scores, not measured</h2>
+          <p id="coverage-status" class="table-status" aria-live="polite">Loading catalog coverage.</p>
+        </div>
+        <div class="feed-links">
+          <button type="button" id="coverage-toggle" class="coverage-toggle" aria-expanded="false">Show all</button>
+        </div>
+      </div>
+      <p class="coverage-note">Everything above has a measured or dated cost per solved task. Everything below does not. These rows borrow Artificial Analysis <code>coding_index</code> (or <code>intelligence_index</code>, or rescaled Design Arena Elo) from OpenRouter's catalog so the other two hundred models are at least visible. No value score, because the formula needs a measured cost per solved task. Prices are list, per 1M tokens.</p>
+      <div class="table-scroll" tabindex="0" aria-label="Scrollable coverage table of unmeasured models">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Model</th>
+              <th scope="col">Borrowed quality</th>
+              <th scope="col">Source</th>
+              <th scope="col">List in / out</th>
+              <th scope="col">Context</th>
+              <th scope="col">Efforts</th>
+            </tr>
+          </thead>
+          <tbody id="coverage-body">
+            <tr><td colspan="7">Coverage needs the JSON feed; see <a href="/api/leaderboard.json">/api/leaderboard.json</a>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <section aria-labelledby="default-stack">
       <h2 class="sec" id="default-stack">Waterfall default stack</h2>
       <p class="secnote">Cheap first. Independent review. Expensive only after a blocking failure.</p>
@@ -137,6 +168,7 @@
           <h3>Context, not borrowed results</h3>
           <p><a href="https://www.swebench.com/">SWE-bench</a>, <a href="https://artificialanalysis.ai/methodology/coding-agents-benchmarking/">Artificial Analysis</a>, and <a href="https://deepswe.datacurve.ai/">DeepSWE</a> are useful external context. Their scores are never relabeled as Waterfall harness numbers.</p>
           <p>The shipped suite is intentionally small: 5 one-file bugfixes, 5 multi-file features, 3 review-only diffs, and 2 long-horizon finish-the-PR tasks.</p>
+          <p><strong>coverage</strong> rows are the exception that proves the rule: borrowed AA and Design Arena scores pulled from OpenRouter's catalog for models the harness has not run, kept in their own table with their own field names so they cannot be mistaken for measurements.</p>
         </div>
       </div>
       <p class="dated-note"><strong>Snapshot date: 2026-09-03.</strong> Prices move; this row is dated. Rebuild the feeds with <code>waterfall leaderboard --publish</code>.</p>

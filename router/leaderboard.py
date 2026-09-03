@@ -158,6 +158,7 @@ def build_leaderboard(
     runs_dir: Path = DEFAULT_RUNS_DIR,
     *,
     generated_at: Optional[str] = None,
+    catalog_models: Optional[Iterable[Mapping[str, Any]]] = None,
 ) -> dict[str, Any]:
     snapshot = load_snapshot(snapshot_path)
     snapshot_rows = []
@@ -180,7 +181,7 @@ def build_leaderboard(
     ]
     merged.extend(replacements.values())
 
-    return {
+    board = {
         "schema_version": 1,
         "as_of": max((row["updated"] for row in merged), default=snapshot["as_of"]),
         "generated_at": generated_at or datetime.now(timezone.utc).isoformat(),
@@ -192,9 +193,15 @@ def build_leaderboard(
             "solved": "The task's declared tests or reviewer gate passed on the first submitted attempt.",
             "cost": "Provider-reported input, output, and cache-read cost. Retries remain in the attempt cost.",
             "sources": "Snapshot rows are priors. Harness rows come only from committed data/runs JSONL records.",
+            "coverage": "coverage.rows are borrowed Artificial Analysis / Design Arena scores from the OpenRouter catalog for unmeasured models. They carry quality_borrowed, never quality or value.",
         },
         "rows": apply_value_scores(merged),
     }
+    # Borrowed catalog scores for everything NOT measured above. Separate key,
+    # separate fields, no value score. See leaderboard_coverage.py.
+    import leaderboard_coverage
+    board["coverage"] = leaderboard_coverage.build_coverage(board["rows"], catalog_models)
+    return board
 
 
 def leaderboard_csv(board: Mapping[str, Any]) -> str:
