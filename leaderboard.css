@@ -356,3 +356,4 @@ tbody th small {
 .coverage-section .borrowed { opacity: 0.85; }
 .coverage-section .free-tag { color: var(--good, #3dd68c); font-weight: 600; }
 .coverage-section .variant-price { display: block; font-size: 0.78em; opacity: 0.7; font-weight: 400; white-space: nowrap; }
+.coverage-section .variant-price.variant-free { color: var(--good, #3dd68c); opacity: 1; font-weight: 600; }

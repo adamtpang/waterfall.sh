@@ -184,10 +184,13 @@ def coverage_rows(
 
 
 # Variant suffixes that are the same weights at a different price and belong
-# folded into the base model's row. ":free" is deliberately NOT here: a free
-# tier is a materially different offer (rate limits, data policy) and it is
-# the thing this board exists to surface, so it keeps its own row.
-COLLAPSE_SUFFIXES = frozenset({"batch"})
+# folded into the base model's row. ":free" was initially kept as its own row
+# (a free tier is a different offer: rate limits, data policy) and Adam chose
+# to fold it too, 2026-09-03, so the table reads one model per row. The free
+# signal is not lost: the base row carries `has_free_variant`, the variant line
+# renders in the free color, and the feed reports `free_tier_count`. A :free
+# model with no paid base row in the set still stands alone.
+COLLAPSE_SUFFIXES = frozenset({"batch", "free"})
 
 
 def collapse_variants(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -219,6 +222,8 @@ def collapse_variants(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             continue
         r.setdefault("variants", [])
         r["variants"].sort(key=lambda v: v["price_blended"])
+        # keep "is there a free way to run this model" answerable per row
+        r["has_free_variant"] = bool(r["free"] or any(v["free"] for v in r["variants"]))
         out.append(r)
     return out
 
@@ -262,6 +267,7 @@ def build_coverage(
         "catalog_models_seen": len(models),
         "count": len(rows),
         "variants_folded": sum(len(r.get("variants") or []) for r in rows),
+        "free_tier_count": sum(1 for r in rows if r.get("has_free_variant")),
         "by_source": by_source,
         "rows": rows,
     }
