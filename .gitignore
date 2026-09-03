@@ -11,3 +11,6 @@ desktop-app/node_modules/
 dist/*.exe
 waterfall.exe
 .env*
+
+# Generated agent handoffs may contain private conversation and account data.
+*_CONTINUE_FROM_*.md
