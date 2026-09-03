@@ -74,6 +74,59 @@
     render();
   }));
 
+  // ---- coverage: borrowed scores for unmeasured models ------------------
+  const coverageBody = document.getElementById('coverage-body');
+  const coverageStatus = document.getElementById('coverage-status');
+  const coverageToggle = document.getElementById('coverage-toggle');
+  const COVERAGE_PREVIEW = 30;
+  let coverageRows = [];
+  let coverageExpanded = false;
+
+  const sourceName = src => src === 'aa:coding_index' ? 'AA coding'
+    : src === 'aa:intelligence_index' ? 'AA intelligence'
+    : src === 'design_arena:elo_rescaled' ? 'Arena Elo' : String(src || '');
+  const ctx = n => n ? (n >= 1000 ? `${Math.round(n / 1000)}k` : String(n)) : '';
+
+  function renderCoverage() {
+    if (!coverageBody) return;
+    const shown = coverageExpanded ? coverageRows : coverageRows.slice(0, COVERAGE_PREVIEW);
+    coverageBody.replaceChildren();
+    shown.forEach((row, index) => {
+      const tr = document.createElement('tr');
+      tr.append(cell(String(index + 1)));
+      const model = document.createElement('th');
+      model.scope = 'row';
+      const name = document.createElement('strong');
+      name.textContent = row.display || row.model;
+      const id = document.createElement('small');
+      id.textContent = row.model;
+      model.append(name, id);
+      tr.append(model);
+      tr.append(cell(number(row.quality_borrowed), 'borrowed'));
+      tr.append(cell(sourceName(row.quality_source)));
+      const price = row.free ? 'free' : `${money(row.price_in)} / ${money(row.price_out)}`;
+      tr.append(cell(price, row.free ? 'free-tag' : ''));
+      tr.append(cell(ctx(row.context)));
+      tr.append(cell((row.efforts && row.efforts.length) ? row.efforts.join(', ') : ''));
+      coverageBody.append(tr);
+    });
+    if (coverageStatus) {
+      coverageStatus.textContent = coverageRows.length
+        ? `${shown.length} of ${coverageRows.length} unmeasured models, sorted by borrowed quality.`
+        : 'No catalog coverage in this feed.';
+    }
+    if (coverageToggle) {
+      coverageToggle.hidden = coverageRows.length <= COVERAGE_PREVIEW;
+      coverageToggle.textContent = coverageExpanded ? 'Show fewer' : `Show all ${coverageRows.length}`;
+      coverageToggle.setAttribute('aria-expanded', String(coverageExpanded));
+    }
+  }
+
+  if (coverageToggle) coverageToggle.addEventListener('click', () => {
+    coverageExpanded = !coverageExpanded;
+    renderCoverage();
+  });
+
   fetch('/api/leaderboard.json')
     .then(response => {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -85,6 +138,8 @@
       const harnessCount = rows.filter(row => row.source === 'harness').length;
       boardSource.textContent = `${rows.length - harnessCount} snapshot priors, ${harnessCount} harness rows`;
       render();
+      coverageRows = (board.coverage && board.coverage.rows) || [];
+      renderCoverage();
     })
     .catch(() => {
       status.textContent = 'Feed unavailable. Showing the committed 2026-09-03 value-sorted snapshot.';

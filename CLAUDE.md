@@ -712,7 +712,18 @@ which is what actually drives the 65–96% reused-input share.
   agent-usable sources are shadcn blocks/themes/registries, tweakcn, Godly,
   SaaS Landing Page.
 
-- **Leaderboard coverage idea, 2026-09-03 (Claude, logged not built).** While
+- **Leaderboard coverage, BUILT 2026-09-03** (`router/leaderboard_coverage.py`,
+  a `coverage` key in `api/leaderboard.json`, its own table on `/leaderboard`).
+  220 borrowed rows from 424 catalog models: AA `coding_index` first, then
+  `intelligence_index`, then rescaled Design Arena Elo; `quality_source` per row.
+  Never `quality`, never `value`, never `cost_per_solved`, and the measured ten
+  plus their `:batch`/`:free` variants are excluded by base provider id.
+  Two filters exist only because the real output was inspected, not just the
+  fixtures: output modality must be text-only ("text+image->text+image"
+  generators had leaked), and variants of measured models are not "unmeasured".
+  Regenerate with `waterfall leaderboard --publish`; it degrades to an empty
+  coverage block on a machine with no key and no cache rather than failing.
+  Origin of the idea, kept for the record: While
   building a duplicate of the leaderboard Codex had already shipped (caught
   before push; the duplicate is parked on branch
   `backup/claude-leaderboard-2026-09-03` and should not be merged), one

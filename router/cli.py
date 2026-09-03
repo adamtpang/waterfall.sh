@@ -191,8 +191,13 @@ def cmd_why(_args: argparse.Namespace) -> int:
 
 def cmd_leaderboard(args: argparse.Namespace) -> int:
     import leaderboard
+    import leaderboard_coverage
 
-    board = leaderboard.build_leaderboard()
+    board = leaderboard.build_leaderboard(
+        catalog_models=leaderboard_coverage.load_catalog_models(),
+    )
+    cov = board.get("coverage") or {}
+    print(f"coverage: {cov.get('count', 0)} borrowed rows from {cov.get('catalog_models_seen', 0)} catalog models")
     if args.publish:
         json_path, csv_path = leaderboard.publish_leaderboard(board)
         print(f"published: {json_path}")

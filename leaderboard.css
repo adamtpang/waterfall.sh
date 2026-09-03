@@ -344,3 +344,14 @@ tbody th small {
     flex-direction: column;
   }
 }
+
+/* coverage: borrowed scores, visually subordinate to the measured board */
+.coverage-section { margin-top: 2.5rem; }
+.coverage-note { color: var(--dust, #9aa6b2); font-size: 0.92rem; line-height: 1.6; max-width: 78ch; margin: 0.25rem 0 1rem; }
+.coverage-note code { font-size: 0.85em; }
+.coverage-toggle { font: inherit; font-size: 0.85rem; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--line, #1c2740); background: transparent; color: inherit; cursor: pointer; }
+.coverage-toggle:hover { border-color: var(--accent, #5ec6ff); }
+.coverage-toggle[hidden] { display: none; }
+.coverage-section tbody th small { display: block; font-weight: 400; opacity: 0.7; font-size: 0.8em; }
+.coverage-section .borrowed { opacity: 0.85; }
+.coverage-section .free-tag { color: var(--good, #3dd68c); font-weight: 600; }
