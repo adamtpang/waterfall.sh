@@ -1,0 +1,108 @@
+{
+  "as_of": "2026-09-03",
+  "disclaimer": "Priors from public benches + list prices. Replace with waterfall.sh harness runs.",
+  "rows": [
+    {
+      "model": "DeepSeek V4 Flash",
+      "effort": "medium",
+      "quality": 72,
+      "price_in": 0.22,
+      "price_out": 0.66,
+      "cost_per_solved": 0.19,
+      "solved_pct": 0.62,
+      "best_for": "High-volume first pass"
+    },
+    {
+      "model": "MiniMax M3",
+      "effort": "medium",
+      "quality": 74,
+      "price_in": 0.30,
+      "price_out": 1.20,
+      "cost_per_solved": 0.35,
+      "solved_pct": 0.70,
+      "best_for": "Cheap capable implement"
+    },
+    {
+      "model": "GLM-5.3",
+      "effort": "max",
+      "quality": 86,
+      "price_in": 1.40,
+      "price_out": 4.40,
+      "cost_per_solved": 0.68,
+      "solved_pct": 0.78,
+      "best_for": "Frontier-cluster value"
+    },
+    {
+      "model": "Grok 4.6",
+      "effort": "medium",
+      "quality": 88,
+      "price_in": 2.00,
+      "price_out": 6.00,
+      "cost_per_solved": 0.84,
+      "solved_pct": 0.80,
+      "best_for": "Default implementer"
+    },
+    {
+      "model": "Kimi K3",
+      "effort": "max",
+      "quality": 87,
+      "price_in": 3.00,
+      "price_out": 15.00,
+      "cost_per_solved": 0.94,
+      "solved_pct": 0.82,
+      "best_for": "Frontend / UI agents"
+    },
+    {
+      "model": "GPT-5.6 Terra",
+      "effort": "max",
+      "quality": 89,
+      "price_in": 2.00,
+      "price_out": 12.00,
+      "cost_per_solved": 4.95,
+      "solved_pct": 0.84,
+      "best_for": "OpenAI everyday agent"
+    },
+    {
+      "model": "Claude Opus 5",
+      "effort": "high",
+      "quality": 93,
+      "price_in": 5.00,
+      "price_out": 25.00,
+      "cost_per_solved": 2.34,
+      "solved_pct": 0.90,
+      "best_for": "Quality floor / review"
+    },
+    {
+      "model": "GPT-5.6 Sol",
+      "effort": "max",
+      "quality": 92,
+      "price_in": 4.00,
+      "price_out": 20.00,
+      "cost_per_solved": 8.39,
+      "solved_pct": 0.89,
+      "best_for": "Tool-heavy agents"
+    },
+    {
+      "model": "Claude Fable 5.1",
+      "effort": "high",
+      "quality": 96,
+      "price_in": 10.00,
+      "price_out": 50.00,
+      "cache_read": 0.25,
+      "cost_per_solved": 2.72,
+      "solved_pct": 0.93,
+      "best_for": "Escalate after Opus fails"
+    },
+    {
+      "model": "Claude Fable 5.1",
+      "effort": "max",
+      "quality": 98,
+      "price_in": 10.00,
+      "price_out": 50.00,
+      "cache_read": 0.25,
+      "cost_per_solved": 3.76,
+      "solved_pct": 0.95,
+      "best_for": "Ceiling only"
+    }
+  ]
+}

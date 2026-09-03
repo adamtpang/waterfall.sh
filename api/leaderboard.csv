@@ -1,0 +1,11 @@
+rank,model,effort,quality,price_in,price_out,cache_read,cost_per_solved,cost_per_attempt,solved_pct,value,best_for,updated,source,n,harness
+1,DeepSeek V4 Flash,medium,72,0.22,0.66,,0.19,,0.62,100.0,High-volume first pass,2026-09-03,snapshot-2026-09-03,0,Public September 2026 priors
+2,MiniMax M3,medium,74,0.3,1.2,,0.35,,0.7,55.8,Cheap capable implement,2026-09-03,snapshot-2026-09-03,0,Public September 2026 priors
+3,GLM-5.3,max,86,1.4,4.4,,0.68,,0.78,33.4,Frontier-cluster value,2026-09-03,snapshot-2026-09-03,0,Public September 2026 priors
+4,Grok 4.6,medium,88,2.0,6.0,,0.84,,0.8,27.6,Default implementer,2026-09-03,snapshot-2026-09-03,0,Public September 2026 priors
+5,Kimi K3,max,87,3.0,15.0,,0.94,,0.82,24.4,Frontend / UI agents,2026-09-03,snapshot-2026-09-03,0,Public September 2026 priors
+6,Claude Opus 5,high,93,5.0,25.0,,2.34,,0.9,10.5,Quality floor / review,2026-09-03,snapshot-2026-09-03,0,Public September 2026 priors
+7,Claude Fable 5.1,high,96,10.0,50.0,0.25,2.72,,0.93,9.3,Escalate after Opus fails,2026-09-03,snapshot-2026-09-03,0,Public September 2026 priors
+8,Claude Fable 5.1,max,98,10.0,50.0,0.25,3.76,,0.95,6.9,Ceiling only,2026-09-03,snapshot-2026-09-03,0,Public September 2026 priors
+9,GPT-5.6 Terra,max,89,2.0,12.0,,4.95,,0.84,4.7,OpenAI everyday agent,2026-09-03,snapshot-2026-09-03,0,Public September 2026 priors
+10,GPT-5.6 Sol,max,92,4.0,20.0,,8.39,,0.89,2.9,Tool-heavy agents,2026-09-03,snapshot-2026-09-03,0,Public September 2026 priors
