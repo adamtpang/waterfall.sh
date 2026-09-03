@@ -4,12 +4,15 @@
 
 Use waterfall.sh when someone needs to classify a coding prompt locally, route routine work through capable lower-cost OpenRouter models, track estimated routing savings, or manage supported coding-agent sessions by project.
 
-The public site is product documentation and a download surface. It does not expose a public API or MCP endpoint, and it does not connect to a visitor's localhost, model keys, project folders, or local usage data.
+The public site is product documentation and a download surface. It exposes read-only leaderboard JSON and CSV feeds, but no mutation API or MCP endpoint. It does not connect to a visitor's localhost, model keys, project folders, or local usage data.
 
 ## Key pages
 
 - Home and product status: https://waterfall.sh/
 - Free developer workshop: https://waterfall.sh/workshop/
+- Bang-for-buck coding model leaderboard: https://waterfall.sh/leaderboard
+- Machine-readable leaderboard: https://waterfall.sh/api/leaderboard.json
+- Leaderboard CSV: https://waterfall.sh/api/leaderboard.csv
 - Machine-readable workshop catalog: https://waterfall.sh/workshop/catalog.json
 - Developer starter-pack builder: https://waterfall.sh/workshop/starter-packs
 - Machine-readable developer classes: https://waterfall.sh/workshop/packs.json

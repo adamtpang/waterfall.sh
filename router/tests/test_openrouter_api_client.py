@@ -396,6 +396,59 @@ class GenerateWithUsageFallbackTests(unittest.TestCase):
         # retries=1 -> 2 attempts on the single pinned model, no other candidates tried
         self.assertEqual(mock_post.call_count, 2)
 
+    @mock.patch("time.sleep", return_value=None)
+    @mock.patch("requests.post")
+    def test_fable_uses_output_effort_without_disabling_thinking(self, mock_post, _sleep) -> None:
+        client = self._client()
+        mock_post.return_value = _fake_response(200, {
+            "choices": [{"message": {"content": "done"}}],
+            "usage": {"prompt_tokens": 5, "completion_tokens": 2, "cost": 0.01},
+        })
+
+        client.generate_with_usage(
+            "hello", model="anthropic/claude-fable-5-1", output_effort="xhigh", retries=0
+        )
+
+        payload = mock_post.call_args.kwargs["json"]
+        self.assertEqual({"effort": "xhigh"}, payload["output_config"])
+        self.assertNotIn("thinking", payload)
+        self.assertNotIn("reasoning", payload)
+
+    @mock.patch("time.sleep", return_value=None)
+    @mock.patch("requests.post")
+    def test_non_fable_effort_uses_reasoning_control(self, mock_post, _sleep) -> None:
+        client = self._client()
+        mock_post.return_value = _fake_response(200, {
+            "choices": [{"message": {"content": "done"}}],
+            "usage": {"prompt_tokens": 5, "completion_tokens": 2, "cost": 0.01},
+        })
+
+        client.generate_with_usage(
+            "hello", model="x-ai/grok-4.6", output_effort="medium", retries=0
+        )
+
+        payload = mock_post.call_args.kwargs["json"]
+        self.assertEqual({"effort": "medium"}, payload["reasoning"])
+        self.assertNotIn("output_config", payload)
+
+    @mock.patch("time.sleep", return_value=None)
+    @mock.patch("requests.post")
+    def test_cache_read_tokens_survive_usage_accounting(self, mock_post, _sleep) -> None:
+        client = self._client()
+        mock_post.return_value = _fake_response(200, {
+            "choices": [{"message": {"content": "done"}}],
+            "usage": {
+                "prompt_tokens": 50,
+                "completion_tokens": 2,
+                "cost": 0.01,
+                "prompt_tokens_details": {"cached_tokens": 40},
+            },
+        })
+
+        result = client.generate_with_usage("hello", model="cheap/text-model", retries=0)
+
+        self.assertEqual(40, result.cache_read_tokens)
+
 
 if __name__ == "__main__":
     unittest.main()

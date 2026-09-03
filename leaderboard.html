@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bang for buck: coding models | waterfall.sh</title>
+<meta name="description" content="A dated coding-model leaderboard ranked by quality per dollar spent on solved tasks, with snapshot and waterfall.sh harness sources kept separate.">
+<meta name="theme-color" content="#0b1220">
+<meta property="og:title" content="Bang for buck: coding models">
+<meta property="og:description" content="Measured cost per solved task in the waterfall.sh harness. Not list price. Not vendor SWE-bench.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://waterfall.sh/leaderboard">
+<link rel="canonical" href="https://waterfall.sh/leaderboard">
+<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="/leaderboard.css">
+<script src="/leaderboard.js" defer></script>
+</head>
+<body class="leaderboard-page">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="leaderboard-wrap">
+  <header>
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="/" aria-label="waterfall.sh home">
+        <img src="/brand/favicon.svg" width="28" height="28" alt="">
+        <span>waterfall<span class="tld">.sh</span></span>
+      </a>
+      <div class="nav-links">
+        <a aria-current="page" href="/leaderboard">leaderboard</a>
+        <a href="/workshop/">workshop</a>
+        <a href="/#cascade">cascade</a>
+        <a href="https://github.com/adamtpang/waterfall.sh">source</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="board-hero" aria-labelledby="page-title">
+      <div>
+        <div class="eyebrow">bang for buck, not bang for ego</div>
+        <h1 id="page-title">Coding models ranked by dollars per solved task.</h1>
+        <p class="lede">Measured cost per solved task in the waterfall.sh harness. Not list price. Not vendor SWE-bench.</p>
+      </div>
+      <aside class="snapshot-card" aria-label="Leaderboard snapshot">
+        <span class="snapshot-label">Current board</span>
+        <strong id="board-date">2026-09-03</strong>
+        <span id="board-source">10 snapshot priors, 0 harness rows</span>
+        <span>Prices move. Every row is dated.</span>
+      </aside>
+    </section>
+
+    <section class="read-grid" aria-labelledby="how-to-read">
+      <h2 class="sec" id="how-to-read">How to read this</h2>
+      <div class="read-copy">
+        <p>Value is quality per dollar spent on a solved task, normalized so the board leader is 100.</p>
+        <p>The quality ceiling is useful, but it is not the same thing as the best default.</p>
+        <p>Snapshot costs are public priors; harness costs include retries and failed attempts as measured runs replace them.</p>
+        <p>Cache reads can change Fable economics, so Waterfall will not recommend Fable on cost unless the harness actually cached the stable prefix.</p>
+      </div>
+    </section>
+
+    <section class="table-section" aria-labelledby="live-table">
+      <div class="section-heading">
+        <div>
+          <h2 class="sec" id="live-table">Live table</h2>
+          <p id="table-status" class="table-status" aria-live="polite">Value sort, snapshot dated 2026-09-03.</p>
+        </div>
+        <div class="feed-links">
+          <a href="/api/leaderboard.json">JSON</a>
+          <a href="/api/leaderboard.csv">CSV</a>
+          <a href="/badge/value.svg?model=grok-4.6">badge</a>
+        </div>
+      </div>
+      <div class="table-scroll" tabindex="0" aria-label="Scrollable coding model leaderboard">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Rank</th>
+              <th scope="col">Model</th>
+              <th scope="col" data-sort-header="quality"><button type="button" data-sort="quality">Quality</button></th>
+              <th scope="col">List in / out</th>
+              <th scope="col">Cache read</th>
+              <th scope="col" data-sort-header="cost_per_solved"><button type="button" data-sort="cost_per_solved">Cost / solved</button></th>
+              <th scope="col">Cost / attempt</th>
+              <th scope="col" data-sort-header="solved_pct"><button type="button" data-sort="solved_pct">Solved %</button></th>
+              <th scope="col" data-sort-header="value" aria-sort="descending"><button type="button" data-sort="value">Value</button></th>
+              <th scope="col">Best for</th>
+              <th scope="col">Updated</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body">
+            <tr><td>1</td><th scope="row"><strong>DeepSeek V4 Flash</strong><small>medium · snapshot</small></th><td>72</td><td>$0.22 / $0.66</td><td>none</td><td>$0.19</td><td>pending</td><td>62%</td><td><strong class="value-score">100.0</strong></td><td>High-volume first pass</td><td>2026-09-03</td></tr>
+            <tr><td>2</td><th scope="row"><strong>MiniMax M3</strong><small>medium · snapshot</small></th><td>74</td><td>$0.30 / $1.20</td><td>none</td><td>$0.35</td><td>pending</td><td>70%</td><td><strong class="value-score">55.8</strong></td><td>Cheap capable implement</td><td>2026-09-03</td></tr>
+            <tr><td>3</td><th scope="row"><strong>GLM-5.3</strong><small>max · snapshot</small></th><td>86</td><td>$1.40 / $4.40</td><td>none</td><td>$0.68</td><td>pending</td><td>78%</td><td><strong class="value-score">33.4</strong></td><td>Frontier-cluster value</td><td>2026-09-03</td></tr>
+            <tr><td>4</td><th scope="row"><strong>Grok 4.6</strong><small>medium · snapshot</small></th><td>88</td><td>$2.00 / $6.00</td><td>none</td><td>$0.84</td><td>pending</td><td>80%</td><td><strong class="value-score">27.6</strong></td><td>Default implementer</td><td>2026-09-03</td></tr>
+            <tr><td>5</td><th scope="row"><strong>Kimi K3</strong><small>max · snapshot</small></th><td>87</td><td>$3.00 / $15.00</td><td>none</td><td>$0.94</td><td>pending</td><td>82%</td><td><strong class="value-score">24.4</strong></td><td>Frontend / UI agents</td><td>2026-09-03</td></tr>
+            <tr><td>6</td><th scope="row"><strong>Claude Opus 5</strong><small>high · snapshot</small></th><td>93</td><td>$5.00 / $25.00</td><td>none</td><td>$2.34</td><td>pending</td><td>90%</td><td><strong class="value-score">10.5</strong></td><td>Quality floor / review</td><td>2026-09-03</td></tr>
+            <tr><td>7</td><th scope="row"><strong>Claude Fable 5.1</strong><small>high · snapshot</small></th><td>96</td><td>$10.00 / $50.00</td><td>$0.25</td><td>$2.72</td><td>pending</td><td>93%</td><td><strong class="value-score">9.3</strong></td><td>Escalate after Opus fails</td><td>2026-09-03</td></tr>
+            <tr><td>8</td><th scope="row"><strong>Claude Fable 5.1</strong><small>max · snapshot</small></th><td>98</td><td>$10.00 / $50.00</td><td>$0.25</td><td>$3.76</td><td>pending</td><td>95%</td><td><strong class="value-score">6.9</strong></td><td>Ceiling only</td><td>2026-09-03</td></tr>
+            <tr><td>9</td><th scope="row"><strong>GPT-5.6 Terra</strong><small>max · snapshot</small></th><td>89</td><td>$2.00 / $12.00</td><td>none</td><td>$4.95</td><td>pending</td><td>84%</td><td><strong class="value-score">4.7</strong></td><td>OpenAI everyday agent</td><td>2026-09-03</td></tr>
+            <tr><td>10</td><th scope="row"><strong>GPT-5.6 Sol</strong><small>max · snapshot</small></th><td>92</td><td>$4.00 / $20.00</td><td>none</td><td>$8.39</td><td>pending</td><td>89%</td><td><strong class="value-score">2.9</strong></td><td>Tool-heavy agents</td><td>2026-09-03</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <noscript><p class="noscript-note">Sorting needs JavaScript. The value-sorted snapshot is visible above, and the <a href="/api/leaderboard.json">JSON feed</a> is always available.</p></noscript>
+    </section>
+
+    <section aria-labelledby="default-stack">
+      <h2 class="sec" id="default-stack">Waterfall default stack</h2>
+      <p class="secnote">Cheap first. Independent review. Expensive only after a blocking failure.</p>
+      <div class="stack" aria-label="Default model routing stack">
+        <article><span>01 · draft</span><strong>DeepSeek Flash</strong><small>low effort</small></article>
+        <div class="stack-arrow" aria-hidden="true">→</div>
+        <article><span>02 · implement</span><strong>Grok / GLM</strong><small>medium effort</small></article>
+        <div class="stack-arrow" aria-hidden="true">→</div>
+        <article><span>03 · harden</span><strong>Opus 5</strong><small>high effort</small></article>
+        <div class="stack-arrow" aria-hidden="true">→</div>
+        <article class="ceiling"><span>04 · escalate</span><strong>Fable 5.1</strong><small>only after failure</small></article>
+      </div>
+    </section>
+
+    <section class="method" aria-labelledby="methodology">
+      <h2 class="sec" id="methodology">Methodology</h2>
+      <div class="method-grid">
+        <div>
+          <h3>Score</h3>
+          <p><code>value_raw = quality / max(cost_per_solved, 0.01)</code></p>
+          <p><code>value = 100 × value_raw / max(value_raw on board)</code></p>
+          <p>Harness quality is the equal-weight mean of pass rates across task categories. A solve means the declared tests or blocking reviewer gate passed on the first submitted attempt.</p>
+        </div>
+        <div>
+          <h3>Source and sample</h3>
+          <p><strong>snapshot-2026-09-03</strong> means a prior compiled from public September 2026 reporting and list prices. It is not a Waterfall measurement, so cost per attempt and n remain pending.</p>
+          <p><strong>harness</strong> means committed task-level records from <code>data/runs/*.jsonl</code>, including model, effort, tokens, cache reads, cost, wall time, pass/fail, promotions, and reviewer verdict.</p>
+        </div>
+        <div>
+          <h3>Context, not borrowed results</h3>
+          <p><a href="https://www.swebench.com/">SWE-bench</a>, <a href="https://artificialanalysis.ai/methodology/coding-agents-benchmarking/">Artificial Analysis</a>, and <a href="https://deepswe.datacurve.ai/">DeepSWE</a> are useful external context. Their scores are never relabeled as Waterfall harness numbers.</p>
+          <p>The shipped suite is intentionally small: 5 one-file bugfixes, 5 multi-file features, 3 review-only diffs, and 2 long-horizon finish-the-PR tasks.</p>
+        </div>
+      </div>
+      <p class="dated-note"><strong>Snapshot date: 2026-09-03.</strong> Prices move; this row is dated. Rebuild the feeds with <code>waterfall leaderboard --publish</code>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <span>waterfall.sh · numbers first · independent software project</span>
+    <nav aria-label="Footer navigation">
+      <a href="/api/leaderboard.json">JSON</a>
+      <a href="/api/leaderboard.csv">CSV</a>
+      <a href="/workshop/">Workshop</a>
+      <a href="https://github.com/adamtpang/waterfall.sh">Source</a>
+    </nav>
+  </footer>
+</div>
+</body>
+</html>
