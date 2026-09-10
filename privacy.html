@@ -4,11 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Privacy — waterfall.sh</title>
-<meta name="description" content="The waterfall.sh privacy notice explains the static website’s lack of forms, accounts, analytics, and first-party cookies, plus its external service links.">
+<meta name="description" content="The waterfall.sh privacy notice explains the static website’s cookieless page analytics, lack of forms and accounts, and external services, plus its external service links.">
 <meta name="theme-color" content="#0b1220">
 <link rel="canonical" href="https://waterfall.sh/privacy">
 <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/site.css">
+<script src="/site-analytics.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -22,11 +23,16 @@
   <main class="page-main" id="main-content">
     <div class="eyebrow">privacy notice</div>
     <h1>What this website does with data</h1>
-    <p class="page-intro">waterfall.sh is a static public website. Its initial response sets no first-party cookies, its pages contain no analytics or advertising scripts, and the website has no account, newsletter, or contact form.</p>
+    <p class="page-intro">waterfall.sh is a static public website. We use cookieless page analytics to understand which public pages are useful. The website has no account, newsletter, or contact form.</p>
 
     <section class="prose-section">
       <h2>Hosting</h2>
       <p>The waterfall.sh website is hosted on Vercel. Requests therefore pass through Vercel’s infrastructure, which may process ordinary request information such as an IP address, user agent, requested path, timestamp, and security or delivery metadata under Vercel’s own terms and privacy notice.</p>
+    </section>
+
+    <section class="prose-section">
+      <h2>Page analytics</h2>
+      <p>PostHog processes public pageviews in its US region, including the page path and basic browser and device information. Tracking is configured without analytics cookies or person profiles. It does not record sessions, form inputs, query strings, URL fragments, or referrer paths. Network requests necessarily expose an IP address to the receiving service. See <a href="https://posthog.com/privacy">PostHog’s privacy notice</a>.</p>
     </section>
 
     <section class="prose-section">

@@ -852,3 +852,10 @@ Key routing rules:
 - Save progress → invoke /context-save
 - Resume context → invoke /context-restore
 - Author a backlog-ready spec/issue → invoke /spec
+
+
+## Public PostHog analytics — 2026-09-10
+
+- Added pinned PostHog JS1.429.1 with a committed static bundle and reproducible analytics/ build source. All seven sitemap pages track one manual pageview per document on allowed production hosts. Exact hostname and stable site_id tags; queries, fragments, referrer data, person profiles, autocapture and replay excluded.
+- Updated privacy disclosure and CSP. Root remains a static deployment; analytics/ tooling excluded from Vercel uploads. Rebuild with public capture token before committing generated site-analytics.js. Never put query-read credentials in browser code.
+- Verification:330Python tests,23existingNode tests,4analytics boundary tests, and bundle build passed. Production receipt recorded separately afterdeployment.
