@@ -8,3 +8,5 @@ desktop-app/
 *.yaml
 *.cmd
 .last-handoff
+
+analytics/
