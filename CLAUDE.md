@@ -745,6 +745,25 @@ which is what actually drives the 65–96% reused-input share.
   `git fetch` before building. BACKUP_PLAN.md's sync ritual is now amended
   to start with a fetch.
 
+- **Fleet model/effort set to Opus 5 low, 2026-09-14**, at Adam's direct
+  instruction, after an Artificial Analysis effort-curve comparison showed
+  Opus 5 low (index 40, $1.10) dominating every Sonnet 5 setting above
+  medium, and Fable max strictly dominated by Fable xhigh (same score, 22%
+  cheaper). Swept 79 settings files: 75 written (global plus 74 projects),
+  4 inherit the global, 0 failed. Merge-only: every other key preserved,
+  verified afterwards (global still has all 11 hook groups and
+  34/47/12 allow/deny/ask permissions). Each file backed up beside itself
+  as `*.bak-model-20260914T125621`. `antlist` (was `high`) and
+  `summon-guide-dashless` (was `max`) dropped to `low` because Adam said
+  all; raise either per project if needed.
+  **Correction for future sessions: agents CAN edit `model` and
+  `effortLevel` in `.claude/settings.json`**, globally and per project. What
+  auto-mode blocks is hook and permission config (the 2026-08-05
+  double-firing fix). A session on 2026-09-13/14 over-generalized that
+  block to the whole file and told Adam three times to paste settings by
+  hand; the 08-19 global edit, the 08-20 28-project write, and this sweep
+  all went through. Try the edit before claiming it is blocked.
+
 ## Not done yet
 
 - **A/B/C/D quota-safety plan shipped, 2026-08-18**, in response to Adam
