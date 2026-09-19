@@ -48,6 +48,11 @@ except ImportError as e:
     logger.warning("OpenRouter API router unavailable: %s", e)
 
 try:
+    import jev as _jev
+except ImportError:
+    _jev = None
+
+try:
     from cache import ResponseCache
     CACHE_AVAILABLE = True
 except ImportError:
@@ -83,12 +88,16 @@ class ApiRoutingResult:
     # On a cache hit both are empty: no model was contacted at all.
     queue: list = field(default_factory=list)
     attempts: list = field(default_factory=list)
+    # Jev's second opinion when it was asked: routing, confidence,
+    # needs_context, cost, and whether it changed the local decision.
+    jev: Optional[dict] = None
 
 
 class SmartRouter:
     """Classify prompts and route between free + Claude sessions."""
 
-    def __init__(self, cache: Optional["ResponseCache"] = None) -> None:
+    def __init__(self, cache: Optional["ResponseCache"] = None,
+                 use_jev: Optional[bool] = None) -> None:
         if not SMART_ROUTER_AVAILABLE:
             raise RuntimeError(f"classifier not importable: {_import_error}")
         self._classifier = PromptClassifier()
@@ -99,6 +108,7 @@ class SmartRouter:
             self._cache = ResponseCache()
         else:
             self._cache = None
+        self._use_jev = (_jev is not None and _jev.enabled()) if use_jev is None else use_jev
 
     def classify(self, prompt: str) -> "TaskClassification":
         """Score the prompt and decide routing."""
@@ -168,6 +178,16 @@ class SmartRouter:
             raise RuntimeError(f"openrouter_api_client not importable: {_api_import_error}")
 
         cls = self.classify(prompt)
+        jev_info = None
+        if self._use_jev and _jev is not None and _jev.should_ask(cls):
+            verdict = _jev.ask(prompt)
+            if verdict is not None:
+                refined = _jev.refine(cls, verdict)
+                jev_info = {"routing": verdict.routing, "confidence": verdict.confidence,
+                            "needs_context": verdict.needs_context,
+                            "cost_usd": verdict.cost_usd,
+                            "changed": refined.routing != cls.routing}
+                cls = refined
         split = self.split(prompt, cls)
 
         client = _openrouter_api_client.OpenRouterClient()
@@ -224,4 +244,5 @@ class SmartRouter:
             cache_hit=cache_hit,
             queue=list(getattr(gen, "queue", []) or []) if gen else [],
             attempts=list(getattr(gen, "attempts", []) or []) if gen else [],
+            jev=jev_info,
         )
