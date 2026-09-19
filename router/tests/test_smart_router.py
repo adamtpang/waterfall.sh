@@ -7,6 +7,7 @@ edge cases.
 
 from __future__ import annotations
 
+import os
 import sys
 import tempfile
 import unittest
@@ -14,6 +15,7 @@ from pathlib import Path
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+os.environ["WATERFALL_JEV"] = "0"  # keep these tests offline; test_jev.py covers Jev
 
 from smart_router import SmartRouter
 from cache import ResponseCache

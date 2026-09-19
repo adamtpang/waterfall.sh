@@ -764,6 +764,21 @@ which is what actually drives the 65–96% reused-input share.
   hand; the 08-19 global edit, the 08-20 28-project write, and this sweep
   all went through. Try the edit before claiming it is blocked.
 
+- **Jev second opinion in the router, 2026-09-19** (`router/jev.py`, wired
+  into `SmartRouter.route_with_api` only; uncommitted at time of writing).
+  TypeSafe's Jev on OpenRouter (`POST /api/alpha/decisions`, model
+  `~typesafe/jev-latest`, boolean type is named `noul`) answers one
+  free/split/claude choice plus a "needs outside context" probability. On 30
+  labeled prompts: local classifier 12/30 (it calls most deep work and every
+  follow-up "free", confidence flat at 0.3), Jev 25/30, Jev plus the rule
+  "free that needs context becomes claude" 29/30 offline and 28/30 live.
+  About 0.45s and 0.000018 USD per call. Asked only when local confidence is
+  under 0.6 (in practice nearly always). Any failure, a 3s timeout, or Jev
+  confidence under 0.5 keeps the local decision. `classify()` and both hooks
+  stay local and offline. `WATERFALL_JEV=0` turns it off. Thresholds were tuned
+  on the same 30 prompts, so re-check against real routed prompts. 15 tests in
+  `test_jev.py`, all mocked; suite green at 359.
+
 ## Not done yet
 
 - **A/B/C/D quota-safety plan shipped, 2026-08-18**, in response to Adam
