@@ -152,12 +152,25 @@ class HttpServerTests(unittest.TestCase):
         self.assertIn("binding constraint", data["guidance"])
 
     def test_pace_endpoint_color_coding(self):
-        # Comfortably under pace -> green
-        status, data = self._get("/api/pace?used_pct=5")
-        self.assertEqual(data["buckets"][0]["color"], "green")
-        # Way over pace -> red
-        status, data = self._get("/api/pace?used_pct=95")
-        self.assertEqual(data["buckets"][0]["color"], "red")
+        # Pin the clock to mid-week (Saturday noon, ~2.8 days after the
+        # Tuesday 4pm reset). With the real clock, "5% used" read as on pace,
+        # not under it, for the first hours after every reset, so this test
+        # failed early each week.
+        from datetime import datetime as _real_dt
+        from unittest import mock
+
+        class _MidWeek(_real_dt):
+            @classmethod
+            def now(cls, tz=None):
+                return _real_dt(2026, 10, 3, 12, 0, tzinfo=tz)
+
+        with mock.patch.object(desktop_server, "datetime", _MidWeek):
+            # Comfortably under pace -> green
+            status, data = self._get("/api/pace?used_pct=5")
+            self.assertEqual(data["buckets"][0]["color"], "green")
+            # Way over pace -> red
+            status, data = self._get("/api/pace?used_pct=95")
+            self.assertEqual(data["buckets"][0]["color"], "red")
 
 
 if __name__ == "__main__":
