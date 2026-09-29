@@ -78,6 +78,7 @@ class SavingsEvent:
     elapsed_sec: float = 0.0
     prompt_preview: str = ""  # first 200 chars of original prompt
     model_tier: str = ""      # "small"/"medium"/"large" -- see openrouter_api_client.tier_for_complexity
+    tier_source: str = ""     # "pinned", "jev", or "local": which path chose model_tier
 
 
 @dataclass
