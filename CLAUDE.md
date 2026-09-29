@@ -778,6 +778,17 @@ which is what actually drives the 65–96% reused-input share.
   stay local and offline. `WATERFALL_JEV=0` turns it off. Thresholds were tuned
   on the same 30 prompts, so re-check against real routed prompts. 15 tests in
   `test_jev.py`, all mocked; suite green at 359.
+  **Tier pick added the same day (uncommitted):** Jev also chooses the
+  small/medium/large price band for the routed text (`jev.ask_tier` +
+  `pick_tier`, threshold 0.65), with `tier_for_complexity()` as fallback. On 30
+  labeled synthetic prompts: local 10/30 (29 of 30 landed in "small", so LRU
+  caches and Dijkstra went to the cheapest band), Jev 29/30 offline and live,
+  about 0.38s and 0.000018 USD per call. Skipped on cache hits and when a
+  model or tier is pinned. Which path chose the tier is logged as
+  `tier_source` ("jev"/"local"/"pinned") on the result, in `waterfall route`
+  output, the desktop API, and the savings ledger. Jev's `score` is continuous
+  (e.g. 1.02); take the level from `probabilities`, never `int(score)`.
+  Suite green at 368.
 
 ## Not done yet
 

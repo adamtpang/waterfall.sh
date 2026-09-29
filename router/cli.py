@@ -324,7 +324,8 @@ def cmd_route(args: argparse.Namespace) -> int:
     if result.cache_hit:
         print("\nserved from cache -- identical routed text answered before, no new API call")
     print(f"\nmodel used:   {result.model_used or '(none -- routed fully to Claude)'}")
-    print(f"model tier:   {result.model_tier or '(n/a)'}")
+    tier_src = getattr(result, "tier_source", "")
+    print(f"model tier:   {result.model_tier or '(n/a)'}" + (f"  (chosen by {tier_src})" if tier_src else ""))
     print(f"cost (USD):   {result.cost_usd}")
     print(f"tokens:       {result.input_tokens} in / {result.output_tokens} out")
     print(f"elapsed:      {result.elapsed_sec}s")
@@ -355,6 +356,7 @@ def cmd_route(args: argparse.Namespace) -> int:
             elapsed_sec=result.elapsed_sec,
             prompt_preview=prompt[:200],
             model_tier=result.model_tier,
+            tier_source=getattr(result, "tier_source", ""),
         )
         tracker.record(event)
 

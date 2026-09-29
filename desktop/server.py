@@ -366,6 +366,7 @@ def api_route(prompt: str, dry_run: bool = True, log: bool = True) -> dict[str, 
     base["attempts"] = list(getattr(result, "attempts", []) or [])
     base["model_used"] = getattr(result, "model_used", "") or ""
     base["model_tier"] = getattr(result, "model_tier", "") or ""
+    base["tier_source"] = getattr(result, "tier_source", "") or ""
     base["cost_usd"] = float(getattr(result, "cost_usd", 0.0) or 0.0)
     base["input_tokens"] = int(getattr(result, "input_tokens", 0) or 0)
     base["output_tokens"] = int(getattr(result, "output_tokens", 0) or 0)
@@ -391,6 +392,7 @@ def api_route(prompt: str, dry_run: bool = True, log: bool = True) -> dict[str, 
             elapsed_sec=result.elapsed_sec,
             prompt_preview=prompt[:200],
             model_tier=result.model_tier,
+            tier_source=getattr(result, "tier_source", ""),
         )
         SavingsTracker().record(event)
         base["logged"] = True

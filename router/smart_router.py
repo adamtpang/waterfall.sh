@@ -91,6 +91,9 @@ class ApiRoutingResult:
     # Jev's second opinion when it was asked: routing, confidence,
     # needs_context, cost, and whether it changed the local decision.
     jev: Optional[dict] = None
+    # Which path chose model_tier: "pinned" (caller passed model/tier),
+    # "jev", or "local" (tier_for_complexity on the classifier score).
+    tier_source: str = ""
 
 
 class SmartRouter:
@@ -193,6 +196,7 @@ class SmartRouter:
         client = _openrouter_api_client.OpenRouterClient()
 
         resolved_tier = tier or _openrouter_api_client.tier_for_complexity(cls.complexity_score)
+        tier_source = "pinned" if (tier or model) else "local"
 
         free_response = ""
         gen = None
@@ -207,6 +211,13 @@ class SmartRouter:
                     input_tokens=0, output_tokens=0, cost_usd=0.0, elapsed_sec=0.0,
                 )
             else:
+                if tier_source == "local" and self._use_jev and _jev is not None:
+                    tv = _jev.ask_tier(split.free_prompt)
+                    resolved_tier, tier_source = _jev.pick_tier(tv, resolved_tier)
+                    if tv is not None:
+                        jev_info = dict(jev_info or {})
+                        jev_info.update({"tier": tv.tier, "tier_confidence": tv.confidence,
+                                         "tier_cost_usd": tv.cost_usd})
                 gen = client.generate_with_usage(
                     split.free_prompt,
                     model=model,
@@ -245,4 +256,5 @@ class SmartRouter:
             queue=list(getattr(gen, "queue", []) or []) if gen else [],
             attempts=list(getattr(gen, "attempts", []) or []) if gen else [],
             jev=jev_info,
+            tier_source=tier_source if gen else "",
         )
