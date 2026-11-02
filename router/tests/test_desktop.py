@@ -7,6 +7,8 @@ import sys
 import threading
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -15,6 +17,22 @@ sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "router"))
 
 from desktop import server as desktop_server  # noqa: E402
+
+
+def _pin_desktop_clock():
+    """Pin desktop_server's clock to mid-week (Saturday noon 2026-10-03
+    SGT, ~2.8 days after the Tuesday 4pm reset) so /api/pace output is
+    deterministic. With the real clock, "5% used" read as on pace, not
+    under it, for the first hours after every reset, so the color test
+    failed early each week."""
+    from datetime import datetime as _real_dt
+
+    class _MidWeek(_real_dt):
+        @classmethod
+        def now(cls, tz=None):
+            return _real_dt(2026, 10, 3, 12, 0, tzinfo=tz)
+
+    return mock.patch.object(desktop_server, "datetime", _MidWeek)
 
 
 class DetectAgentsTests(unittest.TestCase):
@@ -128,43 +146,40 @@ class HttpServerTests(unittest.TestCase):
             self.assertIn("usage pace", body)
 
     def test_pace_endpoint_no_params_falls_back_to_estimate(self):
-        status, data = self._get("/api/pace")
-        self.assertEqual(status, 200)
-        self.assertTrue(data["estimated"])
-        self.assertEqual(len(data["buckets"]), 1)
-        self.assertIn("(est.)", data["buckets"][0]["label"])
-        self.assertEqual(len(data["ceiling_by_day"]), 8)
+        import quota_estimate
+        # Stub get_estimate so the pinned clock never triggers a real
+        # transcript scan or a real ~/.claude cache write keyed to a fake
+        # 2026 reset boundary; the estimate math has its own test file.
+        fake = SimpleNamespace(estimated_pct=42.0)
+        with _pin_desktop_clock(), \
+                mock.patch.object(quota_estimate, "get_estimate", return_value=fake):
+            status, data = self._get("/api/pace")
+            self.assertEqual(status, 200)
+            self.assertTrue(data["estimated"])
+            self.assertEqual(len(data["buckets"]), 1)
+            self.assertIn("(est.)", data["buckets"][0]["label"])
+            self.assertEqual(len(data["ceiling_by_day"]), 8)
 
     def test_pace_endpoint_with_used_pct_is_not_estimated(self):
-        status, data = self._get("/api/pace?used_pct=30")
-        self.assertEqual(status, 200)
-        self.assertFalse(data["estimated"])
-        self.assertEqual(data["buckets"][0]["used_pct"], 30.0)
-        self.assertNotIn("(est.)", data["buckets"][0]["label"])
+        with _pin_desktop_clock():
+            status, data = self._get("/api/pace?used_pct=30")
+            self.assertEqual(status, 200)
+            self.assertFalse(data["estimated"])
+            self.assertEqual(data["buckets"][0]["used_pct"], 30.0)
+            self.assertNotIn("(est.)", data["buckets"][0]["label"])
 
     def test_pace_endpoint_multiple_buckets_include_guidance(self):
-        status, data = self._get(
-            "/api/pace?used_pct=30&session_pct=13&session_hours_remaining=3.45&model_pct=fable=3"
-        )
-        self.assertEqual(status, 200)
-        self.assertEqual(len(data["buckets"]), 3)
-        self.assertIsNotNone(data["guidance"])
-        self.assertIn("binding constraint", data["guidance"])
+        with _pin_desktop_clock():
+            status, data = self._get(
+                "/api/pace?used_pct=30&session_pct=13&session_hours_remaining=3.45&model_pct=fable=3"
+            )
+            self.assertEqual(status, 200)
+            self.assertEqual(len(data["buckets"]), 3)
+            self.assertIsNotNone(data["guidance"])
+            self.assertIn("binding constraint", data["guidance"])
 
     def test_pace_endpoint_color_coding(self):
-        # Pin the clock to mid-week (Saturday noon, ~2.8 days after the
-        # Tuesday 4pm reset). With the real clock, "5% used" read as on pace,
-        # not under it, for the first hours after every reset, so this test
-        # failed early each week.
-        from datetime import datetime as _real_dt
-        from unittest import mock
-
-        class _MidWeek(_real_dt):
-            @classmethod
-            def now(cls, tz=None):
-                return _real_dt(2026, 10, 3, 12, 0, tzinfo=tz)
-
-        with mock.patch.object(desktop_server, "datetime", _MidWeek):
+        with _pin_desktop_clock():
             # Comfortably under pace -> green
             status, data = self._get("/api/pace?used_pct=5")
             self.assertEqual(data["buckets"][0]["color"], "green")
