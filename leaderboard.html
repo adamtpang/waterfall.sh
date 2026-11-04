@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bang for buck: coding models | waterfall.sh</title>
 <meta name="description" content="A dated coding-model leaderboard ranked by quality per dollar spent on solved tasks, with snapshot and waterfall.sh harness sources kept separate.">
-<meta name="theme-color" content="#0b1220">
+<meta name="theme-color" content="#ffffff">
 <meta property="og:title" content="Bang for buck: coding models">
 <meta property="og:description" content="Measured cost per solved task in the waterfall.sh harness. Not list price. Not vendor SWE-bench.">
 <meta property="og:type" content="website">
@@ -14,19 +14,25 @@
 <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/site.css">
 <link rel="stylesheet" href="/leaderboard.css">
+<link rel="preload" href="/fonts/inter-tight-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/ribbon.css">
+<link rel="stylesheet" href="/ribbon-pages.css">
 <script src="/leaderboard.js" defer></script>
 <script src="/site-analytics.js" defer></script>
 </head>
-<body class="leaderboard-page">
+<body class="ribbon leaderboard-page">
+<div class="r-page-wash" aria-hidden="true"></div>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 <div class="leaderboard-wrap">
-  <header>
-    <nav class="nav" aria-label="Primary navigation">
-      <a class="brand" href="/" aria-label="waterfall.sh home">
-        <img src="/brand/favicon.svg" width="28" height="28" alt="">
-        <span>waterfall<span class="tld">.sh</span></span>
-      </a>
-      <div class="nav-links"><a href="/#cascade">cascade</a><a href="/leaderboard" aria-current="page">leaderboard</a><a href="/workshop/">workshop</a><a href="/about">docs</a><a class="btn primary keep" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy $30</a></div>
+  <header class="r-head">
+    <nav class="r-nav" aria-label="Primary navigation">
+      <a class="r-logo" href="/" aria-label="waterfall.sh home"><img src="/brand/favicon.svg" width="28" height="28" alt="">waterfall</a>
+      <a href="/#cascade">Cascade</a>
+      <a href="/leaderboard" aria-current="page">Leaderboard</a>
+      <a href="/workshop/">Workshop</a>
+      <span class="r-sp"></span>
+      <a href="/about">Docs</a>
+      <a class="r-pill light" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy · $30</a>
     </nav>
   </header>
 
@@ -171,14 +177,9 @@
     </section>
   </main>
 
-  <footer>
-    <span>waterfall.sh · numbers first · independent software project</span>
-    <nav aria-label="Footer navigation">
-      <a href="/api/leaderboard.json">JSON</a>
-      <a href="/api/leaderboard.csv">CSV</a>
-      <a href="/workshop/">Workshop</a>
-      <a href="https://github.com/adamtpang/waterfall.sh">Source</a>
-    </nav>
+  <footer class="r-footer">
+    <span>waterfall.sh · independent software project</span>
+    <nav aria-label="Footer navigation"><a href="/workshop/">Workshop</a><a href="/leaderboard">Leaderboard</a><a href="/design">Design</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="https://github.com/adamtpang/waterfall.sh">Source</a></nav>
   </footer>
 </div>
 </body>

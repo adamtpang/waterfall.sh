@@ -1,465 +1,573 @@
 {
   "contract": "shapeable.site-design-system",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "site": "waterfall.sh",
   "repository": "repo://waterfall.sh",
   "status": "owner-approved",
   "approval": {
     "state": "approved",
     "ownerReviewRequired": true,
-    "approvedAt": "2026-11-04T20:10:00.000Z",
-    "evidence": "artifacts/audits/waterfall-sh-redesign-owner-acceptance-20261104/receipt.json"
+    "approvedAt": "2026-11-04T22:00:00.000Z",
+    "evidence": "contracts/waterfall-sh-owner-feedback-20261104.md"
   },
-  "generatedAt": "2026-11-04T18:30:00.000Z",
-  "identityBrief": "repo://waterfall.sh/DESIGN.md, repo://waterfall.sh/PERFECT.md, repo://waterfall.sh/OFFER.md, and the waterfall.sh entry in preferences/owner-preferences.json. No separate identity-brief file exists yet.",
+  "generatedAt": "2026-11-04T22:00:00.000Z",
+  "identityBrief": "repo://waterfall.sh/ribbon.css, repo://waterfall.sh/ribbon-pages.css, repo://waterfall.sh/index.html, repo://waterfall.sh/PERFECT.md, and contracts/waterfall-sh-owner-feedback-20261104.md (no standalone identity brief file exists; this pack was extracted from the accepted, shipped CSS).",
   "ownerPreferences": {
     "ledger": "preferences/owner-preferences.json",
     "site": "waterfall.sh",
-    "latestFeedbackId": "waterfall-redesign-previews-abc-rejection"
+    "latestFeedbackId": "waterfall-ribbon-home-accepted"
   },
-  "intent": "Keep waterfall.sh's dark deep-water identity and blue W, and bring it to the accepted shapeable.art level of polish: one type scale, airy rhythm, restraint, and one clear path to the $30 founding license.",
-  "northStar": "A developer understands in one pass that waterfall.sh is a local board that routes routine prompts to the cheapest capable model and keeps hard work for Claude or Grok, sees the real board, and either buys the $30 license or downloads it.",
+  "intent": "Make waterfall.sh feel as considered as Stripe while staying its own: a light page, one luminous cascade ribbon that reads as falling water, and the real local board shown large, so a developer sees the product and the price in one pass.",
+  "northStar": "A developer understands in one pass that waterfall.sh is a local board that sends each prompt to the cheapest model that can do it, sees the product itself, and can buy the $30 founding license or download in one click.",
   "personality": {
     "traits": [
-      "quiet",
-      "technical",
-      "frugal",
-      "fast",
-      "honest about limits",
-      "developer-native"
+      "luminous",
+      "calm",
+      "confident",
+      "precise",
+      "honest",
+      "generous with space"
     ],
-    "signature": "A deep-water board (#0b1220) with chalk text and a single waterfall blue (#5ec6ff); the blue W tile; mono uppercase eyebrows; large tight sans headlines; one illustrative still of the real local board.",
+    "signature": "A single cascade ribbon (a conic gradient of #5ec6ff, #2f6bff, #6b5cff, #12c2b3, and #a7f3ff with fine diagonal white striations, clipped to a polygon and masked to fade into white) falling behind a light-weight Inter Tight headline, with the dark local board overlapping it and bleeding off the right edge. The ribbon returns once in the navy closing band.",
     "mustPreserve": [
-      "The dark deep-water palette and the blue W mark (brand/logo.svg, brand/favicon.svg).",
-      "Lowercase waterfall wordmark with the .sh in waterfall blue.",
-      "System sans for interface and system mono for labels and commands; no web fonts.",
-      "Waterfall blue as the single signal color; good green only for savings and success.",
-      "Honest status about what works today, what is being wired up, and what is pending.",
-      "The tagline: Flip projects. Pay the least for the job."
+      "The light white page with ink #0a2540 type.",
+      "One cascade ribbon in the hero and its return in the closing band, nowhere else.",
+      "Light-weight (300) display headlines with negative tracking.",
+      "The product shown large: the dark board still overlaps the ribbon and bleeds off the right edge on desktop.",
+      "Pill-shaped actions, 22px tiles, and soft layered shadows for depth.",
+      "Sentence-case labels; honest status, the unsigned-installer note, and labelled example figures."
     ],
     "mustNotBecome": [
-      "Shapeable's light paper look; Adam chose Same quality, keep dark.",
-      "A generic SaaS gradient landing page.",
-      "Crypto neon or glow-heavy styling.",
-      "A wall of text or a long promotional explainer.",
-      "A page that shows fabricated savings, users, or model results as real.",
-      "A logo wall of third-party AI products used as decoration."
+      "Dark generic SaaS. Adam rejected the earlier dark v3 system on 2026-11-04 ('i still dont like the waterfall design system').",
+      "Hand-drawn mockups that skip the Shapeable pipeline (previews A, B, and C were rejected on 2026-11-04).",
+      "Stripe trade dress: no Stripe gradient shape, wave, logo, product imagery, or copy. Learn principles only.",
+      "Tracked micro-caps eyebrows over every section (the measured top generated-look tell).",
+      "Uniform grids of three identical cards.",
+      "Fabricated savings or results presented as measured."
     ]
   },
   "foundations": {
     "color": {
-      "strategy": "Dark only. Deep-water surfaces carry everything; waterfall blue is scarce and means action, focus, links, or the mark. Good green is reserved for savings and success figures. Secondary text never drops below the AA floor of #7f8c99. The light column records that no light theme exists rather than inventing one.",
+      "strategy": "Light only. White and a pale tint carry the page; ink type sits on them. Blue is for links and the one highlighted phrase. The ribbon stops appear only inside the ribbon art layer. Good green is reserved for savings figures and success. The dark board keeps its own sub-palette as an illustration and never leaks into page chrome.",
       "tokens": [
         {
-          "name": "board",
-          "role": "page canvas",
-          "light": "unspecified: dark-only identity",
-          "dark": "#0b1220",
-          "usage": "Body background on every route, with at most one soft radial wash."
+          "name": "ink",
+          "role": "primary text and dark surfaces",
+          "light": "#0a2540",
+          "dark": "unspecified: light-only identity",
+          "usage": "Headlines, body emphasis, the dark pill, code blocks, and the navy closing band."
         },
         {
-          "name": "board2",
-          "role": "elevated surface",
-          "light": "unspecified: dark-only identity",
-          "dark": "#0f1830",
-          "usage": "Cards, the price panel, and the product frame."
-        },
-        {
-          "name": "rail",
-          "role": "deepest surface",
-          "light": "unspecified: dark-only identity",
-          "dark": "#08101c",
-          "usage": "Code blocks, table bodies, the board sidebar in the still."
-        },
-        {
-          "name": "chalk",
-          "role": "primary text",
-          "light": "unspecified: dark-only identity",
-          "dark": "#e9edf2",
-          "usage": "Headlines, body, and primary labels."
-        },
-        {
-          "name": "dust",
+          "name": "mute",
           "role": "secondary text",
-          "light": "unspecified: dark-only identity",
-          "dark": "#aab4be",
-          "usage": "Ledes, card copy, and inactive navigation."
+          "light": "#425466",
+          "dark": "unspecified: light-only identity",
+          "usage": "Ledes, section subtitles, and tile copy."
         },
         {
-          "name": "faint",
+          "name": "soft",
           "role": "tertiary text",
-          "light": "unspecified: dark-only identity",
-          "dark": "#7f8c99",
-          "usage": "Meta, captions, and labels. AA floor: never use the retired #5c6873."
+          "light": "#5f6f84",
+          "dark": "unspecified: light-only identity",
+          "usage": "Fine print, captions, and meta. Minimum 12px."
         },
         {
           "name": "line",
-          "role": "structural border",
-          "light": "unspecified: dark-only identity",
-          "dark": "#27334a",
-          "usage": "One-pixel borders and rules."
+          "role": "hairline",
+          "light": "#e3e8ee",
+          "dark": "unspecified: light-only identity",
+          "usage": "Card outlines (as 1px box-shadow), band borders, and dividers."
         },
         {
-          "name": "accent",
-          "role": "waterfall blue signal",
-          "light": "unspecified: dark-only identity",
-          "dark": "#5ec6ff",
-          "usage": "Primary buttons, links, focus rings, eyebrows, and the W."
+          "name": "tint",
+          "role": "pale surface",
+          "light": "#f6f9fc",
+          "dark": "unspecified: light-only identity",
+          "usage": "The full-bleed cascade band, bento tiles, install cards, and inner-page cards."
         },
         {
-          "name": "accent-dim",
-          "role": "signal wash",
-          "light": "unspecified: dark-only identity",
-          "dark": "#173447",
-          "usage": "Selected or highlighted rows and chips."
+          "name": "white",
+          "role": "page canvas",
+          "light": "#ffffff",
+          "dark": "unspecified: light-only identity",
+          "usage": "Body background on every route."
+        },
+        {
+          "name": "blue",
+          "role": "accent on white",
+          "light": "#0a6fd6",
+          "dark": "unspecified: light-only identity",
+          "usage": "Home links, the highlighted headline phrase, focus rings, and the hard-step outline."
+        },
+        {
+          "name": "accent-inner",
+          "role": "accent on light tints",
+          "light": "#0859ad",
+          "dark": "unspecified: light-only identity",
+          "usage": "Inner-page accent (leaderboard, workshop, docs) so blue text stays AA on #e6f0fb and #eaf3fd tints."
         },
         {
           "name": "good",
           "role": "savings and success",
-          "light": "unspecified: dark-only identity",
-          "dark": "#3dd68c",
-          "usage": "Savings figures and success states only."
+          "light": "#08744e",
+          "dark": "unspecified: light-only identity",
+          "usage": "Savings figures, per-step costs, and the works-today status dot only."
         },
         {
           "name": "warn",
-          "role": "warning",
-          "light": "unspecified: dark-only identity",
-          "dark": "#f5a524",
-          "usage": "Real warnings only, always with text."
+          "role": "caution",
+          "light": "#9a5b00",
+          "dark": "unspecified: light-only identity",
+          "usage": "Pilot or caution states on inner pages."
+        },
+        {
+          "name": "ribbon-cyan",
+          "role": "ribbon stop",
+          "light": "#5ec6ff",
+          "dark": "unspecified: light-only identity",
+          "usage": "Cascade ribbon gradient stop and the cascade line in the routing band."
+        },
+        {
+          "name": "ribbon-blue",
+          "role": "ribbon stop",
+          "light": "#2f6bff",
+          "dark": "unspecified: light-only identity",
+          "usage": "Cascade ribbon gradient stop and step markers."
+        },
+        {
+          "name": "ribbon-violet",
+          "role": "ribbon stop",
+          "light": "#6b5cff",
+          "dark": "unspecified: light-only identity",
+          "usage": "Cascade ribbon gradient stop."
+        },
+        {
+          "name": "ribbon-teal",
+          "role": "ribbon stop",
+          "light": "#12c2b3",
+          "dark": "unspecified: light-only identity",
+          "usage": "Cascade ribbon gradient stop."
+        },
+        {
+          "name": "ribbon-mist",
+          "role": "ribbon stop",
+          "light": "#a7f3ff",
+          "dark": "unspecified: light-only identity",
+          "usage": "Cascade ribbon highlight stop."
+        },
+        {
+          "name": "board-bg",
+          "role": "board canvas",
+          "light": "#0b1220",
+          "dark": "unspecified: light-only identity",
+          "usage": "Illustration-only sub-palette for the dark local board still. Board chat area."
+        },
+        {
+          "name": "board-rail",
+          "role": "board rail",
+          "light": "#08101c",
+          "dark": "unspecified: light-only identity",
+          "usage": "Illustration-only sub-palette for the dark local board still. Board sidebar, title bar, and side panel."
+        },
+        {
+          "name": "board-card",
+          "role": "board card",
+          "light": "#0f1830",
+          "dark": "unspecified: light-only identity",
+          "usage": "Illustration-only sub-palette for the dark local board still. Board message cards and the active project row."
+        },
+        {
+          "name": "board-accent",
+          "role": "board accent",
+          "light": "#5ec6ff",
+          "dark": "unspecified: light-only identity",
+          "usage": "Illustration-only sub-palette for the dark local board still. Hard-route badge and sparkline."
+        },
+        {
+          "name": "board-good",
+          "role": "board success",
+          "light": "#3dd68c",
+          "dark": "unspecified: light-only identity",
+          "usage": "Illustration-only sub-palette for the dark local board still. Cheap-route badge, live dots, and the saved metric."
         }
       ]
     },
     "typography": {
-      "strategy": "One scale replaces the 13 measured sizes and 5 weights. Sans carries headlines and reading; mono is semantic for eyebrows, labels, commands, and numbers. Weights are 400, 600, and 700 only. Nothing essential renders below 12px.",
+      "strategy": "Inter Tight, self-hosted as one variable woff2 (weights 300 to 600, SIL Open Font License), carries everything except code, which uses system mono. Display type is large and light (300) with negative tracking; body is 17px. Labels are sentence case, never tracked uppercase. Nothing renders below 12px.",
       "families": [
         {
           "role": "interface and display",
-          "family": "system sans",
-          "fallback": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, Roboto, Helvetica, sans-serif",
-          "usage": "Headlines, body, navigation, and buttons."
+          "family": "Inter Tight",
+          "fallback": "-apple-system, \"Segoe UI\", system-ui, sans-serif",
+          "usage": "Headlines, body, navigation, pills, labels. Served from /fonts/inter-tight-latin.woff2 and preloaded."
         },
         {
-          "role": "labels, commands, numbers",
+          "role": "code and figures",
           "family": "system mono",
           "fallback": "ui-monospace, \"SF Mono\", \"Cascadia Code\", Menlo, Consolas, monospace",
-          "usage": "Eyebrows, meta, code blocks, and figures."
+          "usage": "Code blocks, the prompt line, per-step costs, and board figures."
         }
       ],
       "scale": [
         {
           "name": "h1",
-          "size": "64px desktop, 44px mobile",
+          "size": "72px desktop, 48px tablet (900px and below), 40px phone (480px and below)",
+          "lineHeight": "1.02",
+          "weight": 300,
+          "tracking": "-0.035em",
+          "usage": "The single hero headline, with one highlighted phrase in blue."
+        },
+        {
+          "name": "close-h2",
+          "size": "56px desktop, 34px mobile",
           "lineHeight": "1.04",
-          "weight": 700,
-          "tracking": "-0.045em",
-          "usage": "The single page headline."
+          "weight": 300,
+          "tracking": "-0.035em",
+          "usage": "The closing band headline on navy."
         },
         {
           "name": "h2",
-          "size": "40px",
-          "lineHeight": "1.04",
-          "weight": 700,
-          "tracking": "-0.035em",
-          "usage": "Section titles."
+          "size": "48px desktop, 34px mobile",
+          "lineHeight": "1.06",
+          "weight": 300,
+          "tracking": "-0.03em",
+          "usage": "Section and cascade band headlines."
         },
         {
-          "name": "h3",
-          "size": "28px",
+          "name": "tile-title",
+          "size": "24px to 28px",
           "lineHeight": "1.2",
-          "weight": 600,
-          "tracking": "-0.02em",
-          "usage": "Large card and step titles."
+          "weight": 400,
+          "tracking": "-0.02em to -0.025em",
+          "usage": "Bento tiles and ranking link cards."
         },
         {
           "name": "lede",
-          "size": "20px",
-          "lineHeight": "1.6",
+          "size": "21px desktop, 18px mobile",
+          "lineHeight": "1.5",
           "weight": 400,
           "tracking": "0",
-          "usage": "The one-sentence intro under a headline."
+          "usage": "The one hero sentence; section subtitles use 19px."
         },
         {
           "name": "body",
-          "size": "16px",
+          "size": "17px",
           "lineHeight": "1.6",
           "weight": 400,
           "tracking": "0",
-          "usage": "Reading copy."
+          "usage": "Reading text and lists."
         },
         {
-          "name": "ui",
-          "size": "14px",
+          "name": "small",
+          "size": "13px to 15px (12px minimum)",
           "lineHeight": "1.5",
-          "weight": 600,
+          "weight": 400,
           "tracking": "0",
-          "usage": "Navigation, buttons, and small copy."
-        },
-        {
-          "name": "label",
-          "size": "12px",
-          "lineHeight": "1.4",
-          "weight": 600,
-          "tracking": "0.16em uppercase (mono)",
-          "usage": "Eyebrows and meta. 12px is the floor."
+          "usage": "Captions, notes, fine print, and sentence-case labels at 15px weight 500."
         }
       ]
     },
     "spacing": {
       "baseUnitPx": 4,
-      "density": "Airy. Sections are separated by 120px on desktop and 72px on mobile; one idea per section. Density is allowed only inside data tables and the product still.",
+      "density": "Generous. Sections are separated by 128px on desktop and 88px on mobile; the hero opens with 112px (64px mobile). One idea per section. Density is allowed only inside the board still and data tables.",
       "scalePx": [
-        4,
         8,
         12,
         16,
         24,
         32,
         48,
+        56,
         72,
-        120
+        88,
+        112,
+        128
       ]
     },
     "shape": {
       "radiusPx": [
-        10,
+        999,
+        22,
+        18,
         14,
-        16
+        12
       ],
-      "border": "One-pixel line-colored borders where containment explains structure.",
-      "elevation": "Flat surfaces. Only the product frame carries a deep shadow so it reads as a window on the board.",
-      "signatureShape": "Rounded 10px controls, 14px cards, and a 16px product frame around the illustrative board."
+      "border": "Hairlines are drawn as 1px box-shadow in #e3e8ee (or ink at low alpha) rather than CSS borders, except the cascade band's top and bottom rules.",
+      "elevation": "Soft layered shadows are part of the identity: for example 0 30px 60px -20px #0a254040 on the floating savings card and 0 50px 100px -20px #0a254066 on the board. Steps and tabs use 0 1px 2px #0a25400d plus a soft 0 8px 24px -12px lift. Never hairline-only flatness.",
+      "signatureShape": "Pills (999px) for every action, 22px tiles and cards, 18px for the floating savings card, 14px for the board and routing steps, 12px for code blocks and tab rows."
     },
     "layout": {
-      "strategy": "Home has at most five sections: hero (headline, one sentence, Buy $30 and Download, trust line, then the product still), how it falls, workshop and leaderboard, honest status, and install. Every page shares one nav: cascade, leaderboard, workshop, docs (about), and a compact Buy $30. Each section intro is at most two short sentences.",
-      "maxContentWidthPx": 1120,
+      "strategy": "Max content width 1200px with a 32px gutter (20px under 480px). The hero is a 660px text column with the ribbon behind the right side; the stage below lets the board run off the right edge. The cascade is a full-bleed tint band with copy left and the routing picture right. Promises are a bento: one wide tile plus two stacked tiles, never three identical cards. At most one sentence-case label per section, and no tracked caps.",
+      "maxContentWidthPx": 1200,
       "columns": 12,
-      "gutterPx": 24,
+      "gutterPx": 32,
       "breakpointsPx": [
-        390,
-        650,
+        480,
         900,
-        1120,
-        1440
+        960
       ]
     },
     "motion": {
-      "principle": "Motion confirms state (hover, focus, a still easing into view) and never decorates.",
+      "principle": "Motion only confirms hover and focus: background and box-shadow transitions on pills and link cards. Nothing animates on load or on scroll.",
       "durationsMs": [
         0,
-        200,
-        400
+        300
       ],
       "easing": "cubic-bezier(.22, 1, .36, 1)",
-      "reducedMotion": "Under prefers-reduced-motion: reduce, transitions, animations, and smooth scrolling are off and every state renders complete and static."
+      "reducedMotion": "Under prefers-reduced-motion: reduce, all transitions are off and every state renders complete."
     },
     "focus": {
-      "ring": "3px solid #5ec6ff",
-      "offset": "3px to 4px",
-      "rule": "Every interactive element shows a visible focus-visible ring, and a skip link reaches the main content first."
+      "ring": "3px solid #0a6fd6",
+      "offset": "3px",
+      "rule": "Every link, pill, and summary shows a visible focus-visible ring with a 6px radius; the skip link becomes visible on focus."
     },
     "imagery": {
-      "direction": "Show the real product: one stageshow-style still of the local board built from its real UI (sidebar Dashboard, Cascade, Agents, Pace; card Classify and route; metrics Prompts routed, Tokens avoided, Est. saved), captioned Illustrative board. Example numbers.",
+      "direction": "One art layer and one product. The cascade ribbon is pure CSS (conic gradient, polygon clip-path, linear mask, repeating diagonal striations). The product is a stageshow-style still of the real local board (rail, tabs, chat with routed badges, savings side panel), aria-hidden with data-shapeable-illustration and captioned 'Illustrative board. Example numbers, not measured savings.'",
       "allowed": [
-        "Code-built product stills of the real board, aria-hidden with data-shapeable-illustration and a visible caption of at least 12px.",
-        "Real command lines and real feature names.",
-        "The W mark and wordmark."
+        "The cascade ribbon in the hero and once in the closing band.",
+        "Code-built stills of the real board and the routing flow, with labelled example figures.",
+        "The floating savings card overlapping the board."
       ],
       "forbidden": [
-        "Third-party product logos used as decoration.",
-        "Fabricated savings, usage, or users presented as real.",
-        "Stock photography or mascots.",
-        "Glowing neon gradients."
+        "Third-party logos or Stripe imagery as decoration.",
+        "Stock photos or AI-generated people.",
+        "More than one ribbon per view, or ribbon colors outside the ribbon.",
+        "Unlabelled figures that could read as measured savings."
       ]
     }
   },
   "patterns": [
     {
-      "name": "unified-nav",
-      "intent": "Make every page read as one product.",
+      "name": "hero",
+      "intent": "Product, promise, and price in one pass.",
       "rules": [
-        "Brand left; cascade, leaderboard, workshop, docs, then a compact Buy $30 on the right.",
-        "Every link has a 44px hit area; non-essential links collapse on narrow screens while Buy $30 stays.",
-        "The current page is marked with aria-current."
+        "One h1 at weight 300 with one blue phrase.",
+        "One 21px sentence.",
+        "Dark pill 'Buy the founding license · $30' and light pill 'Download for Windows'.",
+        "One fine-print line: one-time, own keys, no markup, unsigned installer."
       ],
       "states": [
         "default",
-        "current-page",
         "hover",
         "focus-visible",
-        "collapsed-mobile"
+        "stacked-mobile"
       ]
     },
     {
-      "name": "hero-buy-path",
-      "intent": "One clear path to the founding license.",
+      "name": "board-stage",
+      "intent": "Show the real product large, with depth.",
       "rules": [
-        "The $30 price and the primary Buy action appear once, in the hero.",
-        "Download for Windows is the secondary action.",
-        "A mono trust line states one-time, your own keys, no token markup, and the unsigned installer."
+        "The board (1040px) overlaps the ribbon and bleeds off the right edge on desktop.",
+        "A white savings card floats in front at the left.",
+        "On mobile the board becomes one column (rail and side panel hidden) and the card is hidden.",
+        "Always captioned as illustrative with example numbers."
+      ],
+      "states": [
+        "desktop-bleed",
+        "mobile-column"
+      ]
+    },
+    {
+      "name": "cascade-band",
+      "intent": "Explain routing as a picture, not a paragraph.",
+      "rules": [
+        "Full-bleed tint band with top and bottom hairlines.",
+        "A dark prompt line, three white routing steps on a cyan-to-teal line, the hard step outlined in blue.",
+        "Per-step costs in good green mono, then an all-Claude comparison.",
+        "A note that costs are examples and real prices come from OpenRouter at run time."
       ],
       "states": [
         "default",
-        "hover",
+        "compact-mobile"
+      ]
+    },
+    {
+      "name": "bento",
+      "intent": "Three promises in three shapes.",
+      "rules": [
+        "One wide tile with live project rows plus two stacked tiles.",
+        "One tile carries the large blue 0% markup figure.",
+        "Never three identical cards."
+      ],
+      "states": [
+        "desktop-bento",
+        "stacked-mobile"
+      ]
+    },
+    {
+      "name": "close-band",
+      "intent": "End on the offer with the ribbon's return.",
+      "rules": [
+        "Navy band, ribbon masked in from the right.",
+        "56px weight 300 headline, three checked inclusions, white Buy pill and a contact pill."
+      ],
+      "states": [
+        "default",
         "focus-visible"
       ]
     },
     {
-      "name": "board-still",
-      "intent": "Show the real local board without exposing private data.",
+      "name": "inner-pages",
+      "intent": "Every page reads as the same product.",
       "rules": [
-        "Build the still from the board's real structure and labels.",
-        "Wrap it in aria-hidden plus data-shapeable-illustration with a visible caption.",
-        "Use example numbers and say so in the caption."
+        "Same Ribbon nav and footer on every page, current page marked with aria-current.",
+        "A soft radial wash replaces the ribbon on inner pages.",
+        "Legacy dark tokens are remapped to the light palette in ribbon-pages.css; former uppercase labels are sentence case."
       ],
       "states": [
-        "static",
-        "reduced-motion"
-      ]
-    },
-    {
-      "name": "honest-status",
-      "intent": "Keep trust by separating shipped behavior from unfinished work.",
-      "rules": [
-        "Three columns: works today, being wired up, pending code or evidence.",
-        "The pending column is labelled a roadmap, not a guarantee."
-      ],
-      "states": [
-        "default"
+        "default",
+        "current-page"
       ]
     }
   ],
   "content": {
-    "voice": "A terse developer explaining a tool to another developer: plain, specific, frugal, and honest about limits.",
+    "voice": "A calm, precise developer explaining a tool to another developer: plain verbs, short sentences, real numbers, and the limits stated up front.",
     "rules": [
       "Lead with what it does in one sentence.",
-      "Every number has a source or is labelled an example.",
-      "State limits (unsigned installer, Windows-only desktop package) next to the download.",
-      "Keep each section intro to two short sentences at most."
+      "State the price once in the hero, once in the close, and compactly in the nav.",
+      "Label every example figure as an example.",
+      "Keep honest status: works today, being wired up, pending.",
+      "Use sentence case for every label."
     ],
     "bannedPatterns": [
       "Hype words such as revolutionary, magic, or 10x.",
-      "Invented testimonials, logos, or savings.",
-      "Long promotional paragraphs.",
-      "Em dashes."
+      "Em dashes.",
+      "Tracked all-caps eyebrows.",
+      "Claims of measured savings without evidence."
     ]
   },
   "responsiveRules": [
     {
       "name": "mobile-sequence",
-      "rule": "At 390px the headline, one sentence, Buy and Download, trust line, then the product still read in that order with no horizontal page overflow.",
+      "rule": "At 390px: headline, sentence, stacked full-width pills, fine print, then the one-column board, with no horizontal page overflow.",
       "acceptance": "Site audit reports zero horizontal overflow and zero offscreen page text at 390 x 844."
     },
     {
-      "name": "touch-and-type-floors",
-      "rule": "No text below 12px and every non-inline control at least 44 by 44px at every width.",
-      "acceptance": "Site audit reports zero tiny page text and zero comfortable touch-target shortfalls."
+      "name": "ribbon-mobile",
+      "rule": "Under 900px the ribbon spans the viewport width at 45% opacity behind the hero and never sits behind the Buy pill.",
+      "acceptance": "Rendered 390px frame shows the nav and pills fully legible over the ribbon."
+    },
+    {
+      "name": "bands-full-bleed",
+      "rule": "The cascade band and close band run edge to edge while their content stays on the 1200px grid.",
+      "acceptance": "No horizontal overflow at 1440 or 390."
     }
   ],
   "accessibility": [
     {
       "name": "contrast",
-      "rule": "All text meets WCAG 2.2 AA on deep-water surfaces; secondary text uses dust or faint, never the retired #5c6873.",
-      "acceptance": "axe-core reports zero color-contrast violations at both viewports."
+      "rule": "All text meets WCAG 2.2 AA; blue on tints uses #0859ad, savings green is #08744e.",
+      "acceptance": "axe-core reports zero color-contrast violations at both viewports on every route."
     },
     {
-      "name": "semantics-and-focus",
-      "rule": "Every page has a title, lang, one h1, a skip link, labelled controls, and a visible 3px accent focus ring.",
-      "acceptance": "axe-core reports zero critical or serious violations; manual keyboard pass reaches every control."
+      "name": "targets",
+      "rule": "Every link, pill, nav item, and footer link has at least a 44 by 44px hit area.",
+      "acceptance": "Shapeable touch-target checks report zero shortfalls."
+    },
+    {
+      "name": "illustrations",
+      "rule": "The ribbon, board still, savings card, and tab rows are aria-hidden; decorative regions carry data-shapeable-illustration.",
+      "acceptance": "No illustrative text appears in the accessibility tree; captions carry the meaning."
     },
     {
       "name": "reduced-motion",
-      "rule": "No transition or animation remains active under prefers-reduced-motion.",
-      "acceptance": "Site audit reports zero motion-active-under-reduce elements."
+      "rule": "Transitions are off under prefers-reduced-motion.",
+      "acceptance": "Shapeable reduced-motion check reports no active transitions."
     }
   ],
   "influences": [
     {
-      "id": "linear",
-      "title": "Linear",
-      "author": "Linear",
-      "url": "https://linear.app/",
-      "principle": "Quiet chrome and a strong type hierarchy, with the accent used sparingly.",
-      "take": "A calm nav and restrained use of waterfall blue.",
-      "doNotCopy": "Do not copy Linear's assets, layouts, gradients, or trade dress."
+      "id": "stripe",
+      "title": "Stripe",
+      "author": "Stripe design team",
+      "url": "https://stripe.com/",
+      "principle": "A light page, very light display type, one luminous art layer, and dense product proof shown with depth.",
+      "take": "Light-weight headlines, a single gradient art layer, product shown large with layered shadows. Adam's primary gold reference.",
+      "doNotCopy": "Do not copy Stripe's gradient shape, wave, colors as a set, logos, product imagery, layouts, or copy."
     },
     {
-      "id": "raycast",
-      "title": "Raycast",
-      "author": "Raycast",
-      "url": "https://www.raycast.com/",
-      "principle": "Minimal ornament and fast, obvious actions.",
-      "take": "Primary actions are short and immediate; no decorative motion.",
-      "doNotCopy": "Do not copy Raycast's assets, layouts, or visual identity."
+      "id": "framer",
+      "title": "Framer",
+      "author": "Framer",
+      "url": "https://www.framer.com/",
+      "principle": "The product canvas is the hero and runs large.",
+      "take": "Let the board be big and real rather than a small boxed still.",
+      "doNotCopy": "Do not copy Framer's glow treatment, typography, or assets."
+    },
+    {
+      "id": "family",
+      "title": "Family",
+      "author": "Benji Taylor and the Family team",
+      "url": "https://family.co/",
+      "principle": "Warmth and friendliness in a trust-critical product, with zero tracked caps.",
+      "take": "Friendly sentence-case copy and generous rounding.",
+      "doNotCopy": "Do not copy Family's characters, illustrations, or brand."
+    },
+    {
+      "id": "cursor",
+      "title": "Cursor",
+      "author": "Anysphere",
+      "url": "https://cursor.com/",
+      "principle": "Show the actual app window framed by an art layer.",
+      "take": "The board still framed by the ribbon art layer.",
+      "doNotCopy": "Do not copy Cursor's paintings, app chrome, or typography."
     },
     {
       "id": "stageshow",
-      "title": "stageshow product-still technique",
-      "author": "benjitaylor/skills (MIT)",
+      "title": "stageshow",
+      "author": "Benji Taylor",
       "url": "https://github.com/benjitaylor/skills",
-      "principle": "Show the product as a composed still built from real UI primitives, with real words only where they carry meaning.",
-      "take": "The illustrative still of the local board in the hero.",
-      "doNotCopy": "Do not reuse the kit's example scenes, names, or compositions."
-    },
-    {
-      "id": "benji-taylor-design-eval",
-      "title": "benji-taylor-design-eval skill",
-      "author": "Denis Darkin (community skill inferred from Benji Taylor's public work; MIT)",
-      "url": "https://github.com/dvdarkin/claude-skills/blob/main/skills/benji-taylor-design-eval/SKILL.md",
-      "principle": "Progressive disclosure, motion as meaning, the simplicity, fluidity, and delight triad, craft in edge states, trust through clarity.",
-      "take": "One clear buy path and progressive disclosure: details live on workshop, leaderboard, and docs pages, not the home page.",
-      "doNotCopy": "Do not adopt any product's visual language or imply endorsement by Benji Taylor."
+      "principle": "Product stills with a word budget, cropped off the edge, never boxed with even margins.",
+      "take": "The board's few real strings, the right-edge bleed, and the illustrative caption.",
+      "doNotCopy": "Do not ship the stageshow kit's brand marks or components as page UI."
     }
   ],
   "governance": {
     "owner": "Adam Pang (waterfall.sh owner)",
-    "sourceOfTruth": "This design-system.json plus repo://waterfall.sh/DESIGN.md; the Claude guide is rendered from this file deterministically. Runtime tokens live in waterfall.sh/site.css :root and must match.",
-    "versioning": "Semantic versioning. Patch clarifies evidence, minor adds compatible rules or tokens, major changes identity.",
-    "adoption": "Draft. Redesign previews A, B, and C were rejected on 2026-11-04 because they did not come out of the Shapeable workflow; this pack is the first workflow step. The owner must accept the exact reviewed preview before this becomes owner-approved.",
-    "deviations": "Record each deviation with rationale, affected page, owner, and expiry in the next pack version.",
-    "lastAuditId": "site-audit-20261104175147",
+    "sourceOfTruth": "This design-system.json, extracted from repo://waterfall.sh/ribbon.css and ribbon-pages.css. The Claude guide is rendered from this file deterministically. Runtime tokens live in body.ribbon in those stylesheets and must match.",
+    "versioning": "Semantic versioning. Patch clarifies evidence, minor adds compatible rules or tokens, major changes identity. 1.0.0 is the first version of the Ribbon identity and replaces the rejected dark v3 pack (0.1.0).",
+    "adoption": "Owner-approved. Adam previewed the Ribbon home on localhost and answered 'accept' on 2026-11-04, after choosing direction A from three pipeline-built directions (gold references Stripe, Framer, Family, Cursor). The inner-page rollout (leaderboard, workshop, starter packs, about, contact, privacy, thanks, design) follows the accepted home and carries its tokens; it needs the owner's review before production.",
+    "deviations": "The board still keeps a dark illustration-only sub-palette. Inner pages use #0859ad instead of #0a6fd6 so blue stays AA on light tints. Record any further deviation with rationale, page, owner, and expiry in the next version.",
+    "lastAuditId": "site-audit-20261104191533",
     "reviewCadence": "Re-audit the full site after any material visual, interaction, or route change; persist every owner direction or rejection to the ledger before the next revision."
   },
   "agentInstructions": {
     "readFirst": [
-      "Read repo://waterfall.sh/DESIGN.md, PERFECT.md, and this design system before any visual change.",
-      "Read the waterfall.sh entry in shapeable.art preferences/owner-preferences.json, including its feedback.",
-      "Read waterfall.sh/site.css :root before adding styles."
+      "Read this design-system.json and repo://waterfall.sh/ribbon.css before changing any page.",
+      "Read contracts/waterfall-sh-owner-feedback-20261104.md for the owner's rejections and choices.",
+      "Read shapeable.art reference/premium-pipeline-20261104.md for the build and review pipeline."
     ],
     "decisionRules": [
-      "Keep the dark deep-water identity; never adopt Shapeable's light look for this site.",
-      "Use only the type scale 12, 14, 16, 20, 28, 40, 64 (44 on mobile) and weights 400, 600, 700.",
-      "Use the spacing scale and 120px desktop section rhythm.",
-      "State the $30 price and Buy action once in the hero; keep the compact Buy $30 in the nav.",
-      "Keep text at 12px or larger and targets at 44px or larger.",
-      "Label every example number as an example."
+      "Keep the page light; never return to the rejected dark system.",
+      "Use only the tokens above; no one-off colors or sizes.",
+      "One cascade ribbon in the hero and one in the close, nowhere else.",
+      "Show the product large; never a boxed window with even margins.",
+      "Use sentence-case labels; never tracked uppercase eyebrows.",
+      "Prefer bento layouts; never three identical cards.",
+      "Label every example figure."
     ],
     "forbidden": [
-      "Hand-drawn redesign mockups that skip this pack (rejected 2026-11-04).",
-      "The retired #5c6873 text color.",
-      "Third-party logos as decoration.",
-      "Claiming owner approval or production acceptance without durable evidence."
+      "Stripe trade dress or any third-party logos as decoration.",
+      "Dark generic SaaS styling.",
+      "Hand-drawn mockups that skip the Shapeable pipeline.",
+      "Inline style attributes (the site CSP forbids them)."
     ],
     "reviewChecklist": [
-      "Shapeable audit:sitewide reports 100/100 with full route coverage on two identical passes.",
-      "The page meets the five-section and two-sentence limits on home.",
-      "The owner has reviewed the exact preview on localhost before any push."
+      "Shapeable audit:sitewide reports 100/100 with full route coverage.",
+      "The taste tells report zero tracked micro-caps and zero uniform card grids.",
+      "A fresh-eye reviewer compares frames against the Stripe gold reference and names the one difference."
     ]
   },
   "runnableEvidence": [
     {
-      "command": "npm run audit:sitewide -- --url https://waterfall.sh --output artifacts/audits/waterfall-sh-production-20261104",
-      "expected": "100/100, 100% profile coverage, 7 of 7 eligible routes (recorded as site-audit-20261104175147). This is the pre-redesign baseline.",
-      "scope": "Production waterfall.sh before the redesign; run from shapeable.art."
+      "command": "npm run audit:sitewide -- --url http://127.0.0.1:4100 --allow-loopback true --public-url https://waterfall.sh --output artifacts/audits/waterfall-sh-ribbon-20261104-pass4",
+      "expected": "100/100, 100% profile coverage, 8 of 8 eligible routes, zero findings (site-audit-20261104190810). The accepted Ribbon home.",
+      "scope": "Local preview of branch shapeable-ribbon-20261104; run from shapeable.art."
     },
     {
-      "command": "npm run audit:sitewide -- --url https://waterfall.sh --output artifacts/audits/waterfall-sh-redesign-production-20261104",
-      "expected": "100/100, 100% profile coverage, 7 of 7 eligible routes on production after the redesign (commit 21465a3), following four identical 100/100 preview passes with zero findings.",
-      "scope": "Production waterfall.sh after the Shapeable redesign; run from shapeable.art."
-    },
-    {
-      "command": "npm run validate:contracts",
-      "expected": "All contracts and fixtures validate.",
-      "scope": "Run from the shapeable.art repository."
+      "command": "npm run audit:sitewide -- --url http://127.0.0.1:4100 --allow-loopback true --public-url https://waterfall.sh --include /design --output artifacts/audits/waterfall-sh-ribbon-rollout-20261104-pass4",
+      "expected": "100/100, 100% profile coverage, 8 of 8 eligible routes (site-audit-20261104191533). Ribbon carried to every page.",
+      "scope": "Local preview of the inner-page rollout; run from shapeable.art."
     }
   ],
   "exports": {
