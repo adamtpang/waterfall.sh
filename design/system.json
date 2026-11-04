@@ -1,6 +1,6 @@
 {
   "contract": "shapeable.site-design-system",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "site": "waterfall.sh",
   "repository": "repo://waterfall.sh",
   "status": "owner-approved",
@@ -322,11 +322,12 @@
       "rule": "Every link, pill, and summary shows a visible focus-visible ring with a 6px radius; the skip link becomes visible on focus."
     },
     "imagery": {
-      "direction": "One art layer and one product. The cascade ribbon is pure CSS (conic gradient, polygon clip-path, linear mask, repeating diagonal striations). The product is a stageshow-style still of the real local board (rail, tabs, chat with routed badges, savings side panel), aria-hidden with data-shapeable-illustration and captioned 'Illustrative board. Example numbers, not measured savings.'",
+      "direction": "One art layer and one product. The cascade ribbon is pure CSS (conic gradient, polygon clip-path, linear mask, repeating diagonal striations). The product is a stageshow-style still of the real local board (rail, tabs, chat with routed badges, savings side panel), aria-hidden with data-shapeable-illustration and captioned 'Illustrative board. Example numbers, not measured savings.' The Drop is the logo: one disc sliced once with the right half dropped (two exact arcs), chosen by Adam through the logo-design skill. Master in blue #0a6fd6 on white; white on ink or blue; on a blue #0a6fd6 tile as the app icon and favicon. Files: /brand/waterfall-mark.svg, /brand/waterfall-mark-white.svg, /brand/waterfall-mark-app-icon.svg, /favicon.ico. Never stretch, rotate, outline, add a gradient, or place it on the ribbon.",
       "allowed": [
         "The cascade ribbon in the hero and once in the closing band.",
         "Code-built stills of the real board and the routing flow, with labelled example figures.",
-        "The floating savings card overlapping the board."
+        "The floating savings card overlapping the board.",
+        "The Drop mark in blue, white, or on a blue tile, at any size from 16px up."
       ],
       "forbidden": [
         "Third-party logos or Stripe imagery as decoration.",

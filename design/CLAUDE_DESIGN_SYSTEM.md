@@ -1,6 +1,6 @@
 # waterfall.sh design system
 
-Shapeable contract 1.0.0. Status: owner-approved. This file is generated from `.shapeable/design-system.json`. Edit the JSON source, then render again.
+Shapeable contract 1.1.0. Status: owner-approved. This file is generated from `.shapeable/design-system.json`. Edit the JSON source, then render again.
 
 ## Read this first
 
@@ -104,13 +104,14 @@ Motion: Motion only confirms hover and focus: background and box-shadow transiti
 
 Focus: 3px solid #0a6fd6 Offset: 3px Rule: Every link, pill, and summary shows a visible focus-visible ring with a 6px radius; the skip link becomes visible on focus.
 
-Imagery: One art layer and one product. The cascade ribbon is pure CSS (conic gradient, polygon clip-path, linear mask, repeating diagonal striations). The product is a stageshow-style still of the real local board (rail, tabs, chat with routed badges, savings side panel), aria-hidden with data-shapeable-illustration and captioned 'Illustrative board. Example numbers, not measured savings.'
+Imagery: One art layer and one product. The cascade ribbon is pure CSS (conic gradient, polygon clip-path, linear mask, repeating diagonal striations). The product is a stageshow-style still of the real local board (rail, tabs, chat with routed badges, savings side panel), aria-hidden with data-shapeable-illustration and captioned 'Illustrative board. Example numbers, not measured savings.' The Drop is the logo: one disc sliced once with the right half dropped (two exact arcs), chosen by Adam through the logo-design skill. Master in blue #0a6fd6 on white; white on ink or blue; on a blue #0a6fd6 tile as the app icon and favicon. Files: /brand/waterfall-mark.svg, /brand/waterfall-mark-white.svg, /brand/waterfall-mark-app-icon.svg, /favicon.ico. Never stretch, rotate, outline, add a gradient, or place it on the ribbon.
 
 Allowed:
 
 - The cascade ribbon in the hero and once in the closing band.
 - Code-built stills of the real board and the routing flow, with labelled example figures.
 - The floating savings card overlapping the board.
+- The Drop mark in blue, white, or on a blue tile, at any size from 16px up.
 
 Forbidden:
 

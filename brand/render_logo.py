@@ -1,4 +1,10 @@
-"""Render waterfall blue W mark to PNG/ICO."""
+"""Retired 2026-11-04: the W mark was replaced by the Drop.
+
+Desktop and web icons are now generated from brand/waterfall-mark-app-icon.svg
+(the approved Drop app icon). Running this file would overwrite them with the
+old W, so it exits instead.
+"""
+raise SystemExit("render_logo.py is retired: icons come from brand/waterfall-mark-app-icon.svg (the Drop).")
 from pathlib import Path
 
 from PIL import Image, ImageDraw
