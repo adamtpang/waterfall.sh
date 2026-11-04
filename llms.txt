@@ -22,6 +22,14 @@ The public site is product documentation and a download surface. It exposes read
 - Source and documentation: https://github.com/adamtpang/waterfall.sh
 - Windows releases: https://github.com/adamtpang/waterfall.sh/releases/latest
 
+## Design system (machine readable)
+
+- Overview: https://waterfall.sh/design
+- Full Shapeable v3 design system: https://waterfall.sh/design/system.json
+- W3C design tokens: https://waterfall.sh/design/tokens.json
+- Drop-in CSS variables: https://waterfall.sh/design/tokens.css
+- Implementation guide for coding agents: https://waterfall.sh/design/CLAUDE_DESIGN_SYSTEM.md
+
 ## Free developer workshop
 
 - Curation and workflow guide: https://waterfall.sh/workshop/README.md

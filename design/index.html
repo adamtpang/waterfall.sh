@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design system: waterfall.sh</title>
+<meta name="description" content="The waterfall.sh design system: machine-readable tokens, the full Shapeable v3 pack, drop-in CSS variables, and a Claude implementation guide.">
+<meta name="theme-color" content="#0b1220">
+<link rel="canonical" href="https://waterfall.sh/design">
+<link rel="alternate" type="application/json" href="/design/system.json" title="Shapeable v3 design system">
+<link rel="alternate" type="application/json" href="/design/tokens.json" title="W3C design tokens">
+<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="/home.css">
+<script src="/site-analytics.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="wrap home">
+  <header>
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="/" aria-label="waterfall.sh home"><img src="/brand/favicon.svg" width="28" height="28" alt=""><span>waterfall<span class="tld">.sh</span></span></a>
+      <div class="nav-links"><a href="/#cascade">cascade</a><a href="/leaderboard">leaderboard</a><a href="/workshop/">workshop</a><a href="/about">docs</a><a class="btn primary keep" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy $30</a></div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="h-section design-hero" aria-labelledby="design-title">
+      <div class="eyebrow">design system · machine readable</div>
+      <h1 id="design-title" class="design-h1">The waterfall.sh design system.</h1>
+      <p class="h-lede">Dark deep water, one blue, one type scale. Point any app or coding agent at these files and it can rebuild the look exactly.</p>
+    </section>
+
+    <section class="h-section" aria-labelledby="files-title">
+      <div class="h-head">
+        <div><div class="eyebrow">files</div><h2 id="files-title">Read it from code.</h2></div>
+        <p>Every file is generated from one source, so they never disagree. Cross-origin reads are allowed.</p>
+      </div>
+      <div class="h-install">
+        <div class="h-promise"><h3>system.json</h3><p>The full Shapeable v3 pack: identity, tokens, patterns, voice, rules, and what the design must not become.</p><pre><code>https://waterfall.sh/design/system.json</code></pre></div>
+        <div class="h-promise"><h3>tokens.json</h3><p>Colors, type, space, radius, and motion in the W3C Design Tokens format, for Style Dictionary or any token tool.</p><pre><code>https://waterfall.sh/design/tokens.json</code></pre></div>
+        <div class="h-promise"><h3>tokens.css</h3><p>Drop-in CSS variables. Import it and use <code>var(--accent)</code>, <code>var(--t20)</code>, <code>var(--s24)</code>.</p><pre><code>https://waterfall.sh/design/tokens.css</code></pre></div>
+      </div>
+      <div class="h-links design-guide">
+        <a class="h-link" href="/design/CLAUDE_DESIGN_SYSTEM.md"><span class="eyebrow">for coding agents</span><h3>CLAUDE_DESIGN_SYSTEM.md</h3><p>The implementation guide, rendered from system.json. Hand it to Claude, Codex, or any agent before it builds UI.</p><b>Open the guide →</b></a>
+      </div>
+    </section>
+
+    <section class="h-section" aria-labelledby="tokens-title">
+      <div class="h-head">
+        <div><div class="eyebrow">at a glance</div><h2 id="tokens-title">Color and type.</h2></div>
+        <p>Blue means action, focus, links, or the mark. Green is only for savings and success.</p>
+      </div>
+      <ul class="swatches" aria-label="Color tokens">
+        <li><i class="sw-board"></i><b>board</b><code>#0b1220</code></li>
+        <li><i class="sw-board2"></i><b>board2</b><code>#0f1830</code></li>
+        <li><i class="sw-rail"></i><b>rail</b><code>#08101c</code></li>
+        <li><i class="sw-chalk"></i><b>chalk</b><code>#e9edf2</code></li>
+        <li><i class="sw-dust"></i><b>dust</b><code>#aab4be</code></li>
+        <li><i class="sw-faint"></i><b>faint</b><code>#7f8c99</code></li>
+        <li><i class="sw-line"></i><b>line</b><code>#27334a</code></li>
+        <li><i class="sw-accent"></i><b>accent</b><code>#5ec6ff</code></li>
+        <li><i class="sw-accent-dim"></i><b>accent-dim</b><code>#173447</code></li>
+        <li><i class="sw-good"></i><b>good</b><code>#3dd68c</code></li>
+        <li><i class="sw-warn"></i><b>warn</b><code>#f5a524</code></li>
+      </ul>
+      <ol class="type-scale" aria-label="Type scale">
+        <li class="ts-64"><span>64</span>Flip projects.</li>
+        <li class="ts-40"><span>40</span>A real sequence.</li>
+        <li class="ts-28"><span>28</span>Bang for buck</li>
+        <li class="ts-20"><span>20</span>One local board for every repo.</li>
+        <li class="ts-16"><span>16</span>Body text reads at 16px with 1.6 line height.</li>
+        <li class="ts-12"><span>12</span>MONO LABELS, 12PX MINIMUM</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    <span>waterfall.sh · independent software project</span>
+    <nav aria-label="Footer navigation"><a href="/workshop/">Workshop</a><a href="/leaderboard">Leaderboard</a><a href="/design">Design</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="https://github.com/adamtpang/waterfall.sh">Source</a></nav>
+  </footer>
+</div>
+</body>
+</html>

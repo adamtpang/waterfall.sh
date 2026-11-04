@@ -136,3 +136,30 @@
 @media (prefers-reduced-motion: reduce) {
   .h-ctas .btn, .h-link { transition: none; }
 }
+
+/* /design page */
+.design-hero { padding-top: 72px; }
+.design-h1 { margin-top: 20px; font-size: var(--t64); font-weight: 700; line-height: 1.04; letter-spacing: -.045em; max-width: 14ch; }
+.design-guide { grid-template-columns: 1fr; margin-top: 16px; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; padding: 0; list-style: none; }
+.swatches li { display: grid; gap: 4px; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--board2); }
+.swatches i { display: block; height: 56px; margin-bottom: 8px; border: 1px solid var(--line); border-radius: 10px; }
+.swatches b { font-size: var(--t14); font-weight: 600; }
+.swatches code { color: var(--faint); font: var(--t12)/1.4 var(--mono); }
+.sw-board { background: #0b1220; } .sw-board2 { background: #0f1830; } .sw-rail { background: #08101c; }
+.sw-chalk { background: #e9edf2; } .sw-dust { background: #aab4be; } .sw-faint { background: #7f8c99; }
+.sw-line { background: #27334a; } .sw-accent { background: #5ec6ff; } .sw-good { background: #3dd68c; }
+.type-scale { display: grid; gap: 0; margin-top: 48px; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.type-scale li { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: baseline; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.type-scale span { color: var(--accent); font: 600 var(--t12)/1 var(--mono); }
+.ts-64 { font-size: var(--t64); font-weight: 700; line-height: 1.04; letter-spacing: -.045em; }
+.ts-40 { font-size: var(--t40); font-weight: 700; line-height: 1.08; letter-spacing: -.035em; }
+.ts-28 { font-size: var(--t28); font-weight: 600; letter-spacing: -.03em; }
+.ts-20 { font-size: var(--t20); color: var(--dust); }
+.ts-16 { font-size: var(--t16); color: var(--dust); }
+.ts-12 { color: var(--faint); font: var(--t12)/1.4 var(--mono); letter-spacing: .16em; }
+@media (max-width: 640px) { .design-h1 { font-size: 44px; } .ts-64 { font-size: 44px; } .ts-40 { font-size: var(--t28); } }
+.design-guide { grid-template-columns: minmax(0, 1fr); }
+.h-link, .h-promise { min-width: 0; }
+.h-link h3 { overflow-wrap: anywhere; }
+.sw-accent-dim { background: #173447; } .sw-warn { background: #f5a524; }

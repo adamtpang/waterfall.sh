@@ -1,0 +1,36 @@
+/* waterfall.sh design tokens. Generated from /design/system.json. Dark-only. */
+:root {
+  --board: #0b1220;
+  --board2: #0f1830;
+  --rail: #08101c;
+  --chalk: #e9edf2;
+  --dust: #aab4be;
+  --faint: #7f8c99;
+  --line: #27334a;
+  --accent: #5ec6ff;
+  --accent-dim: #173447;
+  --good: #3dd68c;
+  --warn: #f5a524;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, Helvetica, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --t12: 12px;
+  --t14: 14px;
+  --t16: 16px;
+  --t20: 20px;
+  --t28: 28px;
+  --t40: 40px;
+  --t64: 64px;
+  --s4: 4px;
+  --s8: 8px;
+  --s12: 12px;
+  --s16: 16px;
+  --s24: 24px;
+  --s32: 32px;
+  --s48: 48px;
+  --s72: 72px;
+  --s120: 120px;
+  --radius-control: 10px; --radius-card: 14px; --radius-frame: 16px;
+  --ease: cubic-bezier(.22, 1, .36, 1); --dur-fast: 200ms; --dur-base: 400ms;
+  --max-width: 1120px; --section: 120px; --touch: 44px;
+}
+@media (max-width: 640px) { :root { --section: 72px; } }
