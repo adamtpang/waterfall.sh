@@ -111,3 +111,7 @@
   @media(max-width:650px){.wrap{width:min(100% - 26px,1160px)}.nav{align-items:flex-start;padding:17px 0}.nav-links{justify-content:flex-end}.nav-links a:not(.keep){display:none}.hero{padding:48px 0 36px;gap:26px}.rhythm,.cards,.method{grid-template-columns:1fr}.section-head{display:block}.section-note{margin-top:12px}.control-row{align-items:stretch;flex-direction:column}.search{width:100%}.controls{position:relative}.resource-bar{align-items:flex-start;flex-direction:column}.card{min-height:0}}
   @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card{transition:none}}
   .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+  /* Unified nav Buy button (Shapeable v3 pack). */
+  .nav-links .btn.primary{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;margin-left:8px;border-radius:9px;background:var(--accent);color:#041018;font-family:var(--sans);font-size:14px;font-weight:600}
+  .nav-links .btn.primary:hover{color:#041018;filter:brightness(1.06)}
