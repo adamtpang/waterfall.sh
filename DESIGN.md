@@ -53,7 +53,12 @@ Copy rule: **no em dashes** in product UI.
 | Mono | `ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace` |
 | Hand (marketing only) | `Caveat` (Google Fonts), accent color |
 
-Labels: mono, 10–12px, uppercase, letter-spacing ~0.12–0.22em.
+Labels: mono, 12px minimum, uppercase, letter-spacing ~0.12–0.22em.
+
+**Legibility and touch floors (Shapeable makeover, 2026-11-04):** no rendered
+text below 12px, every secondary text color at WCAG AA (use `--faint`
+`#7f8c99` on board surfaces, never the older `#5c6873`), and every chrome
+link, sort control, and chip at least 44 by 44px on mobile.
 
 ## Shape & motion
 

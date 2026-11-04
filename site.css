@@ -41,6 +41,9 @@ a:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; border-
 .nav-links, footer nav { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
 .nav-links a, footer a { color: var(--dust); text-decoration: none; }
 .nav-links a { font-size: 13px; }
+/* 44px comfortable touch targets for chrome links; the look is unchanged. */
+.brand, .skip-link { min-height: 44px; }
+.nav-links a, footer nav a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; }
 .nav-links a:hover, footer a:hover, .support-link:hover { color: var(--chalk); }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; min-height: 44px;
@@ -56,7 +59,7 @@ a:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; border-
   align-items: end; margin-top: 56px;
 }
 .eyebrow, h2.sec {
-  font-family: var(--mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
 }
 .eyebrow { color: var(--accent); }
 h1 {
@@ -73,9 +76,10 @@ h1 {
 .price-card .btn { width: 100%; }
 .price-card .btn.dl { gap: 8px; margin-top: 8px; }
 .dl-icon { color: var(--accent); font-family: var(--mono); font-size: 15px; line-height: 1; }
-.fine, .support-link { display: block; margin-top: 10px; font-family: var(--mono); font-size: 11px; }
+.fine, .support-link { display: block; margin-top: 10px; font-family: var(--mono); font-size: 12px; }
 .fine { color: var(--faint); }
 .support-link { color: var(--dust); }
+.support-link { display: flex; align-items: center; min-height: 44px; margin-top: 2px; }
 .proof { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 36px; }
 .stat { padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--rail); }
 .stat b { display: block; font-family: var(--mono); font-size: 15px; }
@@ -93,6 +97,7 @@ h2.sec { margin: 72px 0 8px; color: var(--faint); }
 }
 .rung .n { padding-top: 3px; color: var(--accent); font-family: var(--mono); font-size: 12px; }
 .rung p { margin-top: 4px; color: var(--dust); }
+.maturity { align-items: start; }
 .maturity .col { padding: 18px; border-top: 3px solid var(--line); border-radius: 14px; }
 .maturity .col.works { border-top-color: var(--good); }
 .maturity .col h3 { font-size: 14px; letter-spacing: -.01em; }
@@ -106,7 +111,7 @@ h2.sec { margin: 72px 0 8px; color: var(--faint); }
   margin-top: 12px; overflow-x: auto; color: var(--accent); font-family: var(--mono);
   font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere;
 }
-.os .soon { margin-top: 10px; color: var(--faint); font-family: var(--mono); font-size: 11px; }
+.os .soon { margin-top: 10px; color: var(--faint); font-family: var(--mono); font-size: 12px; }
 .os .soon a { color: var(--accent); }
 footer {
   display: flex; justify-content: space-between; gap: 14px 24px; flex-wrap: wrap;
@@ -126,7 +131,7 @@ footer {
   gap: 12px; margin-top: 28px;
 }
 .contact-cards .card h2 { font-size: 19px; }
-.contact-cards .card a { display: inline-block; margin-top: 16px; color: var(--accent); font-weight: 650; }
+.contact-cards .card a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; margin-top: 8px; color: var(--accent); font-weight: 650; }
 .notice {
   margin-top: 28px; padding: 16px 18px; border-left: 3px solid var(--accent);
   background: var(--rail); color: var(--dust);
