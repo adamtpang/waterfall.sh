@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>You are in: waterfall.sh</title>
+<meta name="description" content="Set up the waterfall.sh local board after your founding license purchase.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b1220">
+<link rel="canonical" href="https://waterfall.sh/thanks">
+<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/site.css">
+<script src="/site-analytics.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="wrap">
+  <header>
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="/" aria-label="waterfall.sh home"><img src="/brand/favicon.svg" width="28" height="28" alt=""><span>waterfall<span class="tld">.sh</span></span></a>
+      <div class="nav-links"><a href="/">home</a><a href="/contact">contact</a><a href="/privacy">privacy</a></div>
+    </nav>
+  </header>
+  <main class="page-main" id="main-content">
+    <div class="eyebrow">founding license</div>
+    <h1>Paid. Now set up your board.</h1>
+    <p class="page-intro">Thank you. Stripe emails your receipt. The board runs on your own computer with your own model keys, so setup takes three commands.</p>
+
+    <section class="prose-section setup-steps">
+      <h2>1. Install</h2>
+      <p>Needs Python 3 and git. The installer clones the project, installs the <code>waterfall</code> command, and is safe to re-run.</p>
+      <pre><code>curl -sSL https://raw.githubusercontent.com/adamtpang/waterfall.sh/main/install.py | python3</code></pre>
+
+      <h2>2. Mark this computer as licensed</h2>
+      <pre><code>waterfall license paid</code></pre>
+
+      <h2>3. Open your board</h2>
+      <pre><code>waterfall remote open</code></pre>
+      <p>The board opens at <code>http://127.0.0.1:7910</code> on this computer. Add your OpenRouter key and your Claude, Grok, or Codex access in its settings. waterfall.sh never marks up tokens.</p>
+    </section>
+
+    <section class="prose-section">
+      <h2>Need help?</h2>
+      <p>Reply to your Stripe receipt or use the <a href="/contact">contact page</a>. Bugs and questions can also go to the <a href="https://github.com/adamtpang/waterfall.sh/issues">GitHub issues</a>.</p>
+    </section>
+  </main>
+  <footer><span>waterfall.sh · independent software project</span><nav aria-label="Footer navigation"><a href="/">Home</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="https://github.com/adamtpang/waterfall.sh">Source</a></nav></footer>
+</div>
+</body>
+</html>
