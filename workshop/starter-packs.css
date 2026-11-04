@@ -12,12 +12,12 @@
   .class-sigil,.result-sigil{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--accent);border-radius:10px;background:var(--accent-dim);color:var(--accent);font-family:var(--mono);font-weight:800;letter-spacing:.04em}
   .class-card h3{font-size:21px;letter-spacing:-.03em;margin:18px 0 0}
   .class-card p{font-size:16px;color:var(--dust);margin:8px 0 0}
-  .class-card .choose-label{font-family:var(--mono);font-size:11px;color:var(--accent)}
+  .class-card .choose-label{font-family:var(--mono);font-size:12px;color:var(--accent)}
   .builder-grid{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:14px;align-items:start}
   .panel{border:1px solid var(--line2);border-radius:var(--radius-card);background:var(--board2);padding:22px}
   .panel-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding-bottom:19px;border-bottom:1px solid var(--line)}
   .panel h2{font-size:25px;letter-spacing:-.03em;margin:6px 0 0}
-  .progress{font-family:var(--mono);font-size:11px;color:var(--accent);white-space:nowrap}
+  .progress{font-family:var(--mono);font-size:12px;color:var(--accent);white-space:nowrap}
   .quiz-question{font-size:20px;line-height:1.3;margin:22px 0 15px}
   .quiz-options{display:grid;gap:9px}
   .quiz-option{appearance:none;min-height:52px;padding:12px 14px;border:1px solid var(--line2);border-radius:var(--radius-button);background:var(--rail);color:var(--chalk);text-align:left;cursor:pointer}
@@ -27,9 +27,9 @@
   .result-root strong{color:var(--chalk)}
   .tool-list{display:grid;gap:8px;margin:14px 0 20px;padding:0;list-style:none}
   .tool-list li{display:grid;grid-template-columns:1fr auto;gap:14px;padding:11px 0;border-top:1px solid var(--line)}
-  .tool-list a{color:var(--accent);font-family:var(--mono);font-size:11px;text-decoration:none}
+  .tool-list a{color:var(--accent);font-family:var(--mono);font-size:12px;text-decoration:none}
   .tool-list a:hover{text-decoration:underline}
-  .prompt-label{display:block;margin:16px 0 8px;font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+  .prompt-label{display:block;margin:16px 0 8px;font-family:var(--mono);font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
   .setup-prompt{box-sizing:border-box;width:100%;resize:vertical;border:1px solid var(--line2);border-radius:var(--radius-button);background:#080e19;color:var(--chalk);padding:14px;font-family:var(--mono);font-size:13px;line-height:1.55;outline:none}
   .setup-prompt:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(94,198,255,.12)}
   .result-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
