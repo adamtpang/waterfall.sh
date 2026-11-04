@@ -1,0 +1,105 @@
+/* Ribbon across inner pages. Loads after site.css / leaderboard.css /
+   workshop.css and remaps their dark tokens to the accepted light Ribbon
+   palette, then fixes the few hard-coded dark colors. */
+body.ribbon {
+  color-scheme: light;
+  --board: #ffffff; --board2: #f6f9fc; --rail: #f6f9fc;
+  --chalk: #0a2540; --dust: #425466; --faint: #5f6f84;
+  --line: #e3e8ee; --line2: #e3e8ee;
+  --accent: #0859ad; --accent-dim: #e6f0fb;
+  --good: #08744e; --warn: #9a5b00;
+}
+body.ribbon h1, body.ribbon h2, body.ribbon h3 { color: var(--ink); }
+body.ribbon h1 { font-weight: 300; letter-spacing: -.035em; }
+body.ribbon h2 { font-weight: 400; letter-spacing: -.025em; }
+body.ribbon .eyebrow, body.ribbon .section-kicker { color: var(--blue); }
+
+/* Ribbon header on inner pages: no hero ribbon, just a soft wash. */
+body.ribbon .r-page-wash { position: absolute; inset: 0 0 auto 0; height: 420px; z-index: 0; pointer-events: none;
+  background: radial-gradient(700px 300px at 85% -10%, #5ec6ff33, transparent 70%), radial-gradient(500px 260px at 100% 10%, #6b5cff22, transparent 70%); }
+
+/* Buttons that used dark text on the old cyan accent. */
+body.ribbon .btn.primary, body.ribbon .button.primary, body.ribbon .nav-links .btn.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+body.ribbon .btn.primary:hover, body.ribbon .button.primary:hover { background: #1a3a60; color: #fff; filter: none; }
+body.ribbon .btn.ghost, body.ribbon .button { color: var(--ink); }
+body.ribbon .skip-link { background: var(--ink); color: #fff; }
+
+/* Cards, code and tables on light. */
+body.ribbon .card, body.ribbon .price-card, body.ribbon .stat, body.ribbon .maturity .col { background: var(--board2); }
+body.ribbon pre, body.ribbon .setup-steps pre { background: var(--ink); color: #a7e2ff; border-color: var(--ink); }
+body.ribbon code { color: inherit; }
+body.ribbon .setup-steps pre code { color: #a7e2ff; }
+body.ribbon .table-scroll { background: #fff; }
+body.ribbon .value-score { border-color: #b8d4f0; background: #eaf3fd; color: var(--accent); }
+body.ribbon thead th { background: var(--board2); color: var(--dust); }
+
+/* Workshop surfaces that hard-code dark fills. */
+body.ribbon .rank { color: #fff; }
+body.ribbon .snapshot, body.ribbon .card, body.ribbon .class-card, body.ribbon .quiz-panel, body.ribbon .result-panel { background: var(--board2); }
+body.ribbon .tag, body.ribbon .count { background: #eef3f8; }
+body.ribbon .prompt-box, body.ribbon textarea { background: #fff; color: var(--ink); }
+
+/* Inner page footer spacing (the Ribbon footer lives inside .wrap). */
+body.ribbon .wrap > .r-footer, body.ribbon main + .r-footer { border-top: 1px solid var(--line); margin-top: 72px; }
+
+/* Calm labels instead of tracked micro-caps (the top "generated look" tell). */
+body.ribbon .eyebrow, body.ribbon .section-kicker, body.ribbon h2.sec, body.ribbon .snapshot .stamp {
+  font-family: "Inter Tight", system-ui, sans-serif; font-size: 15px; font-weight: 500;
+  text-transform: none; letter-spacing: 0; color: var(--blue); }
+body.ribbon .controls { background: #ffffffe6; }
+body.ribbon .snapshot { box-shadow: 0 24px 60px -24px #0a254033; }
+
+/* Sentence case for every former uppercase label (gold references use none). */
+body.ribbon .eyebrow,
+body.ribbon h2.sec,
+body.ribbon .snapshot-label,
+body.ribbon thead th,
+body.ribbon .stack article span,
+body.ribbon .stack article small,
+body.ribbon .snapshot .stamp,
+body.ribbon .section-kicker,
+body.ribbon .state,
+body.ribbon .evidence b,
+body.ribbon .avoid b,
+body.ribbon .prompt-label { text-transform: none; letter-spacing: .01em; }
+
+body.ribbon thead button { min-width: 44px; }
+
+/* /design page */
+.r-links-one { grid-template-columns: 1fr; margin-top: 16px; }
+.d-ribbon { height: 140px; margin-top: 48px; border-radius: 22px; background: conic-gradient(from 210deg at 70% 35%, #5ec6ff, #2f6bff, #6b5cff, #12c2b3, #a7f3ff, #5ec6ff); }
+.d-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin: 16px 0 0; padding: 0; list-style: none; }
+.d-swatches li { display: grid; gap: 2px; padding: 12px; border-radius: 18px; box-shadow: 0 0 0 1px var(--line); }
+.d-swatches .sw { display: block; height: 52px; margin-bottom: 8px; border-radius: 12px; box-shadow: 0 0 0 1px #0a25401a inset; }
+.d-swatches b { font-size: 14px; font-weight: 500; }
+.d-swatches code { color: var(--soft); font: 13px/1.4 ui-monospace, monospace; }
+.d-type { margin: 48px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.d-type li { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: baseline; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.d-type span { color: var(--soft); font: 13px/1 ui-monospace, monospace; }
+.d-72 { font-size: 72px; font-weight: 300; line-height: 1.02; letter-spacing: -.035em; }
+.d-48 { font-size: 48px; font-weight: 300; letter-spacing: -.03em; }
+.d-28 { font-size: 28px; letter-spacing: -.025em; }
+.d-21 { font-size: 21px; color: var(--mute); }
+.d-17 { font-size: 17px; color: var(--mute); }
+.d-13 { font-size: 13px; color: var(--soft); }
+@media (max-width: 900px) { .d-72 { font-size: 40px; } .d-48 { font-size: 30px; } .d-type li { grid-template-columns: 1fr; gap: 6px; } }
+.sw-ink { background: #0a2540; }
+.sw-mute { background: #425466; }
+.sw-soft { background: #5f6f84; }
+.sw-line { background: #e3e8ee; }
+.sw-tint { background: #f6f9fc; }
+.sw-white { background: #ffffff; }
+.sw-blue { background: #0a6fd6; }
+.sw-accent-inner { background: #0859ad; }
+.sw-good { background: #08744e; }
+.sw-warn { background: #9a5b00; }
+.sw-ribbon-cyan { background: #5ec6ff; }
+.sw-ribbon-blue { background: #2f6bff; }
+.sw-ribbon-violet { background: #6b5cff; }
+.sw-ribbon-teal { background: #12c2b3; }
+.sw-ribbon-mist { background: #a7f3ff; }
+.sw-board-bg { background: #0b1220; }
+.sw-board-rail { background: #08101c; }
+.sw-board-card { background: #0f1830; }
+.sw-board-accent { background: #5ec6ff; }
+.sw-board-good { background: #3dd68c; }

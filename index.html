@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>waterfall.sh: route coding work to the right model</title>
 <meta name="description" content="waterfall.sh is a local coding board, cascade router, and free developer workshop for current models, IDEs, agent skills, and MCP servers.">
-<meta name="theme-color" content="#0b1220">
+<meta name="theme-color" content="#ffffff">
 <meta property="og:title" content="waterfall.sh: route coding work to the right model">
 <meta property="og:description" content="A local coding board and cascade router with a $30 founding license, direct model billing, and a downloadable Windows app.">
 <meta property="og:type" content="website">
@@ -18,7 +18,8 @@
 <link rel="icon" href="/brand/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/brand/logo-256.png">
 <link rel="stylesheet" href="/site.css">
-<link rel="stylesheet" href="/home.css">
+<link rel="preload" href="/fonts/inter-tight-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/ribbon.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -61,179 +62,199 @@
 </script>
 <script src="/site-analytics.js" defer></script>
 </head>
-<body>
+<body class="ribbon">
 <a class="skip-link" href="#main-content">Skip to main content</a>
-<div class="wrap home">
+<div class="r-ribbon" aria-hidden="true"></div>
+<div class="r-wrap">
   <header>
-    <nav class="nav" aria-label="Primary navigation">
-      <a class="brand" href="/" aria-label="waterfall.sh home">
-        <img src="/brand/favicon.svg" width="28" height="28" alt="">
-        <span>waterfall<span class="tld">.sh</span></span>
-      </a>
-      <div class="nav-links"><a href="/#cascade">cascade</a><a href="/leaderboard">leaderboard</a><a href="/workshop/">workshop</a><a href="/about">docs</a><a class="btn primary keep" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy $30</a></div>
+    <nav class="r-nav" aria-label="Primary navigation">
+      <a class="r-logo" href="/" aria-label="waterfall.sh home"><img src="/brand/favicon.svg" width="28" height="28" alt="">waterfall</a>
+      <a href="#cascade">Cascade</a>
+      <a href="/leaderboard">Leaderboard</a>
+      <a href="/workshop/">Workshop</a>
+      <span class="r-sp"></span>
+      <a href="/about">Docs</a>
+      <a class="r-pill light" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy · $30</a>
     </nav>
   </header>
 
   <main id="main-content">
-    <section class="h-hero" aria-labelledby="hero-title">
-      <div>
-        <div class="eyebrow">local board · cascade router</div>
-        <h1 id="hero-title">Flip projects.<br>Pay the least<br>for the job.</h1>
-        <p class="h-lede">One local board for every repo. waterfall.sh sends routine prompts to the cheapest capable model and keeps hard work for Claude or Grok.</p>
-        <div class="h-ctas">
-          <a class="btn primary" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy waterfall · $30</a>
-          <a class="btn ghost" href="https://github.com/adamtpang/waterfall.sh/releases/latest/download/waterfall_0.1.0_x64-setup.exe"><span aria-hidden="true">↓</span> Download for Windows</a>
-        </div>
-        <p class="h-trust">One-time founding license · your own keys · no token markup<br>v0.1.0 installer is unsigned, so SmartScreen warns once</p>
+    <section class="r-hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">Every prompt finds the <span>cheapest model</span> that can do it.</h1>
+      <p class="r-lede">One local board for all your repos. Routine work falls to cheap models. Hard work stays with Claude or Grok.</p>
+      <div class="r-ctas">
+        <a class="r-pill dark" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy the founding license · $30</a>
+        <a class="r-pill light" href="https://github.com/adamtpang/waterfall.sh/releases/latest/download/waterfall_0.1.0_x64-setup.exe">Download for Windows</a>
       </div>
+      <p class="r-fine">One-time. Your own keys. No token markup. The v0.1.0 installer is unsigned, so SmartScreen warns once.</p>
+    </section>
 
-      <figure class="still">
-        <div class="still-frame" aria-hidden="true" data-shapeable-illustration>
-          <div class="still-bar"><i></i><i></i><i></i><span>127.0.0.1:7910</span></div>
-          <div class="still-body">
-            <div class="still-side">
-              <b><img src="/brand/favicon.svg" width="20" height="20" alt="">waterfall</b>
-              <span>Dashboard</span><span class="on">Cascade</span><span>Agents</span><span>Pace</span>
+    <figure class="r-stage-fig">
+      <div class="r-stage">
+        <div class="r-card" aria-hidden="true" data-shapeable-illustration><small>This week</small><strong>$4.12</strong><p><span>All-Claude would be</span><span>$15.80</span></p><p><span>Saved</span><b>74%</b></p></div>
+        <div class="board" aria-hidden="true" data-shapeable-illustration>
+          <div class="bar"><i></i><i></i><i></i><span>waterfall · 127.0.0.1:7910</span></div>
+          <div class="body">
+            <div class="rail">
+              <div class="brand"><b>W</b>waterfall</div>
+              <div class="proj on"><u></u>api</div>
+              <div class="proj live"><u></u>web</div>
+              <div class="proj"><u></u>docs</div>
+              <div class="proj"><u></u>mobile</div>
+              <div class="proj"><u></u>infra</div>
+              <div class="proj"><u></u>billing</div>
+              <div class="proj"><u></u>landing</div>
+              <div class="proj pin">Settings</div>
             </div>
-            <div class="still-main">
-              <div class="still-metrics">
-                <div><small>Prompts routed</small><strong>128</strong></div>
-                <div><small>Tokens avoided</small><strong>412k</strong></div>
-                <div><small>Est. saved</small><strong class="good">$11.40</strong></div>
+            <div class="main">
+              <div class="tabs"><div class="tab on">fix auth test</div><div class="tab">rename env</div><div class="tab">+</div></div>
+              <div class="chat">
+                <div class="me">rename userCount to totalUsers, then fix the failing auth test</div>
+                <div class="ai"><span class="route">GLM 5.3 · $0.004</span>Renamed in 6 files. auth.spec.ts still fails.</div>
+                <div class="ai"><span class="route hard">Claude · the hard part</span>The session cookie is read before env loads. Moved the import. 42 of 42 passing.</div>
               </div>
-              <div class="still-card">
-                <h3>Classify and route</h3>
-                <div class="still-prompt">rename userCount to totalUsers, then fix the failing auth test</div>
-                <div class="still-actions"><span>Classify only</span><span>Dry run</span><span class="primary">Route</span></div>
-                <div class="still-out">
-                  <p><b>route: split</b><span>local classifier · free</span></p>
-                  <p><span>rename across 6 files → glm-5.3</span><em>$0.004</em></p>
-                  <p class="hard"><span>auth test root cause → claude</span><em>remainder</em></p>
-                </div>
-              </div>
+            </div>
+            <div class="side">
+              <div class="metric"><small>Saved this week</small><strong class="good">74%</strong></div>
+              <div class="spark"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="metric"><small>Routed cheap</small><strong>112</strong></div>
+              <div class="metric"><small>Sent to Claude</small><strong>16</strong></div>
             </div>
           </div>
         </div>
-        <figcaption>Illustrative board. Example numbers, not measured savings.</figcaption>
-      </figure>
-    </section>
-
-    <section class="h-section" id="cascade" aria-labelledby="cascade-title">
-      <div class="h-head">
-        <div><div class="eyebrow">how it falls</div><h2 id="cascade-title">A real sequence, not a model guess.</h2></div>
-        <p>Each stage narrows the prompt, uses a capable lower-cost model, or hands the hard remainder to the model you picked for difficult work.</p>
       </div>
-      <ol class="h-steps">
-        <li><span>01</span><h3>Classify</h3><p>A local classifier scores the prompt with no API call and picks a free, split, or Claude route.</p></li>
-        <li><span>02</span><h3>Cascade</h3><p>Routine work goes to the cheapest capable model in OpenRouter's live-priced catalog.</p></li>
-        <li><span>03</span><h3>Fall back</h3><p>If a model is down, rate-limited, or returns nothing usable, the next ranked candidate takes over.</p></li>
-        <li><span>04</span><h3>Surface</h3><p>Only the difficult remainder reaches Claude or Grok, with the cheaper output already attached.</p></li>
-      </ol>
-    </section>
-
-    <section class="h-section" aria-labelledby="why-title">
-      <div class="h-head">
-        <div><div class="eyebrow">why people buy</div><h2 id="why-title">One window. Fewer expensive tokens.</h2></div>
-        <p>No more opening a terminal, changing folders, and starting another agent for every repo.</p>
-      </div>
-      <div class="h-promises">
-        <div class="h-promise"><h3>Modular board</h3><p>Each chat is tied to its repository. Other chats keep running while you switch, and Ctrl+Tab moves between projects.</p></div>
-        <div class="h-promise"><h3>Cascade</h3><p>Routine parts go to the cheapest capable live-priced model. Only the hard remainder goes to Claude or Grok.</p></div>
-        <div class="h-promise"><h3>Least dollars</h3><p>A savings ledger records routed tokens and estimated cost. You pay providers with your own keys, and waterfall.sh adds no markup.</p></div>
-      </div>
-    </section>
-
-    <section class="h-section" aria-labelledby="free-title">
-      <div class="h-head">
-        <div><div class="eyebrow">free for everyone</div><h2 id="free-title">Rankings for real work.</h2></div>
-        <p>Dated, evidence-first rankings of models, IDEs, agent skills, and MCP servers. No paywall.</p>
-      </div>
-      <div class="h-links">
-        <a class="h-link" href="/leaderboard"><span class="eyebrow">leaderboard</span><h3>Bang for buck</h3><p>Coding models ranked by dollars per solved task, with JSON and CSV feeds.</p><b>Open the board →</b></a>
-        <a class="h-link" href="/workshop/"><span class="eyebrow">workshop</span><h3>Developer workshop</h3><p>Pick a developer class and get one approval-first setup prompt for Claude and Codex.</p><b>Browse the workshop →</b></a>
-      </div>
-    </section>
-
-    <section class="h-section" id="status" aria-labelledby="status-title">
-      <div class="h-head">
-        <div><div class="eyebrow">honest status</div><h2 id="status-title">What works today.</h2></div>
-        <p>Shipped behavior, separated from unfinished work. The pending column is a roadmap, not a guarantee.</p>
-      </div>
-      <div class="h-status">
-        <div class="h-col works">
-          <h3>Works today</h3>
-          <ul>
-            <li>Local zero-API classifier (classify, route --dry-run)</li>
-            <li>Cascade routing to the cheapest capable live-priced model</li>
-            <li>Automatic fallback across ranked candidates</li>
-            <li>Savings ledger, statistics, and response cache</li>
-            <li>Downloadable Windows desktop app (v0.1.0)</li>
-          </ul>
-          <details>
-            <summary>7 more shipped features</summary>
-            <ul>
-              <li>Model tiering (small, medium, large)</li>
-              <li>Coding policy tiers with independent review and inspectable promotion rules</li>
-              <li>Dated bang-for-buck leaderboard with JSON and CSV feeds</li>
-              <li>Hard per-call token cap (the Ringer)</li>
-              <li>Global nudge hook and hook-log audit trail</li>
-              <li>Usage pace and quota estimate in the CLI and dashboard</li>
-              <li>Desktop launchers for Claude, Codex, Grok, and OpenCode</li>
-            </ul>
-          </details>
-        </div>
-        <div class="h-col">
-          <h3>Being wired up</h3>
-          <ul>
-            <li>Skill self-triggering is near 0.1% real-route conversion on measured nudges</li>
-            <li>No code signing yet, so SmartScreen warns on first launch</li>
-            <li>No native macOS or Linux desktop package yet</li>
-          </ul>
-        </div>
-        <div class="h-col">
-          <h3>Pending code or evidence</h3>
-          <ul>
-            <li>A week or more of organic use for a real before-and-after</li>
-            <li>Enough harness runs to replace every public snapshot prior</li>
-            <li>A general answer to long-thread input compounding</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section class="h-section" id="download" aria-labelledby="install-title">
-      <div class="h-head">
-        <div><div class="eyebrow">install</div><h2 id="install-title">Runs on your machine.</h2></div>
-        <p>The board binds to 127.0.0.1. This website never connects to your localhost.</p>
-      </div>
-      <div class="h-install">
-        <div class="h-promise"><h3>CLI</h3><p>Windows, macOS, and Linux. Installs to ~/.waterfall and merges the Claude Code hooks with a backup.</p><pre><code>curl -sSL https://raw.githubusercontent.com/adamtpang/waterfall.sh/main/install.py | python3</code></pre></div>
-        <div class="h-promise"><h3>Windows app</h3><p><a href="https://github.com/adamtpang/waterfall.sh/releases/latest">v0.1.0 release</a> as an NSIS installer or MSI. Unsigned, so SmartScreen warns once.</p><pre><code>waterfall_0.1.0_x64-setup.exe</code></pre></div>
-        <div class="h-promise"><h3>Read the code first</h3><p>The public repo holds the site, router, tests, installers, and desktop sources.</p><pre><code>git clone https://github.com/adamtpang/waterfall.sh
-cd waterfall.sh &amp;&amp; pip install -e .</code></pre></div>
-      </div>
-    </section>
+      <figcaption class="r-caption">Illustrative board. Example numbers, not measured savings.</figcaption>
+    </figure>
   </main>
+</div>
 
-  <section class="h-close" aria-labelledby="close-title">
-    <h2 id="close-title">$30 once. Your keys. No markup.</h2>
-    <p>The founding license unlocks the local board and the cascade router.</p>
-    <div class="h-ctas">
-      <a class="btn primary" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy waterfall · $30</a>
-      <a class="btn ghost" href="/contact">Questions first? Contact</a>
+<section class="r-band" id="cascade" aria-labelledby="cascade-title">
+  <div class="r-wrap r-grid">
+    <div>
+      <h2 id="cascade-title">A real cascade, not a guess.</h2>
+      <p class="r-sub">A local classifier splits each prompt. The routine part falls to the cheapest capable model in OpenRouter's live-priced catalog. Only the hard remainder reaches Claude or Grok, with the cheap work attached. If a model fails, the next ranked one takes over.</p>
+    </div>
+    <div>
+      <div class="r-flow" aria-label="Example: one prompt split across three steps">
+        <div class="r-prompt"><span>$</span> rename userCount, then fix the failing auth test</div>
+        <div class="r-step"><h3>Classify locally</h3><p>no API call · split route</p><b>$0.000</b></div>
+        <div class="r-step"><h3>Rename across 6 files</h3><p>cheapest capable · GLM 5.3</p><b>$0.004</b></div>
+        <div class="r-step hard"><h3>Auth test root cause</h3><p>the hard remainder</p><b>Claude</b></div>
+        <div class="r-total"><span>Same prompt, all-Claude: $0.71</span><span>This route: <b>$0.21</b></span></div>
+      </div>
+      <p class="r-note">Example costs for illustration. Real prices come from OpenRouter at run time.</p>
+    </div>
+  </div>
+</section>
+
+<div class="r-wrap">
+  <section class="r-section" aria-labelledby="why-title">
+    <h2 id="why-title">One window. Fewer expensive tokens.</h2>
+    <p class="r-sub">No more opening a terminal, changing folders, and starting another agent for every repo.</p>
+    <div class="r-bento">
+      <div class="r-tile wide">
+        <h3>A modular board</h3>
+        <p>Each chat is tied to its repository. Other chats keep running while you switch, and Ctrl+Tab moves between projects.</p>
+        <div class="r-tabs" aria-hidden="true" data-shapeable-illustration>
+          <div><i></i>api · fix auth test<span>running</span></div>
+          <div><i></i>web · checkout copy<span>running</span></div>
+          <div class="idle"><i></i>docs · changelog<span>idle</span></div>
+        </div>
+      </div>
+      <div class="r-tile"><h3>A savings ledger</h3><p>Routed tokens and estimated cost are recorded, so every saving can be inspected.</p></div>
+      <div class="r-tile"><h3>Your keys, no markup</h3><p>Pay OpenRouter, Claude, and Grok directly.</p><span class="r-big" aria-label="zero percent markup">0%</span></div>
     </div>
   </section>
 
-  <footer>
+  <section class="r-section" aria-labelledby="free-title">
+    <h2 id="free-title">Free rankings for real work.</h2>
+    <p class="r-sub">Dated, evidence-first rankings of models, IDEs, agent skills, and MCP servers. No paywall.</p>
+    <div class="r-links">
+      <a class="r-link" href="/leaderboard"><h3>Bang for buck</h3><p>Coding models ranked by dollars per solved task, with JSON and CSV feeds.</p><b>Open the leaderboard →</b></a>
+      <a class="r-link" href="/workshop/"><h3>Developer workshop</h3><p>Pick a developer class and get one approval-first setup prompt for Claude and Codex.</p><b>Browse the workshop →</b></a>
+    </div>
+  </section>
+
+  <section class="r-section" id="status" aria-labelledby="status-title">
+    <h2 id="status-title">What works today.</h2>
+    <p class="r-sub">Shipped behavior, separated from unfinished work. The pending column is a roadmap, not a guarantee.</p>
+    <div class="r-status">
+      <div class="r-col works">
+        <h3><i></i>Works today</h3>
+        <ul>
+          <li>Local zero-API classifier (classify, route --dry-run)</li>
+          <li>Cascade routing to the cheapest capable live-priced model</li>
+          <li>Automatic fallback across ranked candidates</li>
+          <li>Savings ledger, statistics, and response cache</li>
+          <li>Downloadable Windows desktop app (v0.1.0)</li>
+        </ul>
+        <details>
+          <summary>7 more shipped features</summary>
+          <ul>
+            <li>Model tiering (small, medium, large)</li>
+            <li>Coding policy tiers with independent review and inspectable promotion rules</li>
+            <li>Dated bang-for-buck leaderboard with JSON and CSV feeds</li>
+            <li>Hard per-call token cap (the Ringer)</li>
+            <li>Global nudge hook and hook-log audit trail</li>
+            <li>Usage pace and quota estimate in the CLI and dashboard</li>
+            <li>Desktop launchers for Claude, Codex, Grok, and OpenCode</li>
+          </ul>
+        </details>
+      </div>
+      <div class="r-col">
+        <h3><i></i>Being wired up</h3>
+        <ul>
+          <li>Skill self-triggering is near 0.1% real-route conversion on measured nudges</li>
+          <li>No code signing yet, so SmartScreen warns on first launch</li>
+          <li>No native macOS or Linux desktop package yet</li>
+        </ul>
+      </div>
+      <div class="r-col">
+        <h3><i></i>Pending code or evidence</h3>
+        <ul>
+          <li>A week or more of organic use for a real before-and-after</li>
+          <li>Enough harness runs to replace every public snapshot prior</li>
+          <li>A general answer to long-thread input compounding</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="r-section" id="download" aria-labelledby="install-title">
+    <h2 id="install-title">Runs on your machine.</h2>
+    <p class="r-sub">The board binds to 127.0.0.1. This website never connects to your localhost.</p>
+    <div class="r-install">
+      <div><h3>CLI</h3><p>Windows, macOS, and Linux. Installs to ~/.waterfall and merges the Claude Code hooks with a backup.</p><pre><code>curl -sSL https://raw.githubusercontent.com/adamtpang/waterfall.sh/main/install.py | python3</code></pre></div>
+      <div><h3>Windows app</h3><p><a href="https://github.com/adamtpang/waterfall.sh/releases/latest">The v0.1.0 release</a> as an NSIS installer or MSI. Unsigned, so SmartScreen warns once.</p><pre><code>waterfall_0.1.0_x64-setup.exe</code></pre></div>
+      <div><h3>Read the code first</h3><p>The public repo holds the site, router, tests, installers, and desktop sources.</p><pre><code>git clone https://github.com/adamtpang/waterfall.sh
+cd waterfall.sh &amp;&amp; pip install -e .</code></pre></div>
+    </div>
+  </section>
+</div>
+
+<section class="r-close" aria-labelledby="close-title">
+  <div class="r-wrap">
+    <h2 id="close-title">$30 once. Yours to keep.</h2>
+    <ul>
+      <li>The local board for every repo</li>
+      <li>The cascade router and savings ledger</li>
+      <li>Your own model keys, no token markup</li>
+    </ul>
+    <div class="r-ctas"><a class="r-pill light" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy waterfall · $30</a><a class="r-pill dark" href="/contact">Questions first? Contact</a></div>
+  </div>
+</section>
+
+<div class="r-wrap">
+  <footer class="r-footer">
     <span>waterfall.sh · independent software project</span>
     <nav aria-label="Footer navigation">
       <a href="/workshop/">Workshop</a>
       <a href="/leaderboard">Leaderboard</a>
+      <a href="/design">Design</a>
       <a href="/about">About</a>
       <a href="/contact">Contact</a>
       <a href="/privacy">Privacy</a>
       <a href="https://github.com/adamtpang/waterfall.sh">Source</a>
-      <a href="https://x.com/adamtpang">X</a>
     </nav>
   </footer>
 </div>

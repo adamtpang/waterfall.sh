@@ -12,16 +12,24 @@
 <link rel="canonical" href="https://waterfall.sh/workshop/">
 <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/workshop/workshop.css">
+<link rel="preload" href="/fonts/inter-tight-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/ribbon.css">
+<link rel="stylesheet" href="/ribbon-pages.css">
 <script src="/site-analytics.js" defer></script>
 </head>
-<body>
-  <header class="wrap nav">
-    <a class="brand" href="/">
-      <img src="/brand/favicon.svg" alt="">
-      <span>waterfall<span class="tld">.sh</span></span>
-    </a>
-    <nav class="nav-links" aria-label="Primary navigation"><a href="/#cascade">cascade</a><a href="/leaderboard">leaderboard</a><a href="/workshop/" aria-current="page">workshop</a><a href="/about">docs</a><a class="btn primary keep" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy $30</a></nav>
-  </header>
+<body class="ribbon">
+<div class="r-page-wash" aria-hidden="true"></div>
+  <div class="wrap"><header class="r-head">
+    <nav class="r-nav" aria-label="Primary navigation">
+      <a class="r-logo" href="/" aria-label="waterfall.sh home"><img src="/brand/favicon.svg" width="28" height="28" alt="">waterfall</a>
+      <a href="/#cascade">Cascade</a>
+      <a href="/leaderboard">Leaderboard</a>
+      <a href="/workshop/" aria-current="page">Workshop</a>
+      <span class="r-sp"></span>
+      <a href="/about">Docs</a>
+      <a class="r-pill light" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy · $30</a>
+    </nav>
+  </header></div>
 
   <main>
     <section class="wrap hero">
@@ -123,9 +131,9 @@
     </section>
   </main>
 
-  <footer class="wrap">
-    <span>waterfall.sh · dev workshop · no affiliate links</span>
-    <span><a href="/">product</a> · <a href="https://github.com/adamtpang/waterfall.sh">source</a></span>
+  <footer class="r-footer">
+    <span>waterfall.sh · independent software project</span>
+    <nav aria-label="Footer navigation"><a href="/workshop/">Workshop</a><a href="/leaderboard">Leaderboard</a><a href="/design">Design</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="https://github.com/adamtpang/waterfall.sh">Source</a></nav>
   </footer>
 
 <script src="/workshop/workshop.js" defer></script>
