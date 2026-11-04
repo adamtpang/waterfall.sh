@@ -216,3 +216,6 @@ body.ribbon a:focus-visible, body.ribbon summary:focus-visible { outline: 3px so
 
 .r-link { min-width: 0; }
 .r-link h3, .r-install h3 { overflow-wrap: anywhere; }
+
+.r-more { margin-top: 16px; }
+.r-more a { display: inline-flex; align-items: center; min-height: 44px; color: var(--blue); font-weight: 500; }

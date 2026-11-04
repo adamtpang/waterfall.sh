@@ -9,20 +9,23 @@
 <link rel="canonical" href="https://waterfall.sh/design">
 <link rel="alternate" type="application/json" href="/design/system.json" title="Shapeable v3 design system">
 <link rel="alternate" type="application/json" href="/design/tokens.json" title="W3C design tokens">
-<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/brand/favicon.svg?v=drop" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
 <link rel="stylesheet" href="/site.css">
 <link rel="preload" href="/fonts/inter-tight-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/ribbon.css">
 <link rel="stylesheet" href="/ribbon-pages.css">
+<link rel="stylesheet" href="/design/design.css">
 <script src="/site-analytics.js" defer></script>
 </head>
 <body class="ribbon">
 <div class="r-page-wash" aria-hidden="true"></div>
 <a class="skip-link" href="#main-content">Skip to main content</a>
-<div class="r-wrap">
+<div class="r-wrap r-wrap-design">
   <header class="r-head">
     <nav class="r-nav" aria-label="Primary navigation">
-      <a class="r-logo" href="/" aria-label="waterfall.sh home"><img src="/brand/favicon.svg" width="28" height="28" alt="">waterfall</a>
+      <a class="r-logo" href="/" aria-label="waterfall.sh home"><img src="/brand/waterfall-mark.svg" width="28" height="28" alt="">waterfall</a>
       <a href="/#cascade">Cascade</a>
       <a href="/leaderboard">Leaderboard</a>
       <a href="/workshop/">Workshop</a>
@@ -33,60 +36,131 @@
   </header>
 
   <main id="main-content">
-    <section class="r-hero" aria-labelledby="design-title">
-      <h1 id="design-title">The waterfall.sh design system.</h1>
-      <p class="r-lede">Light page, one luminous cascade ribbon, Inter Tight set light and large, and the product shown big with depth. Point any app or coding agent at these files and it can rebuild the look.</p>
+  <div class="d-wrap">
+    <section class="d-hero" aria-labelledby="design-title">
+      <h1 id="design-title">How waterfall looks, and why.</h1>
+      <p>Light pages, one luminous ribbon, a mark called the Drop, and the product shown big. Everything here is generated from one approved source, so people and agents build the same thing.</p>
+      <nav class="d-modes" aria-label="Design sections"><a class="on" href="#direction">Direction</a><a href="#in-use">In use</a><a href="#docs">Docs for agents</a></nav>
     </section>
 
-    <section class="r-section" aria-labelledby="files-title">
-      <h2 id="files-title">Read it from code.</h2>
-      <p class="r-sub">Every file is generated from one approved source, so they never disagree. Cross-origin reads are allowed.</p>
-      <div class="r-install">
-        <div><h3>system.json</h3><p>The full Shapeable v3 pack: identity, tokens, patterns, voice, rules, and what the design must not become.</p><pre><code>https://waterfall.sh/design/system.json</code></pre></div>
-        <div><h3>tokens.json</h3><p>Color, type, space, radius, shadow, and motion in the W3C Design Tokens format.</p><pre><code>https://waterfall.sh/design/tokens.json</code></pre></div>
-        <div><h3>tokens.css</h3><p>Drop-in CSS variables, including <code>var(--ribbon)</code> and <code>var(--shadow-float)</code>.</p><pre><code>https://waterfall.sh/design/tokens.css</code></pre></div>
-      </div>
-      <div class="r-links r-links-one">
-        <a class="r-link" href="/design/CLAUDE_DESIGN_SYSTEM.md"><h3>CLAUDE_DESIGN_SYSTEM.md</h3><p>The implementation guide for coding agents, rendered from system.json. Hand it to Claude, Codex, or any agent before it builds UI.</p><b>Open the guide →</b></a>
+    <section id="direction" aria-label="Direction topics">
+      <div class="d-grid">
+        <a class="d-tile" href="#logo"><b>Logo</b><svg viewBox="0 0 256 256" aria-hidden="true"><path fill="#0a6fd6" d="M122 20A88 88 0 0 0 122 196ZM134 68A88 88 0 0 1 134 244Z"/></svg></a>
+        <a class="d-tile" href="#colour"><b>Colour</b><svg viewBox="0 0 200 200" aria-hidden="true"><path fill="#0a2540" d="M10 100a90 90 0 0 1 180 0Z"/><path fill="#0a6fd6" d="M10 100a90 90 0 0 0 180 0Z"/></svg></a>
+        <a class="d-tile" href="#type"><b>Typography</b><span class="d-aa" aria-hidden="true">Aa</span></a>
+        <a class="d-tile" href="#ribbon"><b>Ribbon</b><svg viewBox="0 0 200 200" aria-hidden="true"><defs><linearGradient id="tr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#12c2b3"/><stop offset=".4" stop-color="#5ec6ff"/><stop offset=".75" stop-color="#2f6bff"/><stop offset="1" stop-color="#6b5cff"/></linearGradient></defs><path fill="url(#tr)" d="M70 10H190V130L140 190H100L30 70Z"/></svg></a>
+        <a class="d-tile" href="#product"><b>Product</b><svg viewBox="0 0 200 160" aria-hidden="true"><rect x="10" y="10" width="180" height="140" rx="14" fill="#0b1220"/><rect x="10" y="10" width="180" height="22" rx="11" fill="#08101c"/><rect x="10" y="32" width="44" height="118" fill="#08101c"/><rect x="66" y="48" width="96" height="16" rx="8" fill="#173447"/><rect x="66" y="74" width="72" height="16" rx="8" fill="#0f1830"/><rect x="66" y="100" width="108" height="16" rx="8" fill="#0f1830"/><circle cx="24" cy="48" r="4" fill="#3dd68c"/></svg></a>
+        <a class="d-tile" href="#layout"><b>Layout</b><svg viewBox="0 0 200 160" aria-hidden="true"><rect x="10" y="10" width="104" height="140" rx="16" fill="#cfe2f8"/><rect x="124" y="10" width="66" height="65" rx="16" fill="#fff" stroke="#e3e8ee" stroke-width="2"/><rect x="124" y="85" width="66" height="65" rx="16" fill="#fff" stroke="#e3e8ee" stroke-width="2"/></svg></a>
+        <a class="d-tile" href="#motion"><b>Motion</b><svg viewBox="0 0 200 160" aria-hidden="true"><path d="M16 140C70 140 70 20 184 20" fill="none" stroke="#0a6fd6" stroke-width="12" stroke-linecap="round"/><circle cx="184" cy="20" r="14" fill="#0a2540"/></svg></a>
+        <a class="d-tile" href="#voice"><b>Voice</b><svg viewBox="0 0 200 160" aria-hidden="true"><rect x="16" y="20" width="168" height="96" rx="40" fill="#0a2540"/><path d="M52 112L40 146L84 114Z" fill="#0a2540"/><rect x="50" y="56" width="100" height="10" rx="5" fill="#fff"/><rect x="50" y="76" width="64" height="10" rx="5" fill="#5ec6ff"/></svg></a>
       </div>
     </section>
 
-    <section class="r-section" aria-labelledby="tokens-title">
-      <h2 id="tokens-title">Color, type, and the ribbon.</h2>
-      <p class="r-sub">Blue means action and links. Green is only for savings. The dark board colors belong to the product illustration, never to page chrome.</p>
-      <div class="d-ribbon" aria-hidden="true"></div>
-      <ul class="d-swatches" aria-label="Color tokens">
-        <li><i class="sw sw-ink"></i><b>ink</b><code>#0a2540</code></li>
-        <li><i class="sw sw-mute"></i><b>mute</b><code>#425466</code></li>
-        <li><i class="sw sw-soft"></i><b>soft</b><code>#5f6f84</code></li>
-        <li><i class="sw sw-line"></i><b>line</b><code>#e3e8ee</code></li>
-        <li><i class="sw sw-tint"></i><b>tint</b><code>#f6f9fc</code></li>
-        <li><i class="sw sw-white"></i><b>white</b><code>#ffffff</code></li>
-        <li><i class="sw sw-blue"></i><b>blue</b><code>#0a6fd6</code></li>
-        <li><i class="sw sw-accent-inner"></i><b>accent-inner</b><code>#0859ad</code></li>
-        <li><i class="sw sw-good"></i><b>good</b><code>#08744e</code></li>
-        <li><i class="sw sw-warn"></i><b>warn</b><code>#9a5b00</code></li>
-        <li><i class="sw sw-ribbon-cyan"></i><b>ribbon-cyan</b><code>#5ec6ff</code></li>
-        <li><i class="sw sw-ribbon-blue"></i><b>ribbon-blue</b><code>#2f6bff</code></li>
-        <li><i class="sw sw-ribbon-violet"></i><b>ribbon-violet</b><code>#6b5cff</code></li>
-        <li><i class="sw sw-ribbon-teal"></i><b>ribbon-teal</b><code>#12c2b3</code></li>
-        <li><i class="sw sw-ribbon-mist"></i><b>ribbon-mist</b><code>#a7f3ff</code></li>
-        <li><i class="sw sw-board-bg"></i><b>board-bg</b><code>#0b1220</code></li>
-        <li><i class="sw sw-board-rail"></i><b>board-rail</b><code>#08101c</code></li>
-        <li><i class="sw sw-board-card"></i><b>board-card</b><code>#0f1830</code></li>
-        <li><i class="sw sw-board-accent"></i><b>board-accent</b><code>#5ec6ff</code></li>
-        <li><i class="sw sw-board-good"></i><b>board-good</b><code>#3dd68c</code></li>
-      </ul>
-      <ol class="d-type" aria-label="Type scale">
-        <li class="d-72"><span>72 · 300</span>Every prompt finds the cheapest model.</li>
-        <li class="d-48"><span>48 · 300</span>A real cascade, not a guess.</li>
-        <li class="d-28"><span>28 · 400</span>Bang for buck</li>
-        <li class="d-21"><span>21 · 400</span>One local board for all your repos.</li>
-        <li class="d-17"><span>17 · 400</span>Body text reads at 17px with a 1.6 line height.</li>
-        <li class="d-13"><span>13 · 400</span>Sentence-case labels. Never tracked capitals.</li>
-      </ol>
+    <section class="d-topic" id="logo" aria-labelledby="logo-title">
+      <div>
+        <h2 id="logo-title">Logo: the Drop.</h2>
+        <p class="d-principle">One disc, sliced once, the right half dropped. The fall line, and costs falling. Built from two exact arcs, it reads at 16px and on a billboard.</p>
+        <div class="d-dodont"><div><h3>Do</h3>Use the blue Drop on white, the white Drop on ink or blue, and the Drop on a blue tile as the app icon.</div><div class="dont"><h3>Don't</h3>Stretch it, rotate it, add a gradient or outline, or put it on the ribbon where the edges disappear.</div></div>
+        <div class="d-tokens"><code>/brand/waterfall-mark.svg</code><code>/brand/waterfall-mark-white.svg</code><code>/favicon.ico</code></div>
+      </div>
+      <div class="d-visual"><div class="d-logo-row"><img src="/brand/waterfall-mark.svg" width="120" height="120" alt="The Drop mark in waterfall blue"><img src="/brand/waterfall-mark-app-icon.svg" width="120" height="120" alt="The Drop on a blue app tile"><span class="on-ink"><img src="/brand/waterfall-mark-white.svg" width="84" height="84" alt="The Drop reversed in white on ink"></span></div></div>
     </section>
-  </main>
+
+    <section class="d-topic" id="colour" aria-labelledby="colour-title">
+      <div>
+        <h2 id="colour-title">Colour: ink, blue, and light.</h2>
+        <p class="d-principle">Pages are white and tint. Ink carries words. Blue means action, links, and the mark. Green is only ever money saved. The ribbon is the one place colour sings.</p>
+        <div class="d-dodont"><div><h3>Do</h3>Keep blue scarce so it always means "you can act here".</div><div class="dont"><h3>Don't</h3>Use green for anything but savings, or put body text on the ribbon.</div></div>
+        <div class="d-tokens"><code>--ink #0a2540</code><code>--blue #0a6fd6</code><code>--tint #f6f9fc</code><code>--good #08744e</code></div>
+      </div>
+      <div class="d-visual"><div class="d-colours"><div class="c-ink"><b>Ink</b><code>#0a2540</code></div><div class="c-blue"><b>Blue</b><code>#0a6fd6</code></div><div class="c-tint"><b>Tint</b><code>#f6f9fc</code></div><div class="c-good"><b>Saved</b><code>#08744e</code></div><div class="c-ribbon"><b>Ribbon</b><code>cyan, blue, violet, teal</code></div></div></div>
+    </section>
+
+    <section class="d-topic" id="type" aria-labelledby="type-title">
+      <div>
+        <h2 id="type-title">Typography: light and large.</h2>
+        <p class="d-principle">One family, Inter Tight, self-hosted. Headlines are big and light (weight 300) with tight tracking. Labels are sentence case, never tracked capitals.</p>
+        <div class="d-dodont"><div><h3>Do</h3>Let one headline carry the page. Keep body at 17px with room to breathe.</div><div class="dont"><h3>Don't</h3>Use bold display type, uppercase eyebrow labels, or text under 12px.</div></div>
+        <div class="d-tokens"><code>72 / 300 / -0.035em</code><code>48 / 300</code><code>17 / 400 / 1.6</code></div>
+      </div>
+      <div class="d-visual"><div class="d-type"><p class="t1">Pay the least.</p><p class="t2">A real cascade.</p><p class="t3">One local board for all your repos.</p><p class="t4">Sentence-case labels, 12px minimum.</p></div></div>
+    </section>
+
+    <section class="d-topic" id="ribbon" aria-labelledby="ribbon-title">
+      <div>
+        <h2 id="ribbon-title">Ribbon: the one art layer.</h2>
+        <p class="d-principle">A luminous cascade of cyan, blue, violet, and teal, crossed by fine falling lines. It appears twice: behind the hero, and again in the closing band.</p>
+        <div class="d-dodont"><div><h3>Do</h3>Let it bleed off the top right and fade into white before it reaches the words.</div><div class="dont"><h3>Don't</h3>Add a second art style, or place copy or the mark on top of it.</div></div>
+        <div class="d-tokens"><code>var(--ribbon)</code><code>clip-path + mask</code></div>
+      </div>
+      <div class="d-visual"><div class="d-ribbon-art" aria-hidden="true"></div></div>
+    </section>
+
+    <section class="d-topic" id="product" aria-labelledby="product-title">
+      <div>
+        <h2 id="product-title">Product: show the board, big.</h2>
+        <p class="d-principle">The local board is the hero image: large, overlapping the ribbon, running off the edge. A few real words, quiet placeholders for the rest, and example numbers always labelled.</p>
+        <div class="d-dodont"><div><h3>Do</h3>Crop the window so it bleeds off the page, with depth from soft shadows.</div><div class="dont"><h3>Don't</h3>Shrink it into a boxed card, or show savings that were not measured without a label.</div></div>
+      </div>
+      <div class="d-visual d-product"><img src="/design/img/hero.jpg" width="960" height="600" alt="The waterfall.sh hero: the board overlapping the ribbon"></div>
+    </section>
+
+    <section class="d-topic" id="layout" aria-labelledby="layout-title">
+      <div>
+        <h2 id="layout-title">Layout: one idea per section.</h2>
+        <p class="d-principle">1200px wide, 128px between sections, 22px tile corners, pill buttons. Promises go in a bento with one wide tile, never three identical cards.</p>
+        <div class="d-dodont"><div><h3>Do</h3>Vary tile sizes so the most important idea is the biggest.</div><div class="dont"><h3>Don't</h3>Repeat label, headline, paragraph, card grid in every section.</div></div>
+        <div class="d-tokens"><code>--max-width 1200px</code><code>--section 128px</code><code>--radius-tile 22px</code></div>
+      </div>
+      <div class="d-visual"><div class="d-layout" aria-hidden="true"><i></i><i></i><i></i></div></div>
+    </section>
+
+    <section class="d-topic" id="motion" aria-labelledby="motion-title">
+      <div>
+        <h2 id="motion-title">Motion: quick and quiet.</h2>
+        <p class="d-principle">Only colour and shadow move, in 300ms on one ease-out curve. Under reduced motion, nothing moves at all.</p>
+        <div class="d-dodont"><div><h3>Do</h3>Confirm a hover or a press, then get out of the way.</div><div class="dont"><h3>Don't</h3>Animate layout, slide sections in on scroll, or loop anything.</div></div>
+        <div class="d-tokens"><code>300ms</code><code>cubic-bezier(.22, 1, .36, 1)</code></div>
+      </div>
+      <div class="d-visual"><svg class="d-motion" viewBox="0 0 360 200" aria-hidden="true"><path d="M20 180H340" stroke="#e3e8ee" stroke-width="2"/><path d="M20 20V180" stroke="#e3e8ee" stroke-width="2"/><path d="M20 180C99 -40 130 20 340 20" fill="none" stroke="#0a6fd6" stroke-width="6" stroke-linecap="round"/></svg></div>
+    </section>
+
+    <section class="d-topic" id="voice" aria-labelledby="voice-title">
+      <div>
+        <h2 id="voice-title">Voice: terse and honest.</h2>
+        <p class="d-principle">Write like a developer explaining it to a friend. Short sentences, real numbers with their source, limits stated plainly. No hype, no em dashes.</p>
+        <div class="d-dodont"><div><h3>Do</h3>"The installer is unsigned, so SmartScreen warns once."</div><div class="dont"><h3>Don't</h3>"Revolutionary AI-powered savings, guaranteed."</div></div>
+      </div>
+      <div class="d-visual"><div class="d-voice"><p>Routine work falls to cheap models. Hard work stays with Claude.</p><p>Example figures, not measured savings.</p><p class="no">Unlock limitless AI efficiency today!</p></div></div>
+    </section>
+  </div>
+
+  <section class="d-wrap r-section" id="in-use" aria-labelledby="inuse-title">
+    <h2 id="inuse-title">In use.</h2>
+    <p class="r-sub">The system on the live site.</p>
+    <div class="d-reel" tabindex="0" role="region" aria-label="In use: screenshots of the live site, scroll sideways">
+      <figure><img src="/design/img/hero.jpg" width="960" height="600" alt="Home hero"><figcaption>Hero: ribbon, light headline, the board</figcaption></figure>
+      <figure><img src="/design/img/cascade.jpg" width="960" height="600" alt="Cascade band"><figcaption>The cascade band</figcaption></figure>
+      <figure><img src="/design/img/bento.jpg" width="960" height="600" alt="Bento of promises"><figcaption>Bento, one wide tile</figcaption></figure>
+      <figure><img src="/design/img/close.jpg" width="960" height="600" alt="Closing band"><figcaption>The ribbon returns in the close</figcaption></figure>
+      <figure><img src="/design/img/leaderboard.jpg" width="960" height="600" alt="Leaderboard page"><figcaption>Leaderboard</figcaption></figure>
+      <figure><img src="/design/img/workshop.jpg" width="960" height="600" alt="Workshop page"><figcaption>Workshop</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="d-wrap r-section" id="docs" aria-labelledby="docs-title">
+    <h2 id="docs-title">Docs for agents.</h2>
+    <p class="r-sub">Machine-readable, generated from one approved source, readable cross-origin.</p>
+    <div class="r-install">
+      <div><h3>system.json</h3><p>The full Shapeable v3 pack: identity, tokens, patterns, voice, rules.</p><pre><code>https://waterfall.sh/design/system.json</code></pre></div>
+      <div><h3>tokens.json</h3><p>W3C Design Tokens: colour, type, space, radius, shadow, motion.</p><pre><code>https://waterfall.sh/design/tokens.json</code></pre></div>
+      <div><h3>tokens.css</h3><p>Drop-in CSS variables, including <code>var(--ribbon)</code>.</p><pre><code>https://waterfall.sh/design/tokens.css</code></pre></div>
+    </div>
+    <div class="r-links r-links-one">
+      <a class="r-link" href="/design/CLAUDE_DESIGN_SYSTEM.md"><h3>CLAUDE_DESIGN_SYSTEM.md</h3><p>The implementation guide for coding agents. Hand it to Claude, Codex, or any agent before it builds UI.</p><b>Open the guide →</b></a>
+    </div>
+  </section>
+</main>
 
   <footer class="r-footer">
     <span>waterfall.sh · independent software project</span>

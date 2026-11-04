@@ -15,7 +15,7 @@ body.ribbon h2 { font-weight: 400; letter-spacing: -.025em; }
 body.ribbon .eyebrow, body.ribbon .section-kicker { color: var(--blue); }
 
 /* Ribbon header on inner pages: no hero ribbon, just a soft wash. */
-body.ribbon .r-page-wash { position: absolute; inset: 0 0 auto 0; height: 420px; z-index: 0; pointer-events: none;
+body.ribbon .r-page-wash { position: absolute; inset: 0 0 auto 0; height: 360px; z-index: 0; pointer-events: none;
   background: radial-gradient(700px 300px at 85% -10%, #5ec6ff33, transparent 70%), radial-gradient(500px 260px at 100% 10%, #6b5cff22, transparent 70%); }
 
 /* Buttons that used dark text on the old cyan accent. */

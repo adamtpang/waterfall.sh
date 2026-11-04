@@ -1,9 +1,17 @@
 # waterfall.sh design system
 
+> **Current (2026-11-04):** the website uses the light **Ribbon** system and the
+> **Drop** mark. The source of truth for the site is `/design` (human) and
+> `/design/system.json` (machine), generated from the owner-approved Shapeable
+> pack. The Drop: one disc sliced once, the right half dropped; files in
+> `brand/waterfall-mark*.svg`, `brand/favicon.svg`, `favicon.ico`. The dark
+> deep-water notes below now describe only the desktop app (`desktop/`), whose
+> `.exe` icon (`brand/logo.*`) still uses the older W until it is updated.
+
 Not a full Figma kit. The **source of truth** is this file + `brand/logo.svg`.
 Tokens first appeared inline in `index.html` (deep-water chalkboard, vercel.school-adjacent).
 
-## Brand mark
+## Brand mark (desktop app, historical for the website)
 
 | Element | Meaning |
 |---------|---------|
