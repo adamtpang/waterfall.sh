@@ -18,6 +18,10 @@ logger = logging.getLogger(__name__)
 
 _DEFAULT_KEYWORDS = Path(__file__).parent / "data" / "keywords.json"
 
+# Joiners that put two tasks in one sentence: ", then", "; then", "and then", ";".
+# Shared with the splitter so classify and split agree on what a clause is.
+CLAUSE_JOINER_RE = re.compile(r"\s*(?:[,;]\s*(?:and\s+)?then\s+|(?<![A-Za-z])and\s+then\s+|;\s+)")
+
 
 class PromptClassifier:
     """Classify prompts by complexity and route to free models or Claude."""
@@ -88,6 +92,16 @@ class PromptClassifier:
                     est_free = max(0.3, est_free - 0.3)
                     all_types = list(dict.fromkeys(all_types + ct))
                     break
+
+        # A hard prompt can still carry a plainly routine clause ("write X, then
+        # explain Y"). If some clauses are routine and some are not, it is a split.
+        if routing == "claude":
+            clauses = [c.strip() for c in CLAUSE_JOINER_RE.split(prompt) if c.strip()]
+            if len(clauses) >= 2:
+                easy = [c for c in clauses if self.classify(c).routing == "free"]
+                if easy and len(easy) < len(clauses):
+                    routing = "split"
+                    est_free = max(0.1, min(0.9, sum(len(c) for c in easy) / max(1, len(prompt))))
 
         # Metadata extraction: URLs, error patterns, code languages
         meta = self._extract_metadata(prompt)

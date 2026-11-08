@@ -35,6 +35,24 @@ def estimate_cost_saved(tokens_saved: int, openrouter_cost_usd: float) -> float:
     return round(max(0.0, claude_equivalent - openrouter_cost_usd), 6)
 
 
+def estimate_route_savings(free_prompt: str, free_response: str, openrouter_cost_usd: float) -> dict:
+    """What the routed part would have cost on Claude, both the prompt Claude
+    no longer reads and the answer it no longer writes, against what the cheap
+    model actually cost. Token counts use the ~4 chars/token rule, so this is
+    a display estimate at Sonnet list prices, not a bill."""
+    in_tokens = max(1, len(free_prompt) // 4) if free_prompt else 0
+    out_tokens = max(1, len(free_response) // 4) if free_response else 0
+    claude_usd = in_tokens * CLAUDE_INPUT_PRICE_PER_TOKEN + out_tokens * CLAUDE_OUTPUT_PRICE_PER_TOKEN
+    saved = max(0.0, claude_usd - (openrouter_cost_usd or 0.0))
+    return {
+        "claude_equivalent_usd": round(claude_usd, 6),
+        "actual_usd": round(openrouter_cost_usd or 0.0, 6),
+        "saved_usd": round(saved, 6),
+        "saved_per_1000_usd": round(saved * 1000, 2),
+        "tokens_off_claude": in_tokens + out_tokens,
+    }
+
+
 class SavingsTracker:
     """Read/write the append-only JSONL savings ledger."""
 
