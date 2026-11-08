@@ -9,6 +9,7 @@ The public site is product documentation and a download surface. It exposes read
 ## Key pages
 
 - Home and product status: https://waterfall.sh/
+- Live routing demo (Jev + OpenRouter, shows cost savings): https://waterfall.sh/demo
 - Free developer workshop: https://waterfall.sh/workshop/
 - Bang-for-buck coding model leaderboard: https://waterfall.sh/leaderboard
 - Machine-readable leaderboard: https://waterfall.sh/api/leaderboard.json

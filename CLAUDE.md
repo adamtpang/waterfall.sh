@@ -814,6 +814,29 @@ which is what actually drives the 65–96% reused-input share.
   prompt as split when one of its clauses is plainly routine on its own
   (`CLAUSE_JOINER_RE`, shared with the splitter). Suite green at 382.
 
+- **Public live demo, /demo, BUILT 2026-11-07, NOT DEPLOYED** (Adam asked for a
+  browser demo on prod for the Nov 10 AI Tinkerers Austin talk). `demo.html` +
+  `demo.js` + `demo.css` (external script and style, the CSP blocks inline) and
+  `api/demo-route.js` (CommonJS like the other functions). It is a JavaScript
+  port of the idea, not the Python router, because `.vercelignore` keeps Python
+  out of the deploy on purpose: split into clauses (same joiners as
+  `CLAUSE_JOINER_RE`), ask Jev per clause (same needs-context rule; unsure stays
+  with Claude), send only cheap clauses through a 3-model cascade (glm-5.3-flash,
+  deepseek-v4-flash, gemini-3.8-flash; low reasoning, 500 answer tokens), and
+  report savings with the same formula as `tracker.estimate_route_savings`.
+  Limits: 600 chars, 4 clauses, 5/min and 30/day per IP, 400/day per serverless
+  instance (in memory, so not global: the hard ceiling is the key's credit
+  limit). Key: `WATERFALL_DEMO_OPENROUTER_KEY`; without it the endpoint answers
+  503 and spends nothing. Privacy page, sitemap and llms.txt updated. Tested: 8
+  node tests (`router/tests/demo-route.test.mjs`, fetch faked) and a live run
+  through a local stand-in server (Vercel CLI not installed): mixed prompt split
+  correctly, glm-5.3-flash answered in 1.48s, saved $0.000188; security-review
+  prompt went all to Claude (Jev 97%); fits 375px.
+  **Before it goes live (Adam only):** (1) create a separate OpenRouter key with
+  a hard credit limit (e.g. $5); (2) add it in Vercel as
+  `WATERFALL_DEMO_OPENROUTER_KEY` for Production; (3) say go, then push (a push
+  to main deploys prod).
+
 ## Not done yet
 
 - **A/B/C/D quota-safety plan shipped, 2026-08-18**, in response to Adam
