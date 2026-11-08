@@ -42,6 +42,11 @@
     </section>
 
     <section class="prose-section">
+      <h2>Live demo</h2>
+      <p>The <a href="/demo">live demo</a> sends the prompt you type to OpenRouter, which passes it to Jev (a judgment model from TypeSafe) and to one or more low-cost models to answer. Those providers process the prompt under their own terms. waterfall.sh does not store demo prompts or answers. The demo keeps a short-lived, in-memory count per IP address to limit how often it can be used, and discards it within a day. Do not paste secrets, credentials, or private code into the demo.</p>
+    </section>
+
+    <section class="prose-section">
       <h2>Page analytics</h2>
       <p>PostHog processes public pageviews in its US region, including the page path and basic browser and device information. Tracking is configured without analytics cookies or person profiles. It does not record sessions, form inputs, query strings, URL fragments, or referrer paths. Network requests necessarily expose an IP address to the receiving service. See <a href="https://posthog.com/privacy">PostHog’s privacy notice</a>.</p>
     </section>

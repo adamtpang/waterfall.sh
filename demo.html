@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live demo - waterfall.sh</title>
+<meta name="description" content="Try waterfall.sh live: paste a coding prompt, see which part a cheap model handles, which part Claude still gets, and what the routed part saved.">
+<meta name="theme-color" content="#ffffff">
+<link rel="canonical" href="https://waterfall.sh/demo">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/brand/favicon.svg?v=drop" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="/site.css">
+<link rel="preload" href="/fonts/inter-tight-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/ribbon.css">
+<link rel="stylesheet" href="/ribbon-pages.css">
+<link rel="stylesheet" href="/demo.css">
+<script src="/site-analytics.js" defer></script>
+<script src="/demo.js" defer></script>
+</head>
+<body class="ribbon">
+<div class="r-page-wash" aria-hidden="true"></div>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="wrap">
+  <header class="r-head">
+    <nav class="r-nav" aria-label="Primary navigation">
+      <a class="r-logo" href="/" aria-label="waterfall.sh home"><img src="/brand/waterfall-mark.svg" width="28" height="28" alt="">waterfall</a>
+      <a href="/#cascade">Cascade</a>
+      <a href="/demo" aria-current="page">Demo</a>
+      <a href="/leaderboard">Leaderboard</a>
+      <a href="/workshop/">Workshop</a>
+      <span class="r-sp"></span>
+      <a href="/about">Docs</a>
+      <a class="r-pill light" href="https://buy.stripe.com/4gM14n0wy7cFbIAecVaMU1J">Buy · $30</a>
+    </nav>
+  </header>
+  <main class="page-main" id="main-content">
+    <div class="eyebrow">live demo</div>
+    <h1>Only the hard part goes to Claude.</h1>
+    <p class="page-intro">Paste a coding prompt. Jev decides which parts are routine, a cheap model answers those, and you see what Claude would have charged for them.</p>
+
+    <form class="demo-form" id="demo-form">
+      <label class="demo-label" for="demo-prompt">Your prompt</label>
+      <textarea id="demo-prompt" class="demo-input" maxlength="600" rows="4" spellcheck="false" required>Write a Python function that reverses a string, then explain the tradeoffs of a lock-free queue design for our distributed scheduler</textarea>
+      <div class="demo-row">
+        <button class="r-pill dark" type="submit" id="demo-run">Route it</button>
+        <span class="demo-count" id="demo-count">0 / 600</span>
+      </div>
+      <div class="demo-examples" aria-label="Example prompts">
+        <span>Try:</span>
+        <button type="button" class="demo-chip" data-prompt="Write a JavaScript function that checks if a number is prime, then explain the tradeoffs of sharding our Postgres database for multi-tenant scalability">prime + sharding</button>
+        <button type="button" class="demo-chip" data-prompt="Convert this to snake_case: getUserAccountBalance">one-liner</button>
+        <button type="button" class="demo-chip" data-prompt="Review this PR for security issues in how we handle OAuth tokens and session cookies.">security review</button>
+      </div>
+    </form>
+
+    <p class="demo-status" id="demo-status" role="status" aria-live="polite"></p>
+
+    <section class="demo-result" id="demo-result" hidden>
+      <div class="demo-savings" id="demo-savings"></div>
+      <div class="demo-sides">
+        <div class="demo-side">
+          <h2>Cheap model handles</h2>
+          <p class="demo-ask" id="demo-free-ask"></p>
+          <pre class="demo-answer" id="demo-free-answer" hidden></pre>
+          <p class="demo-meta" id="demo-model"></p>
+        </div>
+        <div class="demo-side">
+          <h2>Claude still gets</h2>
+          <p class="demo-ask" id="demo-claude-ask"></p>
+        </div>
+      </div>
+      <ol class="demo-parts" id="demo-parts" aria-label="How each part was routed"></ol>
+    </section>
+
+    <section class="prose-section">
+      <h2>How this demo works</h2>
+      <p>Your prompt is split into clauses. Jev, a fast judgment model from TypeSafe on OpenRouter, rates each clause as routine or hard. Routine clauses go to a short cascade of cheap models; if one fails or is rate-limited, the next one answers. Hard clauses would go to Claude, so nothing is sent for them here.</p>
+      <p>Savings are an estimate at Claude Sonnet list prices ($3 input and $15 output per million tokens) for the prompt Claude no longer reads and the answer it no longer writes, minus what Jev and the cheap model actually cost. Per prompt it is small; it adds up across thousands of prompts.</p>
+      <p>Limits keep this page cheap to run: 600 characters per prompt, a few tries per minute, and short answers. Prompts are sent to OpenRouter to be answered and are not stored by waterfall.sh. Don't paste secrets or private code.</p>
+    </section>
+  </main>
+  <footer class="r-footer">
+    <span>waterfall.sh · independent software project</span>
+    <nav aria-label="Footer navigation"><a href="/demo">Demo</a><a href="/workshop/">Workshop</a><a href="/leaderboard">Leaderboard</a><a href="/design">Design</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="https://github.com/adamtpang/waterfall.sh">Source</a></nav>
+  </footer>
+</div>
+</body>
+</html>
