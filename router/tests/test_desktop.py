@@ -80,6 +80,42 @@ class ClassifyApiTests(unittest.TestCase):
         self.assertTrue(out.get("dry_run"))
         self.assertFalse(out.get("routed"))
 
+    def _live(self, prompt, jev_verdict):
+        """Live route with Jev and the OpenRouter client mocked: no network."""
+        from unittest import mock
+        import jev
+        from openrouter_api_client import GenerateResult
+        gen = GenerateResult(text="def f(): pass", model="cheap/m", input_tokens=20,
+                             output_tokens=10, cost_usd=0.0, elapsed_sec=0.1)
+        with mock.patch.dict("os.environ", {"WATERFALL_JEV": "1"}), \
+             mock.patch.object(jev, "ask", return_value=jev_verdict), \
+             mock.patch.object(jev, "ask_tier", return_value=None), \
+             mock.patch("smart_router.CACHE_AVAILABLE", False), \
+             mock.patch("openrouter_api_client.OpenRouterClient") as client:
+            client.return_value.generate_with_usage.return_value = gen
+            return desktop_server.api_route(prompt, dry_run=False, log=False), client
+
+    def test_live_route_asks_jev_even_when_local_routes_all_to_claude(self):
+        import jev
+        prompt = "Refactor our auth middleware across 6 files to fix an intermittent race condition in session refresh."
+        self.assertEqual(desktop_server.api_classify(prompt)["routing"], "claude")
+        out, client = self._live(prompt, jev.JevVerdict("claude", 0.9, 0.9))
+        self.assertEqual(out["routing"], "claude")
+        self.assertEqual(out["jev"]["routing"], "claude")
+        self.assertFalse(out["routed"])
+        self.assertIsNone(out["savings"])
+        client.return_value.generate_with_usage.assert_not_called()
+
+    def test_live_route_reports_jevs_final_decision_and_savings(self):
+        import jev
+        prompt = "Write a Python function that reverses a string."
+        out, client = self._live(prompt, jev.JevVerdict("free", 0.99, 0.02))
+        self.assertEqual(out["routing"], "free")
+        self.assertTrue(out["routed"])
+        self.assertEqual(out["free_response"], "def f(): pass")
+        self.assertGreater(out["savings"]["claude_equivalent_usd"], 0)
+        client.return_value.generate_with_usage.assert_called_once()
+
 
 class HttpServerTests(unittest.TestCase):
     @classmethod
