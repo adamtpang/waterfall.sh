@@ -655,7 +655,10 @@ function renderResultBar(d) {
   bits.push(badge(r === "free" ? "success" : r === "claude" ? "destructive" : "warning", "routing: " + r));
   if (d.complexity != null) bits.push(badge("outline", "complexity " + d.complexity));
   if (d.model_used) bits.push(badge("primary", d.model_used));
-  if (d.model_tier) bits.push(badge("outline", "tier " + d.model_tier));
+  if (d.local_routing && d.local_routing !== r) bits.push(badge("outline", "local said " + d.local_routing));
+  if (d.jev && d.jev.routing) bits.push(badge(d.jev.changed ? "primary" : "outline",
+    "jev: " + d.jev.routing + " " + Math.round((d.jev.confidence || 0) * 100) + "%" + (d.jev.changed ? ", changed it" : "")));
+  if (d.model_tier) bits.push(badge("outline", "tier " + d.model_tier + (d.tier_source ? " (" + d.tier_source + ")" : "")));
   if (d.cache_hit) bits.push(badge("success", "cache hit"));
   if (d.routed && d.cost_usd != null) {
     bits.push(badge(Number(d.cost_usd) === 0 ? "success" : "secondary", "$" + d.cost_usd));

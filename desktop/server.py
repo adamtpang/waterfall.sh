@@ -346,10 +346,13 @@ def api_route(prompt: str, dry_run: bool = True, log: bool = True) -> dict[str, 
     from classifier.types import SavingsEvent
 
     base = api_classify(prompt)
-    if dry_run or not base.get("free_prompt"):
+    if dry_run:
         base["dry_run"] = True
         base["routed"] = False
         return base
+    # Live: always go through route_with_api, even when the local classifier
+    # found nothing to route, so Jev's second opinion can still move work off
+    # Claude. The local fields above are then replaced with the final decision.
 
     if not API_ROUTER_AVAILABLE:
         base["dry_run"] = False
@@ -359,8 +362,19 @@ def api_route(prompt: str, dry_run: bool = True, log: bool = True) -> dict[str, 
 
     router = SmartRouter()
     result = router.route_with_api(prompt)
+    final_cls, final_split = result.classification, result.split
+    base["local_routing"] = base["routing"]
+    base.update({
+        "routing": final_cls.routing,
+        "complexity": final_cls.complexity_score,
+        "reasoning": final_cls.reasoning,
+        "free_prompt": final_split.free_prompt or "",
+        "claude_prompt": final_split.claude_prompt or "",
+        "savings_pct": final_split.savings_pct,
+    })
+    base["jev"] = getattr(result, "jev", None)
     base["dry_run"] = False
-    base["routed"] = True
+    base["routed"] = bool(final_split.free_prompt)
     base["cache_hit"] = bool(getattr(result, "cache_hit", False))
     base["queue"] = list(getattr(result, "queue", []) or [])
     base["attempts"] = list(getattr(result, "attempts", []) or [])
@@ -373,9 +387,9 @@ def api_route(prompt: str, dry_run: bool = True, log: bool = True) -> dict[str, 
     base["elapsed_sec"] = float(getattr(result, "elapsed_sec", 0.0) or 0.0)
     base["free_response"] = getattr(result, "free_response", "") or ""
     base["final_claude_prompt"] = getattr(result, "final_claude_prompt", "") or ""
-    base["savings"] = estimate_route_savings(base.get("free_prompt", ""), base["free_response"], base["cost_usd"])
+    base["savings"] = estimate_route_savings(base["free_prompt"], base["free_response"], base["cost_usd"]) if base["routed"] else None
 
-    if log:
+    if log and base["routed"]:
         split = result.split
         cls = result.classification
         tokens_saved = split.free_token_estimate
