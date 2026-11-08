@@ -296,7 +296,8 @@ def cmd_route(args: argparse.Namespace) -> int:
     split = router.split(prompt, cls)
 
     import openrouter_api_client as orc
-    inferred_tier = args.tier or orc.tier_for_complexity(cls.complexity_score)
+    tier_basis = router.classify(split.free_prompt).complexity_score if split.free_prompt and split.free_prompt != prompt else cls.complexity_score
+    inferred_tier = args.tier or orc.tier_for_complexity(tier_basis)
     print(f"routing:  {cls.routing}  (complexity {cls.complexity_score}, "
           f"~{split.savings_pct:.0%} estimated off Claude's plate)")
     print(f"model tier: {inferred_tier}" + ("" if args.model or split.free_prompt else " (unused -- nothing routed off Claude)"))
@@ -306,7 +307,8 @@ def cmd_route(args: argparse.Namespace) -> int:
             print("\n--- would send to free/cheap model ---")
             print(split.free_prompt)
         print("\n--- stays with Claude ---")
-        print(split.claude_prompt or prompt)
+        # Nothing left for Claude is shown as such, never as the whole prompt again.
+        print(split.claude_prompt or ("(nothing, the cheap model handles all of it)" if split.free_prompt else prompt))
         return 0
 
     if not API_ROUTER_AVAILABLE:
@@ -316,7 +318,8 @@ def cmd_route(args: argparse.Namespace) -> int:
             file=sys.stderr,
         )
         print("\n--- stays with Claude ---")
-        print(split.claude_prompt or prompt)
+        # Nothing left for Claude is shown as such, never as the whole prompt again.
+        print(split.claude_prompt or ("(nothing, the cheap model handles all of it)" if split.free_prompt else prompt))
         return 1
 
     result = router.route_with_api(prompt, system=args.system, model=args.model, tier=args.tier)

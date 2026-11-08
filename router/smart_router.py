@@ -195,7 +195,9 @@ class SmartRouter:
 
         client = _openrouter_api_client.OpenRouterClient()
 
-        resolved_tier = tier or _openrouter_api_client.tier_for_complexity(cls.complexity_score)
+        # The cheap model only sees split.free_prompt, so size the tier to that text.
+        tier_basis = self.classify(split.free_prompt).complexity_score if split.free_prompt and split.free_prompt != prompt else cls.complexity_score
+        resolved_tier = tier or _openrouter_api_client.tier_for_complexity(tier_basis)
         tier_source = "pinned" if (tier or model) else "local"
 
         free_response = ""
@@ -222,6 +224,9 @@ class SmartRouter:
                     split.free_prompt,
                     model=model,
                     tier=None if model else resolved_tier,
+                    # Small tasks don't need a long think; keeps a one-line answer from
+                    # spending ~900 reasoning tokens. Larger tiers keep the model's default.
+                    output_effort="low" if resolved_tier == "small" and not model else None,
                     system=system or (
                         "You are handling the routine/easy part of a coding task. "
                         "Be direct and concise -- your output will be handed to "

@@ -37,7 +37,10 @@ class TaskSplitter:
         claude_prompt = self._build_claude_prompt(subtasks, prompt)
 
         free_tokens = _estimate_tokens(free_prompt)
-        claude_tokens = _estimate_tokens(claude_prompt)
+        # Count only the task text left for Claude, not the results-slot header,
+        # or a real split reads as ~0% saved.
+        claude_text = "\n\n".join(st.text for st in subtasks if st.routing == "claude")
+        claude_tokens = _estimate_tokens(claude_text) if claude_text else 0
         original_tokens = _estimate_tokens(prompt)
         savings = max(0.0, 1.0 - (claude_tokens / max(1, original_tokens)))
 
@@ -94,7 +97,11 @@ class TaskSplitter:
         expanded: list[str] = []
         for chunk in raw:
             parts = re.split(r"\n(?=[-*\d]\.?\s|\n)", chunk)
-            expanded.extend(p.strip() for p in parts if p.strip())
+            for part in parts:
+                # One sentence can still hold two tasks ("do X, then explain Y"),
+                # so also split on clause joiners: ", then", "; then", "and then", ";".
+                clauses = re.split(r"\s*(?:[,;]\s*(?:and\s+)?then\s+|\band\s+then\s+|;\s+)", part)
+                expanded.extend(c.strip() for c in clauses if c.strip())
 
         # Restore code blocks
         result: list[str] = []

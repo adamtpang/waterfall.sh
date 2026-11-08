@@ -1,5 +1,9 @@
 {
     "free_signals": {
+        "small_function": {
+            "keywords": ["reverses a string", "reverse a string", "one-line", "one liner", "one-liner", "helper function", "utility function", "write a function that", "write a python function", "fizzbuzz", "palindrome"],
+            "weight": 0.9
+        },
         "boilerplate": {
             "keywords": ["scaffold", "starter template", "boilerplate", "skeleton", "create a basic", "hello world", "simple example", "minimal app", "starter project", "setup project"],
             "weight": 1.0
@@ -42,6 +46,10 @@
         }
     },
     "claude_signals": {
+        "design_tradeoffs": {
+            "keywords": ["tradeoff", "trade-off", "trade off", "lock-free", "lock free", "wait-free", "distributed", "consensus", "scalability", "system design", "consistency model", "scheduler"],
+            "weight": 1.1
+        },
         "architecture": {
             "keywords": ["architecture", "design pattern", "module structure", "dependency injection", "service layer", "repository pattern", "event-driven", "microservice", "plugin system", "abstraction layer"],
             "weight": 1.0

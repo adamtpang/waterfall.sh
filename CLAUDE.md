@@ -790,6 +790,21 @@ which is what actually drives the 65–96% reused-input share.
   (e.g. 1.02); take the level from `probabilities`, never `int(score)`.
   Suite green at 368.
 
+- **Split fix, 2026-11-07** (bug report from the themain.quest session, before the
+  Nov 10 AI Tinkerers Austin demo). `route` labelled a one-sentence "do X, then
+  explain Y" prompt "split" but showed the whole prompt on both sides: the
+  splitter only split on sentence ends, so the one clause went to the cheap
+  model, and the CLI then printed the full prompt under "stays with Claude"
+  because the Claude side was empty. Fixed: the splitter also splits on
+  clause joiners (", then", "; then", "and then", ";"); new keyword groups
+  `small_function` (free) and `design_tradeoffs` (claude); the CLI says
+  "(nothing, the cheap model handles all of it)" instead of repeating the
+  prompt; savings count only the task text left for Claude, not the results
+  header; the tier is sized to the text the cheap model actually gets; small
+  routes ask for low reasoning effort (one-line answer went 925 -> 20 output
+  tokens live). `router/tests/test_splitter.py` (9 tests; 6 fail on the old
+  code). Suite green at 377.
+
 ## Not done yet
 
 - **A/B/C/D quota-safety plan shipped, 2026-08-18**, in response to Adam
