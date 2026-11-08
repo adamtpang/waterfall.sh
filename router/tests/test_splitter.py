@@ -50,6 +50,24 @@ class MixedPromptSplitTests(unittest.TestCase):
             parts = TaskSplitter._split_sentences(f"{EASY}{joiner}{HARD}")
             self.assertEqual(parts, [EASY, HARD], joiner)
 
+    def test_hard_prompt_with_a_routine_clause_still_splits(self):
+        # No cheap-work keyword in the first clause: it used to route all of it to Claude.
+        prompt = ("Write a JavaScript function that checks if a number is prime, then explain the "
+                  "tradeoffs of sharding our Postgres database for distributed multi-tenant scalability")
+        cls = self.classifier.classify(prompt)
+        self.assertEqual(cls.routing, "split")
+        result = self.splitter.split(prompt, cls)
+        self.assertIn("prime", result.free_prompt)
+        self.assertNotIn("sharding", result.free_prompt)
+        self.assertIn("sharding", result.claude_prompt)
+
+    def test_hard_prompt_without_a_routine_clause_stays_claude(self):
+        prompt = "Refactor our auth middleware across 6 files to fix an intermittent race condition in session refresh."
+        self.assertEqual(self.classifier.classify(prompt).routing, "claude")
+
+    def test_and_inside_a_word_is_not_a_joiner(self):
+        self.assertEqual(TaskSplitter._split_sentences("Rebrand then ship"), ["Rebrand then ship"])
+
     def test_code_blocks_are_not_split_on_joiners(self):
         prompt = "Fix this:\n```\na = 1; then_b = 2\n```"
         joined = " ".join(TaskSplitter._split_sentences(prompt))
@@ -103,3 +121,19 @@ class RouteWithApiTierTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RouteSavingsTests(unittest.TestCase):
+    def test_savings_count_the_prompt_read_and_the_answer_written(self):
+        from tracker import estimate_route_savings
+        s = estimate_route_savings("a" * 400, "b" * 400, 0.0)
+        # 100 tokens in at $3/M + 100 tokens out at $15/M
+        self.assertAlmostEqual(s["claude_equivalent_usd"], 0.0018)
+        self.assertAlmostEqual(s["saved_usd"], 0.0018)
+        self.assertEqual(s["saved_per_1000_usd"], 1.8)
+        self.assertEqual(s["tokens_off_claude"], 200)
+
+    def test_savings_subtract_what_the_cheap_model_cost_and_never_go_negative(self):
+        from tracker import estimate_route_savings
+        self.assertAlmostEqual(estimate_route_savings("a" * 400, "b" * 400, 0.0008)["saved_usd"], 0.001)
+        self.assertEqual(estimate_route_savings("a" * 4, "", 5.0)["saved_usd"], 0.0)

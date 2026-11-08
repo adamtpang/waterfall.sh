@@ -342,7 +342,7 @@ def api_classify(prompt: str) -> dict[str, Any]:
 
 def api_route(prompt: str, dry_run: bool = True, log: bool = True) -> dict[str, Any]:
     from smart_router import SmartRouter, API_ROUTER_AVAILABLE
-    from tracker import SavingsTracker, estimate_cost_saved
+    from tracker import SavingsTracker, estimate_cost_saved, estimate_route_savings
     from classifier.types import SavingsEvent
 
     base = api_classify(prompt)
@@ -373,6 +373,7 @@ def api_route(prompt: str, dry_run: bool = True, log: bool = True) -> dict[str, 
     base["elapsed_sec"] = float(getattr(result, "elapsed_sec", 0.0) or 0.0)
     base["free_response"] = getattr(result, "free_response", "") or ""
     base["final_claude_prompt"] = getattr(result, "final_claude_prompt", "") or ""
+    base["savings"] = estimate_route_savings(base.get("free_prompt", ""), base["free_response"], base["cost_usd"])
 
     if log:
         split = result.split
@@ -384,7 +385,7 @@ def api_route(prompt: str, dry_run: bool = True, log: bool = True) -> dict[str, 
             free_tokens_sent=split.free_token_estimate,
             claude_tokens_needed=split.claude_token_estimate,
             tokens_saved=tokens_saved,
-            cost_saved_usd=estimate_cost_saved(tokens_saved, result.cost_usd),
+            cost_saved_usd=base["savings"]["saved_usd"],
             backend_used="cache" if result.cache_hit else "openrouter",
             model_used=result.model_used,
             routing_decision=cls.routing,

@@ -199,6 +199,23 @@ kbd{
   white-space:pre-wrap;word-break:break-word;max-height:400px;overflow:auto;
 }
 .out.placeholder{color:var(--muted-foreground)}
+.savings{display:none;margin:14px 0 4px;padding:16px 18px;border:1px solid color-mix(in oklch,var(--success) 32%,transparent);
+  background:color-mix(in oklch,var(--success) 9%,transparent);border-radius:var(--radius-lg,12px)}
+.savings.show{display:block}
+.savings .big{font-size:22px;font-weight:650;letter-spacing:-0.01em}
+.savings .big b{color:var(--success)}
+.savings .sub{font-size:13px;color:var(--muted-foreground);margin-top:4px;line-height:1.5}
+.sides{display:none;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.sides.show{display:grid}
+@media (max-width:720px){.sides.show{grid-template-columns:1fr}}
+.side{border:1px solid var(--border);border-radius:var(--radius-lg,12px);padding:12px 14px;min-width:0}
+.side h4{margin:0 0 8px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted-foreground)}
+.side .ask{font-size:14px;line-height:1.5;margin:0 0 8px}
+.side pre{margin:0;white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:12px;
+  background:var(--muted);border-radius:8px;padding:8px 10px;max-height:220px;overflow:auto}
+.side.none .ask{color:var(--muted-foreground)}
+.raw{margin-top:10px}
+.raw summary{cursor:pointer;font-size:12px;color:var(--muted-foreground);margin-bottom:6px}
 .out::-webkit-scrollbar{width:10px;height:10px}
 .out::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px;border:3px solid var(--muted)}
 
@@ -376,8 +393,11 @@ code{font-family:var(--mono);font-size:0.92em;background:var(--muted);padding:1p
               <span class="hint"><kbd>Ctrl</kbd><kbd>Enter</kbd> to route</span>
             </div>
             <div class="result-bar" id="result-bar"></div>
+            <div class="savings" id="savings"></div>
+            <div class="sides" id="sides"></div>
             <div class="queue" id="queue"></div>
-            <pre class="out placeholder" id="cascade-out">Results show here.</pre>
+            <details class="raw" id="raw"><summary>Raw response</summary>
+            <pre class="out placeholder" id="cascade-out">Results show here.</pre></details>
           </div>
         </div>
       </section>
@@ -584,6 +604,49 @@ function renderQueue(d) {
     }).join("");
 }
 
+function usd(n) {
+  if (n == null) return "$0";
+  if (n === 0) return "$0";
+  if (n < 0.01) return "$" + Number(n).toFixed(6).replace(/0+$/, "");
+  return "$" + Number(n).toFixed(2);
+}
+
+function claudeAsk(d) {
+  const text = d.claude_prompt || "";
+  const marker = "Please handle the remaining work:";
+  return text.includes(marker) ? text.split(marker)[1].trim() : text.trim();
+}
+
+function renderSavings(d) {
+  const box = $("savings"), sides = $("sides");
+  box.className = "savings"; box.innerHTML = ""; sides.className = "sides"; sides.innerHTML = "";
+  if (!d || d.routing == null) return;
+  const cheapAsk = d.free_prompt || "";
+  const hard = claudeAsk(d);
+  sides.className = "sides show";
+  sides.innerHTML =
+    '<div class="side' + (cheapAsk ? "" : " none") + '"><h4>Cheap model handles</h4>' +
+      '<p class="ask">' + esc(cheapAsk || "Nothing. This one needs Claude.") + '</p>' +
+      (d.free_response ? '<pre>' + esc(d.free_response) + '</pre>' : "") + '</div>' +
+    '<div class="side' + (hard ? "" : " none") + '"><h4>Claude still gets</h4>' +
+      '<p class="ask">' + esc(hard || "Nothing. The cheap model handled all of it.") + '</p></div>';
+  const s = d.savings;
+  if (!s) {
+    if (d.dry_run && cheapAsk) {
+      box.className = "savings show";
+      box.innerHTML = '<div class="big">~' + Math.round((d.savings_pct || 0) * 100) + '% of this task moves off Claude</div>' +
+        '<div class="sub">Dry run, no model called. Press Route live to see the real cost and savings.</div>';
+    }
+    return;
+  }
+  box.className = "savings show";
+  box.innerHTML =
+    '<div class="big">On Claude: ' + usd(s.claude_equivalent_usd) + ' &nbsp;·&nbsp; Here: ' + usd(s.actual_usd) +
+      ' &nbsp;·&nbsp; <b>Saved ' + usd(s.saved_usd) + '</b></div>' +
+    '<div class="sub">~' + s.tokens_off_claude + ' tokens Claude never read or wrote. That is <b>' + usd(s.saved_per_1000_usd) +
+      '</b> per 1,000 prompts like this. Estimate at Claude Sonnet list prices ($3 / $15 per million tokens).</div>';
+}
+
 function renderResultBar(d) {
   const bar = $("result-bar");
   if (!d || d.routing == null) { bar.innerHTML = ""; return; }
@@ -629,10 +692,12 @@ async function runCascade(mode) {
       body: JSON.stringify(body),
     });
     renderResultBar(data);
+    renderSavings(data);
     renderQueue(data);
     out.textContent = JSON.stringify(data, null, 2);
   } catch (err) {
     $("result-bar").innerHTML = badge("destructive", "failed");
+    renderSavings(null);
     $("queue").className = "queue";
     out.textContent = "Error: " + (err.message || err);
   } finally {

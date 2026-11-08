@@ -804,6 +804,15 @@ which is what actually drives the 65–96% reused-input share.
   routes ask for low reasoning effort (one-line answer went 925 -> 20 output
   tokens live). `router/tests/test_splitter.py` (9 tests; 6 fail on the old
   code). Suite green at 377.
+  Same day, for the live demo: the browser app (`waterfall desktop`,
+  http://127.0.0.1:8765, Cascade tab) shows a savings line per live route
+  ("On Claude $X . Here $Y . Saved $Z", plus per 1,000 prompts like this, at
+  Sonnet list prices) and the cheap side vs Claude side next to each other;
+  raw JSON is collapsed. `tracker.estimate_route_savings()` counts both the
+  prompt Claude no longer reads and the answer it no longer writes (the old
+  ledger figure counted only the prompt). The classifier now marks a "claude"
+  prompt as split when one of its clauses is plainly routine on its own
+  (`CLAUSE_JOINER_RE`, shared with the splitter). Suite green at 382.
 
 ## Not done yet
 

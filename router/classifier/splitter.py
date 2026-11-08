@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from .types import RoutingResult, SubTask, TaskClassification
-from .classifier import PromptClassifier
+from .classifier import CLAUSE_JOINER_RE, PromptClassifier
 
 
 def _estimate_tokens(text: str) -> int:
@@ -100,7 +100,7 @@ class TaskSplitter:
             for part in parts:
                 # One sentence can still hold two tasks ("do X, then explain Y"),
                 # so also split on clause joiners: ", then", "; then", "and then", ";".
-                clauses = re.split(r"\s*(?:[,;]\s*(?:and\s+)?then\s+|\band\s+then\s+|;\s+)", part)
+                clauses = CLAUSE_JOINER_RE.split(part)
                 expanded.extend(c.strip() for c in clauses if c.strip())
 
         # Restore code blocks
